@@ -1,2 +1,2 @@
-# JoySDK for iOS
-This library allows you to integrate JoySDK into your iOS app.
+# JoyPlay for iOS
+This library allows you to integrate JoyPlay into your iOS app.
