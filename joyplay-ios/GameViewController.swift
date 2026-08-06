@@ -1,0 +1,68 @@
+import UIKit
+
+final class GameViewController: UIViewController {
+    private let displayMode: GameDisplayMode
+    private let appKey: String
+    private let token: String
+    private lazy var gameWebView = GameWebView(
+        displayMode: displayMode,
+        appKey: appKey,
+        token: token,
+        onClose: { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
+        }
+    )
+
+    init(displayMode: GameDisplayMode, appKey: String, token: String) {
+        self.displayMode = displayMode
+        self.appKey = appKey
+        self.token = token
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        title = displayMode.title
+        view.backgroundColor = .systemBackground
+        configureGameView()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(displayMode.hidesNavigationBar, animated: animated)
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+
+    private func configureGameView() {
+        gameWebView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(gameWebView)
+
+        let gameViewHeightConstraint: NSLayoutConstraint
+        if let ratio = displayMode.heightToWidthRatio {
+            gameViewHeightConstraint = gameWebView.heightAnchor.constraint(
+                equalTo: gameWebView.widthAnchor,
+                multiplier: ratio
+            )
+        } else {
+            gameViewHeightConstraint = gameWebView.heightAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.heightAnchor
+            )
+        }
+
+        NSLayoutConstraint.activate([
+            gameWebView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            gameWebView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            gameWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            gameViewHeightConstraint
+        ])
+    }
+}
