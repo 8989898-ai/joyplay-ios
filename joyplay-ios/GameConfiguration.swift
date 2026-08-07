@@ -72,6 +72,10 @@ enum GameDisplayMode: CaseIterable, Equatable {
         launchPresentation == .embedded
     }
 
+    var backgroundImageName: String {
+        self == .sevenTenths ? "voice-room-bg" : "live-room-bg"
+    }
+
     var miniValue: Int {
         switch self {
         case .full:

@@ -104,6 +104,7 @@ extension GameWebView: WKScriptMessageHandler {
         case .recharge:
             print("游戏回调：用户主动点击增加金币")
         case .close:
+            print("游戏回调：用户主动关闭游戏")
             stop()
             onClose()
         case .openGameSuccess:

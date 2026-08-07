@@ -122,8 +122,8 @@ private final class GameModeLaunchViewController: UIViewController {
     private let token: String
     private var embeddedGameView: GameWebView?
 
-    private let backgroundImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(named: "voice-chat-bg2"))
+    private lazy var backgroundImageView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(named: displayMode.backgroundImageName))
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         return imageView

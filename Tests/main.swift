@@ -26,6 +26,8 @@ expect(GameDisplayMode.sevenTenths.launchPresentation == .embedded, "7分屏游�
 expect(!GameDisplayMode.full.usesGameBackground, "全屏入口不需要游戏背景")
 expect(GameDisplayMode.half.usesGameBackground, "半屏入口应使用游戏背景")
 expect(GameDisplayMode.sevenTenths.usesGameBackground, "7分屏入口应使用游戏背景")
+expect(GameDisplayMode.half.backgroundImageName == "live-room-bg", "半屏应使用直播间背景")
+expect(GameDisplayMode.sevenTenths.backgroundImageName == "voice-room-bg", "7分屏应使用语聊房背景")
 expect(GameDisplayMode.full.hidesNavigationBar, "全屏游戏应隐藏导航栏")
 expect(!GameDisplayMode.half.hidesNavigationBar, "半屏游戏应显示导航栏")
 expect(!GameDisplayMode.sevenTenths.hidesNavigationBar, "7分屏游戏应显示导航栏")
