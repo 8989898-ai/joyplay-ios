@@ -31,6 +31,13 @@ final class GameWebView: UIView {
     }
 
     private func configureWebView() {
+        let closeForwarder = WKUserScript(
+            source: GameBridgeScript.experienceLinkCloseForwarder,
+            injectionTime: .atDocumentStart,
+            forMainFrameOnly: true
+        )
+        webView.configuration.userContentController.addUserScript(closeForwarder)
+
         webView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(webView)
         NSLayoutConstraint.activate([

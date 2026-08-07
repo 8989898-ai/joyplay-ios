@@ -1,10 +1,30 @@
 import Foundation
 
+enum GameLaunchCredentials {
+    static let appKey = "ste5a6lxxrtu10bmnc6g"
+    static let token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3ODU0OTExNzEsImFjY291bnRJZCI6IjIwODMxMjcwNzQxNzU0NTUyMzIifQ.gdzel2RMXHKwyEG6AaQg-sObDx6H_O9Tmo2XGzfcOJU"
+}
+
 enum GameScriptMessage: String, CaseIterable {
     case insufficientBalance = "recharge"
     case recharge = "clickRecharge"
     case close = "newTppClose"
     case openGameSuccess = "OpenGameSucc"
+}
+
+enum GameBridgeScript {
+    static let experienceLinkCloseForwarder = """
+    window.addEventListener('message', function(event) {
+        if (
+            event.data === 'exit' &&
+            window.webkit &&
+            window.webkit.messageHandlers &&
+            window.webkit.messageHandlers.newTppClose
+        ) {
+            window.webkit.messageHandlers.newTppClose.postMessage('');
+        }
+    });
+    """
 }
 
 enum GameLaunchPresentation {
@@ -91,21 +111,14 @@ enum GameURLBuilder {
     static func makeURL(appKey: String, token: String, displayMode: GameDisplayMode) -> URL? {
         var components = URLComponents()
         components.scheme = "https"
-        components.host = "game.abv.cn"
-        components.path = "/frontend/00lobby00/index.html"
+        components.host = "joyplay.cn"
+        components.path = "/release/index.html"
         components.queryItems = [
             URLQueryItem(name: "appKey", value: appKey),
             URLQueryItem(name: "token", value: token),
-            URLQueryItem(name: "gameId", value: "2"),
+            URLQueryItem(name: "gameId", value: "1"),
             URLQueryItem(name: "mini", value: String(displayMode.miniValue))
         ]
         return components.url
-    }
-}
-
-enum GameEntryValidator {
-    static func isValid(appKey: String, token: String) -> Bool {
-        !appKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-            !token.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }

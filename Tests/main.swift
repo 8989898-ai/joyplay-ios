@@ -36,10 +36,8 @@ expect(GameDisplayMode.full.backDestination == .previousScreen, "全屏返回应
 expect(GameDisplayMode.half.backDestination == .fullModeTab, "半屏返回应切换到全屏 Tab")
 expect(GameDisplayMode.sevenTenths.backDestination == .fullModeTab, "7分屏返回应切换到全屏 Tab")
 
-expect(GameEntryValidator.isValid(appKey: "app-key", token: "token"), "两个输入都有值时应通过校验")
-expect(!GameEntryValidator.isValid(appKey: "", token: "token"), "AppKey 为空时不应通过校验")
-expect(!GameEntryValidator.isValid(appKey: "app-key", token: ""), "Token 为空时不应通过校验")
-expect(!GameEntryValidator.isValid(appKey: "   ", token: "\n"), "纯空白输入不应通过校验")
+expect(GameLaunchCredentials.appKey == "ste5a6lxxrtu10bmnc6g", "AppKey 应使用固定配置")
+expect(!GameLaunchCredentials.token.isEmpty, "Token 应使用固定配置")
 
 let scriptMessageNames = Set(GameScriptMessage.allCases.map(\.rawValue))
 expect(
@@ -55,25 +53,35 @@ expect(
     "未知 JS 消息不应被识别"
 )
 
-let url = GameURLBuilder.makeURL(
-    appKey: "app key",
-    token: "token+value",
-    displayMode: .sevenTenths
+let closeForwarder = GameBridgeScript.experienceLinkCloseForwarder
+expect(closeForwarder.contains("window.addEventListener('message'"), "应监听网页 message 事件")
+expect(closeForwarder.contains("event.data === 'exit'"), "应只转发体验链接的 exit 关闭消息")
+expect(
+    closeForwarder.contains("messageHandlers.newTppClose.postMessage"),
+    "exit 消息应转发到现有 newTppClose 原生回调"
 )
-expect(url != nil, "有效参数应生成游戏链接")
 
-if let url,
-   let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
-    let queryItems = Dictionary(
-        uniqueKeysWithValues: (components.queryItems ?? []).map { ($0.name, $0.value ?? "") }
+for (displayMode, expectedMini) in zip(GameDisplayMode.allCases, ["0", "1", "2"]) {
+    let url = GameURLBuilder.makeURL(
+        appKey: GameLaunchCredentials.appKey,
+        token: GameLaunchCredentials.token,
+        displayMode: displayMode
     )
-    expect(components.scheme == "https", "游戏链接应使用 HTTPS")
-    expect(components.host == "game.abv.cn", "游戏链接域名应正确")
-    expect(components.path == "/frontend/00lobby00/index.html", "游戏链接路径应正确")
-    expect(queryItems["appKey"] == "app key", "AppKey 应来自输入值")
-    expect(queryItems["token"] == "token+value", "Token 应来自输入值")
-    expect(queryItems["gameId"] == "2", "gameId 应固定为 2")
-    expect(queryItems["mini"] == "2", "mini 应来自展示模式")
+    expect(url != nil, "固定参数应生成游戏链接")
+
+    if let url,
+       let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+        let queryItems = Dictionary(
+            uniqueKeysWithValues: (components.queryItems ?? []).map { ($0.name, $0.value ?? "") }
+        )
+        expect(components.scheme == "https", "游戏链接应使用 HTTPS")
+        expect(components.host == "joyplay.cn", "游戏链接域名应正确")
+        expect(components.path == "/release/index.html", "游戏链接路径应正确")
+        expect(queryItems["appKey"] == GameLaunchCredentials.appKey, "AppKey 应使用固定配置")
+        expect(queryItems["token"] == GameLaunchCredentials.token, "Token 应使用固定配置")
+        expect(queryItems["gameId"] == "1", "gameId 应固定为 1")
+        expect(queryItems["mini"] == expectedMini, "mini 应来自展示模式")
+    }
 }
 
 print("GameConfiguration tests passed")
