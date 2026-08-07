@@ -56,4 +56,28 @@ else {
     fail("all open-game buttons should be centered")
 }
 
+guard
+    controllerSource.contains("CGAffineTransform(scaleX: 0.96, y: 0.96)"),
+    controllerSource.contains("CGAffineTransform(scaleX: 1.04, y: 1.04)"),
+    controllerSource.contains("UIView.animate("),
+    controllerSource.contains("withDuration: 0.6"),
+    controllerSource.contains(".curveEaseInOut"),
+    controllerSource.contains(".autoreverse"),
+    controllerSource.contains(".repeat"),
+    controllerSource.contains(".allowUserInteraction")
+else {
+    fail("all open-game buttons should use the gentle breathing animation")
+}
+
+guard
+    controllerSource.contains("UIAccessibility.isReduceMotionEnabled"),
+    controllerSource.contains("override func viewDidAppear(_ animated: Bool)"),
+    controllerSource.contains("override func viewWillDisappear(_ animated: Bool)"),
+    controllerSource.contains("startGameButtonBreathing()"),
+    controllerSource.contains("stopGameButtonBreathing()"),
+    controllerSource.contains("gameButton.layer.removeAllAnimations()")
+else {
+    fail("the breathing animation should respect accessibility and controller lifecycle")
+}
+
 print("Theme and game-button layout tests passed")

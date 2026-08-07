@@ -11,10 +11,12 @@ guard let readme = try? String(contentsOfFile: "README.md", encoding: .utf8) els
 
 let requiredContent = [
     "iOS 15.6",
-    "GameConfiguration.swift",
-    "GameWebView.swift",
+    "joyplay-ios/JoyPlayIntegration/GameConfiguration.swift",
+    "joyplay-ios/JoyPlayIntegration/GameWebView.swift",
     "GameViewController.swift",
     "GameModeTabBarController.swift",
+    "AGENTS.md",
+    "INTEGRATION_REQUEST.yaml",
     "gameId=1",
     "mini=0",
     "mini=1",

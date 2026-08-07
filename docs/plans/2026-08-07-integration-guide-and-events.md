@@ -15,8 +15,8 @@
 **Files:**
 - Modify: `Tests/main.swift`
 - Create: `Tests/IntegrationSurfaceTests.swift`
-- Modify: `joyplay-ios/GameConfiguration.swift`
-- Modify: `joyplay-ios/GameWebView.swift`
+- Modify: `joyplay-ios/JoyPlayIntegration/GameConfiguration.swift`
+- Modify: `joyplay-ios/JoyPlayIntegration/GameWebView.swift`
 - Modify: `joyplay-ios/GameViewController.swift`
 - Modify: `joyplay-ios/GameModeTabBarController.swift`
 
@@ -43,7 +43,7 @@
 
 **Files:**
 - Verify: `README.md`
-- Verify: `joyplay-ios/*.swift`
+- Verify: `joyplay-ios/**/*.swift`
 - Verify: `Tests/*.swift`
 
 1. Run all standalone focused tests with writable module-cache paths.

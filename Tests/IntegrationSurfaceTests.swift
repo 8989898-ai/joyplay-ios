@@ -12,12 +12,12 @@ private func source(at path: String) -> String {
     return value
 }
 
-let configurationSource = source(at: "joyplay-ios/GameConfiguration.swift")
+let configurationSource = source(at: "joyplay-ios/JoyPlayIntegration/GameConfiguration.swift")
 guard configurationSource.contains("enum GameEvent: String, CaseIterable") else {
     fail("GameConfiguration should expose the documented callbacks as GameEvent")
 }
 
-let gameWebViewSource = source(at: "joyplay-ios/GameWebView.swift")
+let gameWebViewSource = source(at: "joyplay-ios/JoyPlayIntegration/GameWebView.swift")
 guard
     gameWebViewSource.contains("private let onEvent: (GameEvent) -> Void"),
     gameWebViewSource.contains("onEvent: @escaping (GameEvent) -> Void"),

@@ -182,6 +182,16 @@ private final class GameModeLaunchViewController: UIViewController {
         gameButton.addTarget(self, action: #selector(openGame), for: .touchUpInside)
     }
 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        startGameButtonBreathing()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        stopGameButtonBreathing()
+    }
+
     private func configureLayout() {
         backgroundImageView.isHidden = !displayMode.usesGameBackground
         backgroundImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -209,6 +219,7 @@ private final class GameModeLaunchViewController: UIViewController {
     @objc private func openGame() {
         switch displayMode.launchPresentation {
         case .pushed:
+            stopGameButtonBreathing()
             let gameViewController = GameViewController(
                 displayMode: displayMode,
                 appKey: appKey,
@@ -227,6 +238,7 @@ private final class GameModeLaunchViewController: UIViewController {
             return
         }
 
+        stopGameButtonBreathing()
         let gameWebView = GameWebView(
             displayMode: displayMode,
             appKey: appKey,
@@ -262,9 +274,32 @@ private final class GameModeLaunchViewController: UIViewController {
         gameWebView.removeFromSuperview()
         embeddedGameView = nil
         gameButton.isHidden = false
+        startGameButtonBreathing()
     }
 
     func removeEmbeddedGameIfNeeded() {
         removeEmbeddedGame()
+    }
+
+    private func startGameButtonBreathing() {
+        guard !gameButton.isHidden, !UIAccessibility.isReduceMotionEnabled else {
+            stopGameButtonBreathing()
+            return
+        }
+
+        gameButton.layer.removeAllAnimations()
+        gameButton.transform = CGAffineTransform(scaleX: 0.96, y: 0.96)
+        UIView.animate(
+            withDuration: 0.6,
+            delay: 0,
+            options: [.curveEaseInOut, .autoreverse, .repeat, .allowUserInteraction]
+        ) { [weak self] in
+            self?.gameButton.transform = CGAffineTransform(scaleX: 1.04, y: 1.04)
+        }
+    }
+
+    private func stopGameButtonBreathing() {
+        gameButton.layer.removeAllAnimations()
+        gameButton.transform = .identity
     }
 }

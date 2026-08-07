@@ -25,14 +25,25 @@ Demo AppKey 和 Token 允许公开，当前固定值仅用于让接入方直接�
 
 | 文件 | 是否必需 | 作用 |
 | --- | --- | --- |
-| `joyplay-ios/GameConfiguration.swift` | 必需 | 游戏模式、URL 参数、事件名称、充值刷新 JS |
-| `joyplay-ios/GameWebView.swift` | 必需 | WKWebView、URL 加载、JS 回调注册和释放 |
+| `joyplay-ios/JoyPlayIntegration/GameConfiguration.swift` | 必需 | 游戏模式、URL 参数、事件名称、充值刷新 JS |
+| `joyplay-ios/JoyPlayIntegration/GameWebView.swift` | 必需 | WKWebView、URL 加载、JS 回调注册和释放 |
 | `joyplay-ios/GameViewController.swift` | 可选 | 全屏游戏的导航 Push 示例 |
 | `joyplay-ios/GameModeTabBarController.swift` | 可选 | 三种模式入口以及半屏嵌入示例 |
 | `joyplay-ios/Localizable.xcstrings` | 可选 | Demo 页面中英文文案 |
 | `joyplay-ios/Assets.xcassets` | 可选 | Demo 按钮颜色和场景背景图 |
 
-复制 Swift 文件后，在 Xcode 的 File Inspector 中确认它们已加入业务 App Target。
+接入时建议复制整个 `joyplay-ios/JoyPlayIntegration/` 文件夹，避免漏掉依赖文件。复制后在 Xcode 的 File Inspector 中确认两个 Swift 文件都已加入业务 App Target。
+
+## 使用 AI 直接接入
+
+本工程同时提供：
+
+- `AGENTS.md`：约束 AI 只复制核心源码、遵守游戏契约并执行构建验证。
+- `INTEGRATION_REQUEST.yaml`：记录目标工程、宿主控制器、凭证来源、关闭方式和充值行为。
+
+先将 `INTEGRATION_REQUEST.yaml` 中所有 `<请填写>` 替换为业务工程真实信息，再让 AI 执行：
+
+> 阅读 `AGENTS.md`、`README.md` 和 `INTEGRATION_REQUEST.yaml`，将 `joyplay-ios/JoyPlayIntegration/` 接入目标工程。不要复制 Demo Tab Bar、背景资源和导航结构；完成后执行目标 Scheme 的无签名模拟器构建，并单独报告尚未完成的真实 H5 验证。
 
 ## 游戏 URL 参数
 
@@ -171,7 +182,7 @@ gameWebView = nil
 
 ```sh
 swiftc -module-cache-path /tmp/joyplay-module-cache \
-  joyplay-ios/GameConfiguration.swift Tests/main.swift \
+  joyplay-ios/JoyPlayIntegration/GameConfiguration.swift Tests/main.swift \
   -o /tmp/joyplay-tests && /tmp/joyplay-tests
 ```
 

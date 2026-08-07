@@ -1,0 +1,34 @@
+# 将 <请填写> 替换为目标工程的真实信息，再交给 AI 执行接入。
+project_path: <请填写.xcodeproj或xcworkspace>
+project_kind: <project或workspace>
+scheme: <请填写>
+app_target: <请填写>
+ui_framework: UIKit
+minimum_ios: '15.6'
+
+modes:
+  full:
+    enabled: true
+    host_controller: <请填写>
+    close_behavior: pop
+  half:
+    enabled: true
+    host_controller: <请填写直播间控制器>
+    close_behavior: remove_game_view
+  seven_tenths:
+    enabled: true
+    host_controller: <请填写语聊房控制器>
+    close_behavior: remove_game_view
+
+credentials:
+  app_key_source: <固定值或代码表达式>
+  token_source: <固定值或代码表达式>
+
+recharge:
+  automatically_shows_demo_prompt: false
+  recharge_handler: <请填写充值页面或处理方法>
+  notify_game_after_success: true
+
+validation:
+  configuration: Debug
+  destination: generic/platform=iOS Simulator
