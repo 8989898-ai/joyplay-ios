@@ -69,21 +69,25 @@ expect(
     "通知游戏时应调用文档定义的余额刷新 JS"
 )
 
-let closeForwarder = GameBridgeScript.experienceLinkCloseForwarder
-expect(closeForwarder.contains("window.addEventListener('message'"), "应监听网页 message 事件")
-expect(closeForwarder.contains("event.data === 'exit'"), "应只转发体验链接的 exit 关闭消息")
-expect(
-    closeForwarder.contains("messageHandlers.newTppClose.postMessage"),
-    "exit 消息应转发到现有 newTppClose 原生回调"
-)
-
 for (displayMode, expectedMini) in zip(GameDisplayMode.allCases, ["0", "1", "2"]) {
-    let url = GameURLBuilder.makeURL(
+    let integrationURL = GameURLBuilder.makeURL(
         appKey: GameLaunchCredentials.appKey,
         token: GameLaunchCredentials.token,
         displayMode: displayMode
     )
-    expect(url != nil, "固定参数应生成游戏链接")
+    if let integrationURL,
+       let components = URLComponents(url: integrationURL, resolvingAgainstBaseURL: false) {
+        let queryItemNames = Set((components.queryItems ?? []).map(\.name))
+        expect(!queryItemNames.contains("isNativeDemo"), "业务接入链接默认不应标记为 Demo")
+    }
+
+    let url = GameURLBuilder.makeURL(
+        appKey: GameLaunchCredentials.appKey,
+        token: GameLaunchCredentials.token,
+        displayMode: displayMode,
+        isNativeDemo: true
+    )
+    expect(url != nil, "Demo 固定参数应生成游戏链接")
 
     if let url,
        let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
@@ -97,6 +101,7 @@ for (displayMode, expectedMini) in zip(GameDisplayMode.allCases, ["0", "1", "2"]
         expect(queryItems["token"] == GameLaunchCredentials.token, "Token 应使用固定配置")
         expect(queryItems["gameId"] == "1", "gameId 应固定为 1")
         expect(queryItems["mini"] == expectedMini, "mini 应来自展示模式")
+        expect(queryItems["isNativeDemo"] == "1", "Demo 游戏链接应携带 isNativeDemo=1")
     }
 }
 

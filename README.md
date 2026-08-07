@@ -55,6 +55,7 @@ Demo AppKey 和 Token 允许公开，当前固定值仅用于让接入方直接�
 | `token` | 创建 `GameWebView` 时传入 |
 | `gameId` | 固定为 `gameId=1` |
 | `mini` | 全屏 `mini=0`、半屏 `mini=1`、大半屏 `mini=2` |
+| `isNativeDemo` | 当前 Demo 固定传 `isNativeDemo=1`；业务工程默认不传 |
 
 ## 最快接入方式
 

@@ -12,6 +12,7 @@ final class GameWebView: UIView {
         displayMode: GameDisplayMode,
         appKey: String,
         token: String,
+        isNativeDemo: Bool = false,
         automaticallyShowsRechargePrompt: Bool = true,
         onEvent: @escaping (GameEvent) -> Void
     ) {
@@ -20,7 +21,12 @@ final class GameWebView: UIView {
         super.init(frame: .zero)
         configureWebView()
         registerScriptMessageHandlers()
-        loadGame(displayMode: displayMode, appKey: appKey, token: token)
+        loadGame(
+            displayMode: displayMode,
+            appKey: appKey,
+            token: token,
+            isNativeDemo: isNativeDemo
+        )
     }
 
     @available(*, unavailable)
@@ -47,13 +53,6 @@ final class GameWebView: UIView {
     }
 
     private func configureWebView() {
-        let closeForwarder = WKUserScript(
-            source: GameBridgeScript.experienceLinkCloseForwarder,
-            injectionTime: .atDocumentStart,
-            forMainFrameOnly: true
-        )
-        webView.configuration.userContentController.addUserScript(closeForwarder)
-
         webView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(webView)
         NSLayoutConstraint.activate([
@@ -64,11 +63,17 @@ final class GameWebView: UIView {
         ])
     }
 
-    private func loadGame(displayMode: GameDisplayMode, appKey: String, token: String) {
+    private func loadGame(
+        displayMode: GameDisplayMode,
+        appKey: String,
+        token: String,
+        isNativeDemo: Bool
+    ) {
         guard let url = GameURLBuilder.makeURL(
             appKey: appKey,
             token: token,
-            displayMode: displayMode
+            displayMode: displayMode,
+            isNativeDemo: isNativeDemo
         ) else {
             return
         }

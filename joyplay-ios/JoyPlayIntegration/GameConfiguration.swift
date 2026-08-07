@@ -24,19 +24,6 @@ enum GameRechargePrompt {
 
 enum GameBridgeScript {
     static let balanceRefresh = "HttpTool.NativeToJs('recharge')"
-
-    static let experienceLinkCloseForwarder = """
-    window.addEventListener('message', function(event) {
-        if (
-            event.data === 'exit' &&
-            window.webkit &&
-            window.webkit.messageHandlers &&
-            window.webkit.messageHandlers.newTppClose
-        ) {
-            window.webkit.messageHandlers.newTppClose.postMessage('');
-        }
-    });
-    """
 }
 
 enum GameLaunchPresentation {
@@ -124,17 +111,26 @@ enum GameDisplayMode: CaseIterable, Equatable {
 }
 
 enum GameURLBuilder {
-    static func makeURL(appKey: String, token: String, displayMode: GameDisplayMode) -> URL? {
+    static func makeURL(
+        appKey: String,
+        token: String,
+        displayMode: GameDisplayMode,
+        isNativeDemo: Bool = false
+    ) -> URL? {
         var components = URLComponents()
         components.scheme = "https"
         components.host = "joyplay.cn"
         components.path = "/release/index.html"
-        components.queryItems = [
+        var queryItems = [
             URLQueryItem(name: "appKey", value: appKey),
             URLQueryItem(name: "token", value: token),
             URLQueryItem(name: "gameId", value: "1"),
             URLQueryItem(name: "mini", value: String(displayMode.miniValue))
         ]
+        if isNativeDemo {
+            queryItems.append(URLQueryItem(name: "isNativeDemo", value: "1"))
+        }
+        components.queryItems = queryItems
         return components.url
     }
 }

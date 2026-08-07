@@ -9,6 +9,13 @@ guard let readme = try? String(contentsOfFile: "README.md", encoding: .utf8) els
     fail("README.md should exist")
 }
 
+private func source(at path: String) -> String {
+    guard let value = try? String(contentsOfFile: path, encoding: .utf8) else {
+        fail("\(path) should exist")
+    }
+    return value
+}
+
 let requiredContent = [
     "iOS 15.6",
     "joyplay-ios/JoyPlayIntegration/GameConfiguration.swift",
@@ -21,6 +28,7 @@ let requiredContent = [
     "mini=0",
     "mini=1",
     "mini=2",
+    "isNativeDemo=1",
     "GameWebView(",
     "onEvent:",
     "automaticallyShowsRechargePrompt: false",
@@ -35,6 +43,21 @@ let requiredContent = [
 
 for content in requiredContent where !readme.contains(content) {
     fail("README should document \(content)")
+}
+
+let gameWebView = source(at: "joyplay-ios/JoyPlayIntegration/GameWebView.swift")
+if !gameWebView.contains("isNativeDemo: Bool = false") {
+    fail("the distributable GameWebView should keep the Demo marker disabled by default")
+}
+if !gameWebView.contains("isNativeDemo: isNativeDemo") {
+    fail("GameWebView should forward the Demo marker to GameURLBuilder")
+}
+
+for demoPath in [
+    "joyplay-ios/GameViewController.swift",
+    "joyplay-ios/GameModeTabBarController.swift"
+] where !source(at: demoPath).contains("isNativeDemo: true") {
+    fail("\(demoPath) should enable the native Demo URL marker")
 }
 
 print("Integration guide tests passed")

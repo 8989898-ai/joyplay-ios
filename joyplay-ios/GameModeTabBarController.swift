@@ -243,6 +243,7 @@ private final class GameModeLaunchViewController: UIViewController {
             displayMode: displayMode,
             appKey: appKey,
             token: token,
+            isNativeDemo: true,
             onEvent: { [weak self] event in
                 guard event == .close else {
                     return
