@@ -10,9 +10,21 @@ enum GameScriptMessage: String, CaseIterable {
     case recharge = "clickRecharge"
     case close = "newTppClose"
     case openGameSuccess = "OpenGameSucc"
+
+    var showsRechargePrompt: Bool {
+        self == .insufficientBalance || self == .recharge
+    }
+}
+
+enum GameRechargePrompt {
+    static let message = "请展示APP的充值界面，当玩家充值成功之后，原生调用 JS方法，通知游戏刷新玩家余额"
+    static let notRechargedTitle = "未充值"
+    static let notifyGameTitle = "通知游戏"
 }
 
 enum GameBridgeScript {
+    static let balanceRefresh = "HttpTool.NativeToJs('recharge')"
+
     static let experienceLinkCloseForwarder = """
     window.addEventListener('message', function(event) {
         if (
@@ -49,7 +61,7 @@ enum GameDisplayMode: CaseIterable, Equatable {
         case .half:
             return String(localized: "game.mode.half", defaultValue: "Half Screen")
         case .sevenTenths:
-            return String(localized: "game.mode.seven_tenths", defaultValue: "70% Screen")
+            return String(localized: "game.mode.seven_tenths", defaultValue: "Large Half Screen")
         }
     }
 

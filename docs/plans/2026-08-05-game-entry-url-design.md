@@ -9,7 +9,7 @@
 - 使用 `URLComponents` 生成 `https://game.abv.cn/frontend/00lobby00/index.html` 链接，避免输入值中的特殊字符破坏查询参数。
 - 查询参数固定包含 `appKey`、`token`、`gameId=1` 和 `mini`。
 - 展示模式映射为：全屏 `mini=0`、半屏 `mini=1`、大半屏 `mini=2`。
-- 将现有“7分屏”文案改为“大半屏”；具体尺寸按 WebView 宽高比设计处理。
+- 将该模式文案统一为“大半屏”；具体尺寸按 WebView 宽高比设计处理。
 - `GameViewController` 在 `WKWebView` 加载前打印并加载同一个 URL。
 - 不在源码中保存示例 Token。
 

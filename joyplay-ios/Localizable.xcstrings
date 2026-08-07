@@ -54,13 +54,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "70% Screen"
+            "value" : "Large Half Screen"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "7分屏"
+            "value" : "大半屏"
           }
         }
       }
@@ -102,13 +102,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open 70% Screen Game"
+            "value" : "Open Large Half-Screen Game"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "打开7分屏游戏"
+            "value" : "打开大半屏游戏"
           }
         }
       }

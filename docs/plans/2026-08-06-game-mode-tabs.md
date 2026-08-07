@@ -36,9 +36,9 @@
 - Create: `joyplay-ios/GameModeViewController.swift`
 - Modify: `joyplay-ios/GameViewController.swift`
 
-1. Add a bottom tab bar with `全屏`, `半屏`, and `7分屏` in model order.
+1. Add a bottom tab bar with `全屏`, `半屏`, and `大半屏` in model order.
 2. Show a centered launch button for full screen; push the existing game controller and hide the bottom tab bar when tapped.
-3. For half screen and 7-part screen, show the existing game background and a bottom-trailing launch button; embed the existing game controller in the current page when tapped.
+3. For half screen and large-half screen, show the existing game background and a bottom-trailing launch button; embed the existing game controller in the current page when tapped.
 4. When an embedded game's close callback fires, remove it and restore the button in the current tab.
 
 ### Task 4: Verify

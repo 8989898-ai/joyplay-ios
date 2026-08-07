@@ -2,9 +2,9 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Hide the mode Tab Bar as soon as half or seven-tenths mode is selected, and embed a reusable game WebView directly in those scene controllers without adding a game child controller.
+**Goal:** Hide the mode Tab Bar as soon as half or large-half mode is selected, and embed a reusable game WebView directly in those scene controllers without adding a game child controller.
 
-**Architecture:** Extract WebKit loading and JS-bridge behavior from `GameViewController` into a reusable `GameWebView`. Full screen keeps `GameViewController` as a navigation container, while half and seven-tenths scene controllers add and remove `GameWebView` directly. `GameModeTabBarController` remains the sole owner of its Tab Bar visibility.
+**Architecture:** Extract WebKit loading and JS-bridge behavior from `GameViewController` into a reusable `GameWebView`. Full screen keeps `GameViewController` as a navigation container, while half and large-half scene controllers add and remove `GameWebView` directly. `GameModeTabBarController` remains the sole owner of its Tab Bar visibility.
 
 **Tech Stack:** Swift, UIKit, WebKit, Auto Layout, command-line Swift tests, Xcode.
 
@@ -16,7 +16,7 @@
 - Modify: `Tests/main.swift`
 - Modify: `joyplay-ios/GameConfiguration.swift`
 
-1. Add failing assertions that full screen keeps the mode Tab Bar visible while half and seven-tenths hide it.
+1. Add failing assertions that full screen keeps the mode Tab Bar visible while half and large-half hide it.
 2. Run:
 
    ```bash
@@ -56,7 +56,7 @@
 1. Make `GameModeTabBarController` its own `UITabBarControllerDelegate`.
 2. When a tab is selected, derive the selected `GameDisplayMode` from `selectedIndex` and set `tabBar.isHidden` from `hidesModeTabBar`.
 3. Replace `embeddedGameViewController` with `embeddedGameView`.
-4. For half and seven-tenths, instantiate `GameWebView`, add it directly with `addSubview`, pin it to the scene's safe-area bottom and horizontal edges, and use the mode's existing width-to-height ratio.
+4. For half and large-half, instantiate `GameWebView`, add it directly with `addSubview`, pin it to the scene's safe-area bottom and horizontal edges, and use the mode's existing width-to-height ratio.
 5. On `newTppClose`, remove only `GameWebView`, clear its stored reference, and show the game button again. Do not pop the navigation stack and do not change Tab Bar visibility.
 6. Keep the full-screen push path and `hidesBottomBarWhenPushed` unchanged.
 7. Run the focused configuration tests and unsigned simulator build.
@@ -72,6 +72,6 @@
 
 1. Run the focused Swift tests and confirm `GameConfiguration tests passed`.
 2. Run `git diff --check` for the task files.
-3. Confirm source inspection shows no `addChild(GameViewController)` path for half or seven-tenths.
+3. Confirm source inspection shows no `addChild(GameViewController)` path for half or large-half.
 4. Run the unsigned simulator build and confirm `BUILD SUCCEEDED`.
-5. Record the remaining runtime checks: Tab Bar hides immediately on half/seven-tenths selection; `newTppClose` removes only the WebView; the Tab Bar remains hidden; the top back button exits the scene.
+5. Record the remaining runtime checks: Tab Bar hides immediately on half/large-half selection; `newTppClose` removes only the WebView; the Tab Bar remains hidden; the top back button exits the scene.

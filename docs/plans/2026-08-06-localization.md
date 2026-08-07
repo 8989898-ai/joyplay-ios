@@ -36,7 +36,7 @@ Expected: failure because `joyplay-ios/Localizable.xcstrings` does not exist yet
 
 **Step 3: Update the display-mode fallback expectations first**
 
-Change the existing title expectation in `Tests/main.swift` to `Full Screen`, `Half Screen`, and `70% Screen`.
+Change the existing title expectation in `Tests/main.swift` to `Full Screen`, `Half Screen`, and `Large Half Screen`.
 
 **Step 4: Run the focused configuration test to verify it fails**
 

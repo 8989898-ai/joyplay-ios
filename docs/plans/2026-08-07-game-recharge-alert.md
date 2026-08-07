@@ -39,7 +39,7 @@
 2. Build `UIAlertController` without a title and with the configured message.
 3. Add “未充值” as a cancel action with no handler.
 4. Add “通知游戏” as a default action whose handler evaluates `GameBridgeScript.balanceRefresh` on the owned `WKWebView`.
-5. Find the nearest `UIViewController` through the responder chain and present the alert from it so the same code works for full, half, and seven-tenths modes.
+5. Find the nearest `UIViewController` through the responder chain and present the alert from it so the same code works for full, half, and large-half modes.
 6. Run the focused tests again and expect `GameConfiguration tests passed`.
 
 ### Task 3: Verify the completed behavior

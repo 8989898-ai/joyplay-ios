@@ -87,6 +87,46 @@ final class GameWebView: UIView {
         scriptMessageHandler = nil
         areScriptMessageHandlersRegistered = false
     }
+
+    private func showRechargePrompt() {
+        let alertController = UIAlertController(
+            title: nil,
+            message: GameRechargePrompt.message,
+            preferredStyle: .alert
+        )
+        alertController.addAction(UIAlertAction(
+            title: GameRechargePrompt.notRechargedTitle,
+            style: .cancel
+        ))
+        alertController.addAction(UIAlertAction(
+            title: GameRechargePrompt.notifyGameTitle,
+            style: .default,
+            handler: { [weak self] _ in
+                self?.webView.evaluateJavaScript(
+                    GameBridgeScript.balanceRefresh,
+                    completionHandler: { _, error in
+                        if error != nil {
+                            print("原生通知JS--失败")
+                        } else {
+                            print("原生通知JS--成功")
+                        }
+                    }
+                )
+            }
+        ))
+        hostingViewController?.present(alertController, animated: true)
+    }
+
+    private var hostingViewController: UIViewController? {
+        var responder: UIResponder? = self
+        while let currentResponder = responder {
+            if let viewController = currentResponder as? UIViewController {
+                return viewController
+            }
+            responder = currentResponder.next
+        }
+        return nil
+    }
 }
 
 extension GameWebView: WKScriptMessageHandler {
@@ -109,6 +149,10 @@ extension GameWebView: WKScriptMessageHandler {
             onClose()
         case .openGameSuccess:
             print("游戏回调：游戏加载成功")
+        }
+
+        if scriptMessage.showsRechargePrompt {
+            showRechargePrompt()
         }
     }
 }

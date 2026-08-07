@@ -14,7 +14,7 @@
 ## 实现范围
 
 - 在现有 `GameBridgeScript` 中保存余额刷新脚本，供测试和 `WKWebView.evaluateJavaScript` 共用。
-- `GameWebView` 继续统一处理全屏、半屏和 7 分屏的 JS 消息，并通过响应链找到当前宿主控制器展示 `UIAlertController`。
+- `GameWebView` 继续统一处理全屏、半屏和大半屏的 JS 消息，并通过响应链找到当前宿主控制器展示 `UIAlertController`。
 - 不新增充值业务页面，不修改游戏展示模式、关闭流程或现有未提交的背景图改动。
 
 ## 验证

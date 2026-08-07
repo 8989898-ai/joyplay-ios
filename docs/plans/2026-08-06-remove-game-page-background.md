@@ -40,4 +40,4 @@ Expected: `BUILD SUCCEEDED`.
 
 **Step 5: Runtime acceptance check**
 
-Open an actual game in all three modes. Confirm the game content page no longer shows `voice-chat-bg2`, while the half-screen and 7-part launch pages retain it.
+Open an actual game in all three modes. Confirm the game content page no longer shows `voice-chat-bg2`, while the half-screen and large-half launch pages retain it.

@@ -132,14 +132,18 @@ private final class GameModeLaunchViewController: UIViewController {
     private let gameButton: UIButton = {
         var configuration = UIButton.Configuration.filled()
         configuration.title = String(localized: "game.title", defaultValue: "Game")
-        configuration.cornerStyle = .medium
+        configuration.baseBackgroundColor = UIColor(named: "AccentColor")
+        configuration.cornerStyle = .capsule
+        configuration.titleAlignment = .center
         configuration.contentInsets = NSDirectionalEdgeInsets(
             top: 14,
             leading: 28,
             bottom: 14,
             trailing: 28
         )
-        return UIButton(configuration: configuration)
+        let button = UIButton(configuration: configuration)
+        button.titleLabel?.numberOfLines = 0
+        return button
     }()
 
     init(displayMode: GameDisplayMode, appKey: String, token: String) {
@@ -171,7 +175,7 @@ private final class GameModeLaunchViewController: UIViewController {
         case .sevenTenths:
             gameButton.configuration?.title = String(
                 localized: "game.open.seven_tenths",
-                defaultValue: "Open 70% Screen Game"
+                defaultValue: "Open Large Half-Screen Game"
             )
         }
         configureLayout()
@@ -192,18 +196,12 @@ private final class GameModeLaunchViewController: UIViewController {
             backgroundImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ]
 
-        switch displayMode.launchPresentation {
-        case .pushed:
-            constraints += [
-                gameButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-                gameButton.centerYAnchor.constraint(equalTo: view.centerYAnchor)
-            ]
-        case .embedded:
-            constraints += [
-                gameButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -24),
-                gameButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -40)
-            ]
-        }
+        constraints += [
+            gameButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            gameButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            gameButton.widthAnchor.constraint(equalToConstant: 160),
+            gameButton.heightAnchor.constraint(equalTo: gameButton.widthAnchor)
+        ]
 
         NSLayoutConstraint.activate(constraints)
     }

@@ -8,7 +8,7 @@
 
 - 删除 `GameViewController` 内的背景图片视图及其布局约束。
 - 保留根视图的系统背景色和现有 WebView 布局。
-- 保留 `GameModeLaunchViewController` 的背景图片，使半屏和 7 分屏进入游戏前的外层页面不变。
+- 保留 `GameModeLaunchViewController` 的背景图片，使半屏和大半屏进入游戏前的外层页面不变。
 - 保留图片资源，因为外层页面仍然使用它。
 
 ## 验证
