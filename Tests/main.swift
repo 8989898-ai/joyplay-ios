@@ -41,23 +41,23 @@ expect(GameDisplayMode.sevenTenths.backDestination == .fullModeTab, "大半屏�
 expect(GameLaunchCredentials.appKey == "ste5a6lxxrtu10bmnc6g", "AppKey 应使用固定配置")
 expect(!GameLaunchCredentials.token.isEmpty, "Token 应使用固定配置")
 
-let scriptMessageNames = Set(GameScriptMessage.allCases.map(\.rawValue))
+let eventNames = Set(GameEvent.allCases.map(\.rawValue))
 expect(
-    scriptMessageNames == ["recharge", "clickRecharge", "newTppClose", "OpenGameSucc"],
-    "应注册文档定义的全部 JS 回调"
+    eventNames == ["recharge", "clickRecharge", "newTppClose", "OpenGameSucc"],
+    "宿主事件应覆盖文档定义的全部 JS 回调"
 )
 expect(
-    GameScriptMessage(rawValue: "newTppClose") == .close,
+    GameEvent(rawValue: "newTppClose") == .close,
     "关闭回调应映射到关闭游戏事件"
 )
 expect(
-    GameScriptMessage(rawValue: "unknown") == nil,
+    GameEvent(rawValue: "unknown") == nil,
     "未知 JS 消息不应被识别"
 )
-expect(GameScriptMessage.insufficientBalance.showsRechargePrompt, "余额不足回调应展示充值弹窗")
-expect(GameScriptMessage.recharge.showsRechargePrompt, "主动充值回调应展示充值弹窗")
-expect(!GameScriptMessage.close.showsRechargePrompt, "关闭回调不应展示充值弹窗")
-expect(!GameScriptMessage.openGameSuccess.showsRechargePrompt, "加载成功回调不应展示充值弹窗")
+expect(GameEvent.insufficientBalance.showsRechargePrompt, "余额不足事件应支持充值提示")
+expect(GameEvent.recharge.showsRechargePrompt, "主动充值事件应支持充值提示")
+expect(!GameEvent.close.showsRechargePrompt, "关闭事件不应展示充值弹窗")
+expect(!GameEvent.openGameSuccess.showsRechargePrompt, "加载成功事件不应展示充值弹窗")
 expect(
     GameRechargePrompt.message == "请展示APP的充值界面，当玩家充值成功之后，原生调用 JS方法，通知游戏刷新玩家余额",
     "充值弹窗提示文案应正确"

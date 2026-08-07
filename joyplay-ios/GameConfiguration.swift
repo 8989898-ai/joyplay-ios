@@ -5,7 +5,7 @@ enum GameLaunchCredentials {
     static let token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3ODU0OTExNzEsImFjY291bnRJZCI6IjIwODMxMjcwNzQxNzU0NTUyMzIifQ.gdzel2RMXHKwyEG6AaQg-sObDx6H_O9Tmo2XGzfcOJU"
 }
 
-enum GameScriptMessage: String, CaseIterable {
+enum GameEvent: String, CaseIterable {
     case insufficientBalance = "recharge"
     case recharge = "clickRecharge"
     case close = "newTppClose"

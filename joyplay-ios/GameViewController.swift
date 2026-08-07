@@ -8,7 +8,10 @@ final class GameViewController: UIViewController {
         displayMode: displayMode,
         appKey: appKey,
         token: token,
-        onClose: { [weak self] in
+        onEvent: { [weak self] event in
+            guard event == .close else {
+                return
+            }
             self?.navigationController?.popViewController(animated: true)
         }
     )
@@ -39,6 +42,9 @@ final class GameViewController: UIViewController {
 
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        if isMovingFromParent {
+            gameWebView.stop()
+        }
         navigationController?.setNavigationBarHidden(false, animated: animated)
     }
 

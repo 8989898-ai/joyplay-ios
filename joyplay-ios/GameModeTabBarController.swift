@@ -231,7 +231,10 @@ private final class GameModeLaunchViewController: UIViewController {
             displayMode: displayMode,
             appKey: appKey,
             token: token,
-            onClose: { [weak self] in
+            onEvent: { [weak self] event in
+                guard event == .close else {
+                    return
+                }
                 self?.removeEmbeddedGame()
             }
         )
@@ -255,6 +258,7 @@ private final class GameModeLaunchViewController: UIViewController {
             return
         }
 
+        gameWebView.stop()
         gameWebView.removeFromSuperview()
         embeddedGameView = nil
         gameButton.isHidden = false

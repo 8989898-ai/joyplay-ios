@@ -2,7 +2,8 @@ import UIKit
 import WebKit
 
 final class GameWebView: UIView {
-    private let onClose: () -> Void
+    private let automaticallyShowsRechargePrompt: Bool
+    private let onEvent: (GameEvent) -> Void
     private let webView = WKWebView()
     private var scriptMessageHandler: WeakScriptMessageHandler?
     private var areScriptMessageHandlersRegistered = false
@@ -11,9 +12,11 @@ final class GameWebView: UIView {
         displayMode: GameDisplayMode,
         appKey: String,
         token: String,
-        onClose: @escaping () -> Void
+        automaticallyShowsRechargePrompt: Bool = true,
+        onEvent: @escaping (GameEvent) -> Void
     ) {
-        self.onClose = onClose
+        self.automaticallyShowsRechargePrompt = automaticallyShowsRechargePrompt
+        self.onEvent = onEvent
         super.init(frame: .zero)
         configureWebView()
         registerScriptMessageHandlers()
@@ -28,6 +31,19 @@ final class GameWebView: UIView {
     func stop() {
         removeScriptMessageHandlers()
         webView.stopLoading()
+    }
+
+    func notifyGameBalanceDidChange() {
+        webView.evaluateJavaScript(
+            GameBridgeScript.balanceRefresh,
+            completionHandler: { _, error in
+                if error != nil {
+                    print("原生通知JS--失败")
+                } else {
+                    print("原生通知JS--成功")
+                }
+            }
+        )
     }
 
     private func configureWebView() {
@@ -66,10 +82,10 @@ final class GameWebView: UIView {
         }
 
         let scriptMessageHandler = WeakScriptMessageHandler(delegate: self)
-        for message in GameScriptMessage.allCases {
+        for event in GameEvent.allCases {
             webView.configuration.userContentController.add(
                 scriptMessageHandler,
-                name: message.rawValue
+                name: event.rawValue
             )
         }
         self.scriptMessageHandler = scriptMessageHandler
@@ -81,8 +97,8 @@ final class GameWebView: UIView {
             return
         }
 
-        for message in GameScriptMessage.allCases {
-            webView.configuration.userContentController.removeScriptMessageHandler(forName: message.rawValue)
+        for event in GameEvent.allCases {
+            webView.configuration.userContentController.removeScriptMessageHandler(forName: event.rawValue)
         }
         scriptMessageHandler = nil
         areScriptMessageHandlersRegistered = false
@@ -102,16 +118,7 @@ final class GameWebView: UIView {
             title: GameRechargePrompt.notifyGameTitle,
             style: .default,
             handler: { [weak self] _ in
-                self?.webView.evaluateJavaScript(
-                    GameBridgeScript.balanceRefresh,
-                    completionHandler: { _, error in
-                        if error != nil {
-                            print("原生通知JS--失败")
-                        } else {
-                            print("原生通知JS--成功")
-                        }
-                    }
-                )
+                self?.notifyGameBalanceDidChange()
             }
         ))
         hostingViewController?.present(alertController, animated: true)
@@ -134,11 +141,11 @@ extension GameWebView: WKScriptMessageHandler {
         _ userContentController: WKUserContentController,
         didReceive message: WKScriptMessage
     ) {
-        guard let scriptMessage = GameScriptMessage(rawValue: message.name) else {
+        guard let event = GameEvent(rawValue: message.name) else {
             return
         }
 
-        switch scriptMessage {
+        switch event {
         case .insufficientBalance:
             print("游戏回调：用户下注时余额不足")
         case .recharge:
@@ -146,12 +153,13 @@ extension GameWebView: WKScriptMessageHandler {
         case .close:
             print("游戏回调：用户主动关闭游戏")
             stop()
-            onClose()
         case .openGameSuccess:
             print("游戏回调：游戏加载成功")
         }
 
-        if scriptMessage.showsRechargePrompt {
+        onEvent(event)
+
+        if automaticallyShowsRechargePrompt && event.showsRechargePrompt {
             showRechargePrompt()
         }
     }
