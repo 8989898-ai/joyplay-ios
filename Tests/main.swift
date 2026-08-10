@@ -68,11 +68,11 @@ expect(GameEvent.recharge.showsRechargePrompt, "主动充值事件应支持充�
 expect(!GameEvent.close.showsRechargePrompt, "关闭事件不应展示充值弹窗")
 expect(!GameEvent.openGameSuccess.showsRechargePrompt, "加载成功事件不应展示充值弹窗")
 expect(
-    GameRechargePrompt.message == "请展示APP的充值界面，当玩家充值成功之后，原生调用 JS方法，通知游戏刷新玩家余额",
-    "充值弹窗提示文案应正确"
+    GameRechargePrompt.message == "Please show the app's recharge screen. After the player recharges successfully, call the JS method from native code to notify the game to refresh the player's balance.",
+    "不加载本地化资源时，充值弹窗提示应回退英文"
 )
-expect(GameRechargePrompt.notRechargedTitle == "未充值", "取消按钮应显示未充值")
-expect(GameRechargePrompt.notifyGameTitle == "通知游戏", "确认按钮应显示通知游戏")
+expect(GameRechargePrompt.notRechargedTitle == "Not Recharged", "取消按钮应回退英文")
+expect(GameRechargePrompt.notifyGameTitle == "Notify Game", "确认按钮应回退英文")
 expect(
     GameBridgeScript.balanceRefresh == "HttpTool.NativeToJs('recharge')",
     "通知游戏时应调用文档定义的余额刷新 JS"

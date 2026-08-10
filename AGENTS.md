@@ -25,6 +25,16 @@
 - `Localizable.xcstrings`
 - `Assets.xcassets` 中的按钮颜色和场景背景图
 
+## 本地文案与多语言
+
+- 当前 Demo 的所有用户可见文案和无障碍文案必须支持英文 `en` 与简体中文 `zh-Hans`。
+- 使用 iOS 原生本地化机制和 `String(localized:defaultValue:)`，跟随系统语言，英文作为源语言和默认回退语言。
+- 新增或修改本地文案时，必须同时更新 `Localizable.xcstrings` 中的英文和简体中文翻译，并更新本地化测试。
+- 控制台日志、URL、查询参数、资源名称、AppKey、Token、JS 脚本以及 H5 回调名称不属于本地文案，不要本地化。
+- `JoyPlayIntegration` 核心源码中的用户可见默认文案也必须使用本地化调用，并提供英文 `defaultValue`。
+- 接入其他业务工程时不要复制 Demo 的 `Localizable.xcstrings`；如果启用了核心源码提供的默认 UI，应将相同本地化键加入目标 App 自己的字符串资源。
+- 使用 `xcrun xcstringstool compile` 验证字符串目录，并通过无签名模拟器构建确认英中资源被打包。构建不能替代系统语言切换后的运行时视觉验证。
+
 ## 不得擅自改变的接入契约
 
 - 游戏地址由 `GameURLBuilder` 生成。

@@ -17,9 +17,20 @@ enum GameEvent: String, CaseIterable {
 }
 
 enum GameRechargePrompt {
-    static let message = "请展示APP的充值界面，当玩家充值成功之后，原生调用 JS方法，通知游戏刷新玩家余额"
-    static let notRechargedTitle = "未充值"
-    static let notifyGameTitle = "通知游戏"
+    static var message: String {
+        String(
+            localized: "game.recharge_prompt.message",
+            defaultValue: "Please show the app's recharge screen. After the player recharges successfully, call the JS method from native code to notify the game to refresh the player's balance."
+        )
+    }
+
+    static var notRechargedTitle: String {
+        String(localized: "game.recharge_prompt.not_recharged", defaultValue: "Not Recharged")
+    }
+
+    static var notifyGameTitle: String {
+        String(localized: "game.recharge_prompt.notify_game", defaultValue: "Notify Game")
+    }
 }
 
 enum GameBridgeScript {

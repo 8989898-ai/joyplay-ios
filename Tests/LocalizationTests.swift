@@ -47,6 +47,18 @@ let expectedValues: [String: [String: String]] = [
         "en": "Open Large Half-Screen Game",
         "zh-Hans": "打开大半屏游戏"
     ],
+    "game.recharge_prompt.message": [
+        "en": "Please show the app's recharge screen. After the player recharges successfully, call the JS method from native code to notify the game to refresh the player's balance.",
+        "zh-Hans": "请展示APP的充值界面，当玩家充值成功之后，原生调用 JS方法，通知游戏刷新玩家余额"
+    ],
+    "game.recharge_prompt.not_recharged": [
+        "en": "Not Recharged",
+        "zh-Hans": "未充值"
+    ],
+    "game.recharge_prompt.notify_game": [
+        "en": "Notify Game",
+        "zh-Hans": "通知游戏"
+    ],
     "game.title": [
         "en": "Game",
         "zh-Hans": "游戏"
