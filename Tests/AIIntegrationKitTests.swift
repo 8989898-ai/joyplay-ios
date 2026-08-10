@@ -38,6 +38,7 @@ let requiredAgentRules = [
     "docs/plans",
     "历史",
     "newTppClose",
+    "widthHeightRatio",
     "notifyGameBalanceDidChange()",
     "xcodebuild",
     "真实 H5"
@@ -59,6 +60,8 @@ let requiredRequestFields = [
     "close_behavior:",
     "app_key_source:",
     "token_source:",
+    "width_height_ratio_source:",
+    "invalid_ratio_behavior:",
     "recharge_handler:",
     "notify_game_after_success: true"
 ]

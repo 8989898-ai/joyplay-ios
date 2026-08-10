@@ -36,6 +36,21 @@ enum GameBackDestination {
     case fullModeTab
 }
 
+struct GameAspectRatio: Equatable {
+    let widthHeightRatio: CGFloat
+
+    init?(widthHeightRatio: CGFloat) {
+        guard widthHeightRatio.isFinite, widthHeightRatio > 0 else {
+            return nil
+        }
+        self.widthHeightRatio = widthHeightRatio
+    }
+
+    var heightMultiplier: CGFloat {
+        1 / widthHeightRatio
+    }
+}
+
 enum GameDisplayMode: CaseIterable, Equatable {
     case full
     case half
@@ -96,17 +111,6 @@ enum GameDisplayMode: CaseIterable, Equatable {
 
     var backDestination: GameBackDestination {
         self == .full ? .previousScreen : .fullModeTab
-    }
-
-    var heightToWidthRatio: CGFloat? {
-        switch self {
-        case .half:
-            return 1.0
-        case .sevenTenths:
-            return 1.5
-        case .full:
-            return nil
-        }
     }
 }
 

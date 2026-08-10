@@ -24,6 +24,10 @@ credentials:
   app_key_source: <固定值或代码表达式>
   token_source: <固定值或代码表达式>
 
+layout:
+  width_height_ratio_source: <请填写后端字段或代码表达式，语义为宽除以高>
+  invalid_ratio_behavior: <请填写不打开游戏、提示或重试方式>
+
 recharge:
   automatically_shows_demo_prompt: false
   recharge_handler: <请填写充值页面或处理方法>

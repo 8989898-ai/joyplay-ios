@@ -30,7 +30,7 @@
 - 游戏地址由 `GameURLBuilder` 生成。
 - `gameId=1`。
 - 全屏、半屏、大半屏分别使用 `mini=0`、`mini=1`、`mini=2`。
-- 半屏宽高比为 `1:1`，大半屏为 `1:1.5`，并底部对齐安全区。
+- 半屏和大半屏的 `widthHeightRatio`（宽 ÷ 高）来自宿主后端配置；使用 `GameAspectRatio` 校验并转换成高度 multiplier，底部对齐安全区。不要在 `GameDisplayMode` 或核心源码中写死比例。
 - H5 消息名称固定为 `recharge`、`clickRecharge`、`newTppClose`、`OpenGameSucc`。
 - `newTppClose` 到达后，宿主根据模板选择移除游戏视图或 Pop；不要擅自关闭直播间、语聊房等业务控制器。
 - 宿主主动退出时调用 `stop()`。
@@ -39,9 +39,9 @@
 
 ## AI 接入步骤
 
-1. 根据 `INTEGRATION_REQUEST.yaml` 定位目标工程、Scheme、App Target 和宿主控制器。
+1. 根据 `INTEGRATION_REQUEST.yaml` 定位目标工程、Scheme、App Target、宿主控制器和宽高比来源。
 2. 复制 `JoyPlayIntegration` 目录，保持两个文件在同一个 Target 中。
-3. 根据启用的模式创建 `GameWebView`，不要引入 Demo Tab Bar 或背景资源。
+3. 根据启用的模式创建 `GameWebView`；半屏和大半屏使用后端比例设置宿主高度约束，不要引入 Demo Tab Bar 或背景资源。
 4. 实现全部 `GameEvent` 分支，即使某个事件当前只记录日志。
 5. 按模板实现关闭与充值行为。
 6. 检查每个主动移除路径都调用 `stop()`。
@@ -69,6 +69,6 @@ AI 完成后必须报告：
 
 - 复制或修改了哪些文件。
 - 每种启用模式接入到哪个宿主控制器。
-- AppKey、Token、关闭和充值行为来自模板中的哪项配置。
+- AppKey、Token、宽高比、无效比例处理、关闭和充值行为来自模板中的哪项配置。
 - 执行了哪些测试或 `xcodebuild` 命令及其结果。
 - 哪些真实 H5 或视觉验证仍待人工完成。

@@ -7,9 +7,18 @@ private func expect(_ condition: @autoclosure () -> Bool, _ message: String) {
     }
 }
 
-expect(GameDisplayMode.half.heightToWidthRatio == 1.0, "半屏宽高比应为 1:1")
-expect(GameDisplayMode.sevenTenths.heightToWidthRatio == 1.5, "大半屏宽高比应为 1:1.5")
-expect(GameDisplayMode.full.heightToWidthRatio == nil, "全屏应使用安全区完整高度")
+let squareAspectRatio = GameAspectRatio(widthHeightRatio: 1.0)
+expect(squareAspectRatio?.heightMultiplier == 1.0, "1:1 后端宽高比应生成 1 倍高度")
+
+let largeHalfAspectRatio = GameAspectRatio(widthHeightRatio: 2.0 / 3.0)
+expect(
+    abs((largeHalfAspectRatio?.heightMultiplier ?? 0) - 1.5) < 0.000_001,
+    "2:3 后端宽高比应生成 1.5 倍高度"
+)
+expect(GameAspectRatio(widthHeightRatio: 0) == nil, "零宽高比应被拒绝")
+expect(GameAspectRatio(widthHeightRatio: -1) == nil, "负宽高比应被拒绝")
+expect(GameAspectRatio(widthHeightRatio: .infinity) == nil, "无限宽高比应被拒绝")
+expect(GameAspectRatio(widthHeightRatio: .nan) == nil, "非数字宽高比应被拒绝")
 expect(
     GameDisplayMode.allCases.map(\.title) == ["Full Screen", "Half Screen", "Large Half Screen"],
     "不加载本地化资源时，底部 Tab 应回退英文"

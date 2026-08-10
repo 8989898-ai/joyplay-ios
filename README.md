@@ -77,14 +77,21 @@ navigationController?.pushViewController(gameViewController, animated: true)
 
 ### 方式二：直接嵌入业务页面
 
-直播间或语聊房只复制两个核心文件，并直接添加 `GameWebView`：
+直播间或语聊房只复制两个核心文件。业务后端返回 `widthHeightRatio`（宽 ÷ 高）后，宿主先校验比例，再直接添加 `GameWebView`：
 
 ```swift
 private var gameWebView: GameWebView?
 
-private func openHalfScreenGame() {
+private func openEmbeddedGame(
+    displayMode: GameDisplayMode,
+    widthHeightRatio: CGFloat
+) {
+    guard let aspectRatio = GameAspectRatio(widthHeightRatio: widthHeightRatio) else {
+        return
+    }
+
     let gameWebView = GameWebView(
-        displayMode: .half,
+        displayMode: displayMode,
         appKey: GameLaunchCredentials.appKey,
         token: GameLaunchCredentials.token,
         automaticallyShowsRechargePrompt: false,
@@ -98,13 +105,18 @@ private func openHalfScreenGame() {
         gameWebView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
         gameWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
         gameWebView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-        gameWebView.heightAnchor.constraint(equalTo: gameWebView.widthAnchor)
+        gameWebView.heightAnchor.constraint(
+            equalTo: gameWebView.widthAnchor,
+            multiplier: aspectRatio.heightMultiplier
+        )
     ])
     self.gameWebView = gameWebView
 }
 ```
 
-大半屏只需把 `displayMode` 改成 `.sevenTenths`，并将高度约束的 multiplier 设置为 `1.5`。直接嵌入全屏时使用 `.full`，让 `GameWebView` 约束到页面安全区的四条边，不设置固定宽高比。
+例如后端返回 `widthHeightRatio=1.0` 时 WebView 为 `1:1`；返回约 `0.6667` 时，高度约为宽度的 `1.5` 倍。`GameAspectRatio` 会拒绝小于等于零、无限或非数字的值。比例无效时如何提示或重试由业务宿主决定，不要在核心源码中写死兜底比例。
+
+直接嵌入全屏时使用 `.full`，让 `GameWebView` 约束到页面安全区的四条边，不读取 `widthHeightRatio`。比例只控制原生容器高度，不改变 `mini` 参数。
 
 ## 统一事件回调
 
@@ -171,6 +183,7 @@ gameWebView = nil
 
 - 核心 Swift 文件已加入业务 App Target。
 - 传入的 AppKey、Token 符合接入约定。
+- 半屏和大半屏使用后端 `widthHeightRatio`，并已处理无效比例。
 - 全屏、半屏和大半屏分别生成正确的 `mini`。
 - 四个 `GameEvent` 均已按业务需要处理。
 - 自定义充值流程关闭了自动 Demo 弹窗，并在充值成功后通知游戏。

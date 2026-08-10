@@ -29,6 +29,9 @@ let requiredContent = [
     "mini=1",
     "mini=2",
     "isNativeDemo=1",
+    "widthHeightRatio",
+    "GameAspectRatio",
+    "heightMultiplier",
     "GameWebView(",
     "onEvent:",
     "automaticallyShowsRechargePrompt: false",
@@ -51,6 +54,24 @@ if !gameWebView.contains("isNativeDemo: Bool = false") {
 }
 if !gameWebView.contains("isNativeDemo: isNativeDemo") {
     fail("GameWebView should forward the Demo marker to GameURLBuilder")
+}
+
+let configuration = source(at: "joyplay-ios/JoyPlayIntegration/GameConfiguration.swift")
+if configuration.contains("var heightToWidthRatio") {
+    fail("display modes should not define host layout ratios")
+}
+
+let demoHost = source(at: "joyplay-ios/ViewController.swift")
+guard
+    demoHost.contains("backendWidthHeightRatios"),
+    demoHost.contains("GameAspectRatio(widthHeightRatio:")
+else {
+    fail("the Demo host should convert backend ratios before creating the game screen")
+}
+
+let embeddedHost = source(at: "joyplay-ios/GameModeTabBarController.swift")
+guard embeddedHost.contains("aspectRatio.heightMultiplier") else {
+    fail("the embedded host should size the game using the injected backend ratio")
 }
 
 for demoPath in [

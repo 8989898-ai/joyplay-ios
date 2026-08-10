@@ -4,6 +4,7 @@ final class GameViewController: UIViewController {
     private let displayMode: GameDisplayMode
     private let appKey: String
     private let token: String
+    private let aspectRatio: GameAspectRatio?
     private lazy var gameWebView = GameWebView(
         displayMode: displayMode,
         appKey: appKey,
@@ -17,10 +18,16 @@ final class GameViewController: UIViewController {
         }
     )
 
-    init(displayMode: GameDisplayMode, appKey: String, token: String) {
+    init(
+        displayMode: GameDisplayMode,
+        appKey: String,
+        token: String,
+        aspectRatio: GameAspectRatio? = nil
+    ) {
         self.displayMode = displayMode
         self.appKey = appKey
         self.token = token
+        self.aspectRatio = aspectRatio
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -54,10 +61,10 @@ final class GameViewController: UIViewController {
         view.addSubview(gameWebView)
 
         let gameViewHeightConstraint: NSLayoutConstraint
-        if let ratio = displayMode.heightToWidthRatio {
+        if let aspectRatio {
             gameViewHeightConstraint = gameWebView.heightAnchor.constraint(
                 equalTo: gameWebView.widthAnchor,
-                multiplier: ratio
+                multiplier: aspectRatio.heightMultiplier
             )
         } else {
             gameViewHeightConstraint = gameWebView.heightAnchor.constraint(

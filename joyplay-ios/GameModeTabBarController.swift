@@ -3,6 +3,7 @@ import UIKit
 final class GameModeTabBarController: UITabBarController {
     private let appKey: String
     private let token: String
+    private let aspectRatios: [GameDisplayMode: GameAspectRatio]
     private lazy var modeTabsBackButton: UIBarButtonItem = {
         let button = UIBarButtonItem(
             image: UIImage(systemName: "chevron.left"),
@@ -14,9 +15,14 @@ final class GameModeTabBarController: UITabBarController {
         return button
     }()
 
-    init(appKey: String, token: String) {
+    init(
+        appKey: String,
+        token: String,
+        aspectRatios: [GameDisplayMode: GameAspectRatio]
+    ) {
         self.appKey = appKey
         self.token = token
+        self.aspectRatios = aspectRatios
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -33,7 +39,8 @@ final class GameModeTabBarController: UITabBarController {
             let viewController = GameModeLaunchViewController(
                 displayMode: mode,
                 appKey: appKey,
-                token: token
+                token: token,
+                aspectRatio: aspectRatios[mode]
             )
             viewController.tabBarItem = UITabBarItem(
                 title: mode.title,
@@ -120,6 +127,7 @@ private final class GameModeLaunchViewController: UIViewController {
     private let displayMode: GameDisplayMode
     private let appKey: String
     private let token: String
+    private let aspectRatio: GameAspectRatio?
     private var embeddedGameView: GameWebView?
 
     private lazy var backgroundImageView: UIImageView = {
@@ -146,10 +154,16 @@ private final class GameModeLaunchViewController: UIViewController {
         return button
     }()
 
-    init(displayMode: GameDisplayMode, appKey: String, token: String) {
+    init(
+        displayMode: GameDisplayMode,
+        appKey: String,
+        token: String,
+        aspectRatio: GameAspectRatio?
+    ) {
         self.displayMode = displayMode
         self.appKey = appKey
         self.token = token
+        self.aspectRatio = aspectRatio
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -223,7 +237,8 @@ private final class GameModeLaunchViewController: UIViewController {
             let gameViewController = GameViewController(
                 displayMode: displayMode,
                 appKey: appKey,
-                token: token
+                token: token,
+                aspectRatio: aspectRatio
             )
             gameViewController.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(gameViewController, animated: true)
@@ -234,7 +249,7 @@ private final class GameModeLaunchViewController: UIViewController {
 
     private func embedGame() {
         guard embeddedGameView == nil,
-              let heightToWidthRatio = displayMode.heightToWidthRatio else {
+              let aspectRatio else {
             return
         }
 
@@ -259,7 +274,7 @@ private final class GameModeLaunchViewController: UIViewController {
             gameWebView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             gameWebView.heightAnchor.constraint(
                 equalTo: gameWebView.widthAnchor,
-                multiplier: heightToWidthRatio
+                multiplier: aspectRatio.heightMultiplier
             )
         ])
         embeddedGameView = gameWebView
