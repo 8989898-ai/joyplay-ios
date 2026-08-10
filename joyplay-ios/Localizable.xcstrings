@@ -49,7 +49,7 @@
         }
       }
     },
-    "game.mode.seven_tenths" : {
+    "game.mode.large_half" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -97,7 +97,7 @@
         }
       }
     },
-    "game.open.seven_tenths" : {
+    "game.open.large_half" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {

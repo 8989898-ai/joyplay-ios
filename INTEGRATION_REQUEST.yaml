@@ -15,7 +15,7 @@ modes:
     enabled: true
     host_controller: <请填写直播间控制器>
     close_behavior: remove_game_view
-  seven_tenths:
+  large_half:
     enabled: true
     host_controller: <请填写语聊房控制器>
     close_behavior: remove_game_view

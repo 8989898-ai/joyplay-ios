@@ -31,7 +31,7 @@ let expectedValues: [String: [String: String]] = [
         "en": "Half Screen",
         "zh-Hans": "半屏"
     ],
-    "game.mode.seven_tenths": [
+    "game.mode.large_half": [
         "en": "Large Half Screen",
         "zh-Hans": "大半屏"
     ],
@@ -43,7 +43,7 @@ let expectedValues: [String: [String: String]] = [
         "en": "Open Half-Screen Game",
         "zh-Hans": "打开半屏游戏"
     ],
-    "game.open.seven_tenths": [
+    "game.open.large_half": [
         "en": "Open Large Half-Screen Game",
         "zh-Hans": "打开大半屏游戏"
     ],

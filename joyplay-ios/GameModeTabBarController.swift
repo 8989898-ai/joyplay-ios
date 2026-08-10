@@ -186,9 +186,9 @@ private final class GameModeLaunchViewController: UIViewController {
                 localized: "game.open.half",
                 defaultValue: "Open Half-Screen Game"
             )
-        case .sevenTenths:
+        case .largeHalf:
             gameButton.configuration?.title = String(
-                localized: "game.open.seven_tenths",
+                localized: "game.open.large_half",
                 defaultValue: "Open Large Half-Screen Game"
             )
         }

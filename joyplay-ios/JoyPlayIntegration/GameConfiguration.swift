@@ -65,7 +65,7 @@ struct GameAspectRatio: Equatable {
 enum GameDisplayMode: CaseIterable, Equatable {
     case full
     case half
-    case sevenTenths
+    case largeHalf
 
     var title: String {
         switch self {
@@ -73,8 +73,8 @@ enum GameDisplayMode: CaseIterable, Equatable {
             return String(localized: "game.mode.full", defaultValue: "Full Screen")
         case .half:
             return String(localized: "game.mode.half", defaultValue: "Half Screen")
-        case .sevenTenths:
-            return String(localized: "game.mode.seven_tenths", defaultValue: "Large Half Screen")
+        case .largeHalf:
+            return String(localized: "game.mode.large_half", defaultValue: "Large Half Screen")
         }
     }
 
@@ -84,7 +84,7 @@ enum GameDisplayMode: CaseIterable, Equatable {
             return 1.0
         case .half:
             return 0.5
-        case .sevenTenths:
+        case .largeHalf:
             return 0.7
         }
     }
@@ -98,7 +98,7 @@ enum GameDisplayMode: CaseIterable, Equatable {
     }
 
     var backgroundImageName: String {
-        self == .sevenTenths ? "voice-room-bg" : "live-room-bg"
+        self == .largeHalf ? "voice-room-bg" : "live-room-bg"
     }
 
     var miniValue: Int {
@@ -107,7 +107,7 @@ enum GameDisplayMode: CaseIterable, Equatable {
             return 0
         case .half:
             return 1
-        case .sevenTenths:
+        case .largeHalf:
             return 2
         }
     }

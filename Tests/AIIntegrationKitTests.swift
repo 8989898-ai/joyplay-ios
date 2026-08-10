@@ -55,7 +55,7 @@ let requiredRequestFields = [
     "minimum_ios: '15.6'",
     "full:",
     "half:",
-    "seven_tenths:",
+    "large_half:",
     "host_controller:",
     "close_behavior:",
     "app_key_source:",
