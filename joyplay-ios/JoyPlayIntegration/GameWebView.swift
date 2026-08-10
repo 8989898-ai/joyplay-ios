@@ -2,11 +2,16 @@ import UIKit
 import WebKit
 
 final class GameWebView: UIView {
+    private let displayMode: GameDisplayMode
+    private let appKey: String
+    private let token: String
+    private let isNativeDemo: Bool
     private let automaticallyShowsRechargePrompt: Bool
     private let onEvent: (GameEvent) -> Void
     private let webView = WKWebView()
     private var scriptMessageHandler: WeakScriptMessageHandler?
     private var areScriptMessageHandlersRegistered = false
+    private var hasLoadedGame = false
 
     init(
         displayMode: GameDisplayMode,
@@ -16,22 +21,25 @@ final class GameWebView: UIView {
         automaticallyShowsRechargePrompt: Bool = true,
         onEvent: @escaping (GameEvent) -> Void
     ) {
+        self.displayMode = displayMode
+        self.appKey = appKey
+        self.token = token
+        self.isNativeDemo = isNativeDemo
         self.automaticallyShowsRechargePrompt = automaticallyShowsRechargePrompt
         self.onEvent = onEvent
         super.init(frame: .zero)
         configureWebView()
         registerScriptMessageHandlers()
-        loadGame(
-            displayMode: displayMode,
-            appKey: appKey,
-            token: token,
-            isNativeDemo: isNativeDemo
-        )
     }
 
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        loadGameIfNeeded()
     }
 
     func stop() {
@@ -53,6 +61,7 @@ final class GameWebView: UIView {
     }
 
     private func configureWebView() {
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(webView)
         NSLayoutConstraint.activate([
@@ -63,20 +72,22 @@ final class GameWebView: UIView {
         ])
     }
 
-    private func loadGame(
-        displayMode: GameDisplayMode,
-        appKey: String,
-        token: String,
-        isNativeDemo: Bool
-    ) {
+    private func loadGameIfNeeded() {
+        guard !hasLoadedGame, let window else {
+            return
+        }
+
+        let paddingBottom = window.safeAreaInsets.bottom
         guard let url = GameURLBuilder.makeURL(
             appKey: appKey,
             token: token,
             displayMode: displayMode,
+            paddingBottom: paddingBottom,
             isNativeDemo: isNativeDemo
         ) else {
             return
         }
+        hasLoadedGame = true
         print("打开游戏链接：\(url.absoluteString)")
         webView.load(URLRequest(url: url))
     }

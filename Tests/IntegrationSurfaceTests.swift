@@ -17,6 +17,10 @@ guard configurationSource.contains("enum GameEvent: String, CaseIterable") else 
     fail("GameConfiguration should expose the documented callbacks as GameEvent")
 }
 
+guard configurationSource.contains("if displayMode == .full") else {
+    fail("safeTop and paddingBottom should only be added for full-screen games")
+}
+
 let gameWebViewSource = source(at: "joyplay-ios/JoyPlayIntegration/GameWebView.swift")
 guard
     gameWebViewSource.contains("private let onEvent: (GameEvent) -> Void"),
@@ -29,6 +33,18 @@ else {
     fail("GameWebView should expose one complete host-facing event surface")
 }
 
+guard gameWebViewSource.contains("webView.scrollView.contentInsetAdjustmentBehavior = .never") else {
+    fail("GameWebView should not automatically inset content for the safe area")
+}
+
+guard
+    gameWebViewSource.contains("override func layoutSubviews()"),
+    gameWebViewSource.contains("window.safeAreaInsets.bottom"),
+    gameWebViewSource.contains("paddingBottom: paddingBottom")
+else {
+    fail("GameWebView should load with the window's bottom safe-area height")
+}
+
 let fullScreenHostSource = source(at: "joyplay-ios/GameViewController.swift")
 guard
     fullScreenHostSource.contains("onEvent:"),
@@ -37,6 +53,14 @@ guard
     fullScreenHostSource.contains("gameWebView.stop()")
 else {
     fail("the full-screen host should close only for the close event and stop on host exit")
+}
+
+guard
+    fullScreenHostSource.contains("gameWebView.topAnchor.constraint(equalTo: view.topAnchor)"),
+    fullScreenHostSource.contains("gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)"),
+    !fullScreenHostSource.contains("equalTo: view.safeAreaLayoutGuide.heightAnchor")
+else {
+    fail("the full-screen game should extend to every physical screen edge")
 }
 
 let embeddedHostSource = source(at: "joyplay-ios/GameModeTabBarController.swift")

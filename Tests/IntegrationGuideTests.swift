@@ -28,6 +28,7 @@ let requiredContent = [
     "mini=0",
     "mini=1",
     "mini=2",
+    "paddingBottom",
     "isNativeDemo=1",
     "widthHeightRatio",
     "GameAspectRatio",

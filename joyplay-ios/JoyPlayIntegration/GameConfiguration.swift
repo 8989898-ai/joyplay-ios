@@ -130,6 +130,7 @@ enum GameURLBuilder {
         appKey: String,
         token: String,
         displayMode: GameDisplayMode,
+        paddingBottom: CGFloat,
         isNativeDemo: Bool = false
     ) -> URL? {
         var components = URLComponents()
@@ -139,9 +140,16 @@ enum GameURLBuilder {
         var queryItems = [
             URLQueryItem(name: "appKey", value: appKey),
             URLQueryItem(name: "token", value: token),
-            URLQueryItem(name: "gameId", value: "1"),
+            URLQueryItem(name: "gameId", value: "34"),
             URLQueryItem(name: "mini", value: String(displayMode.miniValue))
         ]
+        if displayMode == .full {
+            queryItems.append(URLQueryItem(name: "safeTop", value: "1"))
+            queryItems.append(URLQueryItem(
+                name: "paddingBottom",
+                value: String(Double(paddingBottom))
+            ))
+        }
         if isNativeDemo {
             queryItems.append(URLQueryItem(name: "isNativeDemo", value: "1"))
         }

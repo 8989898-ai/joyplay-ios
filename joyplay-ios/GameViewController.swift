@@ -60,23 +60,25 @@ final class GameViewController: UIViewController {
         gameWebView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(gameWebView)
 
-        let gameViewHeightConstraint: NSLayoutConstraint
+        let verticalConstraints: [NSLayoutConstraint]
         if let aspectRatio {
-            gameViewHeightConstraint = gameWebView.heightAnchor.constraint(
-                equalTo: gameWebView.widthAnchor,
-                multiplier: aspectRatio.heightMultiplier
-            )
+            verticalConstraints = [
+                gameWebView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+                gameWebView.heightAnchor.constraint(
+                    equalTo: gameWebView.widthAnchor,
+                    multiplier: aspectRatio.heightMultiplier
+                )
+            ]
         } else {
-            gameViewHeightConstraint = gameWebView.heightAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.heightAnchor
-            )
+            verticalConstraints = [
+                gameWebView.topAnchor.constraint(equalTo: view.topAnchor),
+                gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            ]
         }
 
-        NSLayoutConstraint.activate([
-            gameWebView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+        NSLayoutConstraint.activate(verticalConstraints + [
             gameWebView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            gameWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            gameViewHeightConstraint
+            gameWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
 }

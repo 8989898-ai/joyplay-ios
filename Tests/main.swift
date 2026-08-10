@@ -78,11 +78,14 @@ expect(
     "通知游戏时应调用文档定义的余额刷新 JS"
 )
 
+var observedGameIDs = Set<String>()
+
 for (displayMode, expectedMini) in zip(GameDisplayMode.allCases, ["0", "1", "2"]) {
     let integrationURL = GameURLBuilder.makeURL(
         appKey: GameLaunchCredentials.appKey,
         token: GameLaunchCredentials.token,
-        displayMode: displayMode
+        displayMode: displayMode,
+        paddingBottom: 34
     )
     if let integrationURL,
        let components = URLComponents(url: integrationURL, resolvingAgainstBaseURL: false) {
@@ -94,6 +97,7 @@ for (displayMode, expectedMini) in zip(GameDisplayMode.allCases, ["0", "1", "2"]
         appKey: GameLaunchCredentials.appKey,
         token: GameLaunchCredentials.token,
         displayMode: displayMode,
+        paddingBottom: 34,
         isNativeDemo: true
     )
     expect(url != nil, "Demo 固定参数应生成游戏链接")
@@ -108,10 +112,19 @@ for (displayMode, expectedMini) in zip(GameDisplayMode.allCases, ["0", "1", "2"]
         expect(components.path == "/release/index.html", "游戏链接路径应正确")
         expect(queryItems["appKey"] == GameLaunchCredentials.appKey, "AppKey 应使用固定配置")
         expect(queryItems["token"] == GameLaunchCredentials.token, "Token 应使用固定配置")
-        expect(queryItems["gameId"] == "1", "gameId 应固定为 1")
+        if displayMode == .full {
+            expect(queryItems["safeTop"] == "1", "全屏游戏链接应携带 safeTop=1")
+            expect(queryItems["paddingBottom"] == "34.0", "全屏游戏链接应携带系统底部安全距离")
+        } else {
+            expect(queryItems["safeTop"] == nil, "非全屏游戏链接不应携带 safeTop")
+            expect(queryItems["paddingBottom"] == nil, "非全屏游戏链接不应携带 paddingBottom")
+        }
+        observedGameIDs.insert(queryItems["gameId"] ?? "")
         expect(queryItems["mini"] == expectedMini, "mini 应来自展示模式")
         expect(queryItems["isNativeDemo"] == "1", "Demo 游戏链接应携带 isNativeDemo=1")
     }
 }
+
+expect(observedGameIDs == ["1"], "gameId 应固定为 1")
 
 print("GameConfiguration tests passed")
