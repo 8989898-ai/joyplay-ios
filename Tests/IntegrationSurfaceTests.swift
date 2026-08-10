@@ -38,6 +38,16 @@ guard gameWebViewSource.contains("webView.scrollView.contentInsetAdjustmentBehav
 }
 
 guard
+    gameWebViewSource.contains("aspectRatio: GameAspectRatio? = nil"),
+    gameWebViewSource.contains("backgroundColor = .black"),
+    gameWebViewSource.contains("webView.topAnchor.constraint(equalTo: topAnchor)"),
+    gameWebViewSource.contains("webView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)"),
+    gameWebViewSource.contains("multiplier: aspectRatio.heightMultiplier")
+else {
+    fail("embedded GameWebView should add the bottom safe area below its ratio-sized WKWebView")
+}
+
+guard
     gameWebViewSource.contains("override func layoutSubviews()"),
     gameWebViewSource.contains("window.safeAreaInsets.bottom"),
     gameWebViewSource.contains("paddingBottom: paddingBottom")
@@ -56,6 +66,7 @@ else {
 }
 
 guard
+    fullScreenHostSource.contains("if displayMode != .full, aspectRatio != nil"),
     fullScreenHostSource.contains("gameWebView.topAnchor.constraint(equalTo: view.topAnchor)"),
     fullScreenHostSource.contains("gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)"),
     !fullScreenHostSource.contains("equalTo: view.safeAreaLayoutGuide.heightAnchor")
@@ -67,9 +78,13 @@ let embeddedHostSource = source(at: "joyplay-ios/GameModeTabBarController.swift"
 guard
     embeddedHostSource.contains("onEvent:"),
     embeddedHostSource.contains("event == .close"),
-    embeddedHostSource.contains("gameWebView.stop()")
+    embeddedHostSource.contains("gameWebView.stop()"),
+    embeddedHostSource.contains("aspectRatio: aspectRatio"),
+    embeddedHostSource.contains("gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)"),
+    !embeddedHostSource.contains("gameWebView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)"),
+    !embeddedHostSource.contains("equalTo: gameWebView.widthAnchor")
 else {
-    fail("the embedded host should close only for the close event and stop before removal")
+    fail("the embedded host should pass its ratio and pin the outer GameWebView to the screen bottom")
 }
 
 print("Integration surface tests passed")

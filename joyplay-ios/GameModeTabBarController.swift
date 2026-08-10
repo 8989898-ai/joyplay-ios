@@ -258,6 +258,7 @@ private final class GameModeLaunchViewController: UIViewController {
             displayMode: displayMode,
             appKey: appKey,
             token: token,
+            aspectRatio: aspectRatio,
             isNativeDemo: true,
             onEvent: { [weak self] event in
                 guard event == .close else {
@@ -271,11 +272,7 @@ private final class GameModeLaunchViewController: UIViewController {
         NSLayoutConstraint.activate([
             gameWebView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             gameWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            gameWebView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            gameWebView.heightAnchor.constraint(
-                equalTo: gameWebView.widthAnchor,
-                multiplier: aspectRatio.heightMultiplier
-            )
+            gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         embeddedGameView = gameWebView
         gameButton.isHidden = true

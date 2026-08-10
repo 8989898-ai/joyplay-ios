@@ -71,8 +71,12 @@ else {
 }
 
 let embeddedHost = source(at: "joyplay-ios/GameModeTabBarController.swift")
-guard embeddedHost.contains("aspectRatio.heightMultiplier") else {
-    fail("the embedded host should size the game using the injected backend ratio")
+let gameWebViewSource = source(at: "joyplay-ios/JoyPlayIntegration/GameWebView.swift")
+guard
+    embeddedHost.contains("aspectRatio: aspectRatio"),
+    gameWebViewSource.contains("aspectRatio.heightMultiplier")
+else {
+    fail("the embedded host should inject the backend ratio used to size the WKWebView")
 }
 
 for demoPath in [

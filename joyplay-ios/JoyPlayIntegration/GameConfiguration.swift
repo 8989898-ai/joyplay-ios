@@ -140,7 +140,7 @@ enum GameURLBuilder {
         var queryItems = [
             URLQueryItem(name: "appKey", value: appKey),
             URLQueryItem(name: "token", value: token),
-            URLQueryItem(name: "gameId", value: "34"),
+            URLQueryItem(name: "gameId", value: "1"),
             URLQueryItem(name: "mini", value: String(displayMode.miniValue))
         ]
         if displayMode == .full {

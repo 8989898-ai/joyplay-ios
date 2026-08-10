@@ -5,6 +5,7 @@ final class GameWebView: UIView {
     private let displayMode: GameDisplayMode
     private let appKey: String
     private let token: String
+    private let aspectRatio: GameAspectRatio?
     private let isNativeDemo: Bool
     private let automaticallyShowsRechargePrompt: Bool
     private let onEvent: (GameEvent) -> Void
@@ -17,6 +18,7 @@ final class GameWebView: UIView {
         displayMode: GameDisplayMode,
         appKey: String,
         token: String,
+        aspectRatio: GameAspectRatio? = nil,
         isNativeDemo: Bool = false,
         automaticallyShowsRechargePrompt: Bool = true,
         onEvent: @escaping (GameEvent) -> Void
@@ -24,6 +26,7 @@ final class GameWebView: UIView {
         self.displayMode = displayMode
         self.appKey = appKey
         self.token = token
+        self.aspectRatio = aspectRatio
         self.isNativeDemo = isNativeDemo
         self.automaticallyShowsRechargePrompt = automaticallyShowsRechargePrompt
         self.onEvent = onEvent
@@ -61,15 +64,30 @@ final class GameWebView: UIView {
     }
 
     private func configureWebView() {
+        if displayMode != .full {
+            backgroundColor = .black
+        }
         webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(webView)
-        NSLayoutConstraint.activate([
+
+        var constraints = [
             webView.topAnchor.constraint(equalTo: topAnchor),
             webView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            webView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            webView.bottomAnchor.constraint(equalTo: bottomAnchor)
-        ])
+            webView.trailingAnchor.constraint(equalTo: trailingAnchor)
+        ]
+        if displayMode != .full, let aspectRatio {
+            constraints += [
+                webView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
+                webView.heightAnchor.constraint(
+                    equalTo: webView.widthAnchor,
+                    multiplier: aspectRatio.heightMultiplier
+                )
+            ]
+        } else {
+            constraints.append(webView.bottomAnchor.constraint(equalTo: bottomAnchor))
+        }
+        NSLayoutConstraint.activate(constraints)
     }
 
     private func loadGameIfNeeded() {

@@ -9,6 +9,7 @@ final class GameViewController: UIViewController {
         displayMode: displayMode,
         appKey: appKey,
         token: token,
+        aspectRatio: aspectRatio,
         isNativeDemo: true,
         onEvent: { [weak self] event in
             guard event == .close else {
@@ -61,13 +62,9 @@ final class GameViewController: UIViewController {
         view.addSubview(gameWebView)
 
         let verticalConstraints: [NSLayoutConstraint]
-        if let aspectRatio {
+        if displayMode != .full, aspectRatio != nil {
             verticalConstraints = [
-                gameWebView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-                gameWebView.heightAnchor.constraint(
-                    equalTo: gameWebView.widthAnchor,
-                    multiplier: aspectRatio.heightMultiplier
-                )
+                gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
             ]
         } else {
             verticalConstraints = [

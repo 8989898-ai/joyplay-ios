@@ -96,6 +96,7 @@ private func openEmbeddedGame(
         displayMode: displayMode,
         appKey: GameLaunchCredentials.appKey,
         token: GameLaunchCredentials.token,
+        aspectRatio: aspectRatio,
         automaticallyShowsRechargePrompt: false,
         onEvent: { [weak self] event in
             self?.handleGameEvent(event)
@@ -106,17 +107,13 @@ private func openEmbeddedGame(
     NSLayoutConstraint.activate([
         gameWebView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
         gameWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-        gameWebView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-        gameWebView.heightAnchor.constraint(
-            equalTo: gameWebView.widthAnchor,
-            multiplier: aspectRatio.heightMultiplier
-        )
+        gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
     ])
     self.gameWebView = gameWebView
 }
 ```
 
-例如后端返回 `widthHeightRatio=1.0` 时 WebView 为 `1:1`；返回约 `0.6667` 时，高度约为宽度的 `1.5` 倍。`GameAspectRatio` 会拒绝小于等于零、无限或非数字的值。比例无效时如何提示或重试由业务宿主决定，不要在核心源码中写死兜底比例。
+例如后端返回 `widthHeightRatio=1.0` 时，内部 `WKWebView` 为 `1:1`；返回约 `0.6667` 时，`WKWebView` 高度约为宽度的 `1.5` 倍。`GameWebView` 使用 `GameAspectRatio.heightMultiplier` 建立这条内部比例约束。半屏和大半屏的外层 `GameWebView` 底部贴屏幕底部，高度为 `WKWebView` 高度加底部安全距离；`WKWebView` 顶部与外层顶部对齐，底部安全区域显示外层黑色背景。`GameAspectRatio` 会拒绝小于等于零、无限或非数字的值。比例无效时如何提示或重试由业务宿主决定，不要在核心源码中写死兜底比例。
 
 直接嵌入全屏时使用 `.full`，让 `GameWebView` 约束到页面安全区的四条边，不读取 `widthHeightRatio`。比例只控制原生容器高度，不改变 `mini` 参数。
 
