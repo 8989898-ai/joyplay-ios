@@ -6,8 +6,7 @@ final class GameWebView: UIView {
     private let appKey: String
     private let token: String
     private let aspectRatio: GameAspectRatio?
-    private let isNativeDemo: Bool
-    private let automaticallyShowsRechargePrompt: Bool
+    private let additionalURLQueryItems: [URLQueryItem]
     private let onEvent: (GameEvent) -> Void
     private let webView = WKWebView()
     private var scriptMessageHandler: WeakScriptMessageHandler?
@@ -19,16 +18,14 @@ final class GameWebView: UIView {
         appKey: String,
         token: String,
         aspectRatio: GameAspectRatio? = nil,
-        isNativeDemo: Bool = false,
-        automaticallyShowsRechargePrompt: Bool = true,
+        additionalURLQueryItems: [URLQueryItem] = [],
         onEvent: @escaping (GameEvent) -> Void
     ) {
         self.displayMode = displayMode
         self.appKey = appKey
         self.token = token
         self.aspectRatio = aspectRatio
-        self.isNativeDemo = isNativeDemo
-        self.automaticallyShowsRechargePrompt = automaticallyShowsRechargePrompt
+        self.additionalURLQueryItems = additionalURLQueryItems
         self.onEvent = onEvent
         super.init(frame: .zero)
         configureWebView()
@@ -101,7 +98,7 @@ final class GameWebView: UIView {
             token: token,
             displayMode: displayMode,
             paddingBottom: paddingBottom,
-            isNativeDemo: isNativeDemo
+            additionalURLQueryItems: additionalURLQueryItems
         ) else {
             return
         }
@@ -137,37 +134,6 @@ final class GameWebView: UIView {
         scriptMessageHandler = nil
         areScriptMessageHandlersRegistered = false
     }
-
-    private func showRechargePrompt() {
-        let alertController = UIAlertController(
-            title: nil,
-            message: GameRechargePrompt.message,
-            preferredStyle: .alert
-        )
-        alertController.addAction(UIAlertAction(
-            title: GameRechargePrompt.notRechargedTitle,
-            style: .cancel
-        ))
-        alertController.addAction(UIAlertAction(
-            title: GameRechargePrompt.notifyGameTitle,
-            style: .default,
-            handler: { [weak self] _ in
-                self?.notifyGameBalanceDidChange()
-            }
-        ))
-        hostingViewController?.present(alertController, animated: true)
-    }
-
-    private var hostingViewController: UIViewController? {
-        var responder: UIResponder? = self
-        while let currentResponder = responder {
-            if let viewController = currentResponder as? UIViewController {
-                return viewController
-            }
-            responder = currentResponder.next
-        }
-        return nil
-    }
 }
 
 extension GameWebView: WKScriptMessageHandler {
@@ -192,10 +158,6 @@ extension GameWebView: WKScriptMessageHandler {
         }
 
         onEvent(event)
-
-        if automaticallyShowsRechargePrompt && event.showsRechargePrompt {
-            showRechargePrompt()
-        }
     }
 }
 

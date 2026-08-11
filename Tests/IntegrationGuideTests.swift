@@ -23,6 +23,7 @@ let requiredContent = [
     "DemoGameConfiguration.swift",
     "GameViewController.swift",
     "GameModeTabBarController.swift",
+    "DemoRechargePromptPresenter.swift",
     "AGENTS.md",
     "INTEGRATION_REQUEST.yaml",
     "gameId=1",
@@ -36,7 +37,7 @@ let requiredContent = [
     "heightMultiplier",
     "GameWebView(",
     "onEvent:",
-    "automaticallyShowsRechargePrompt: false",
+    "additionalURLQueryItems",
     "notifyGameBalanceDidChange()",
     "recharge",
     "clickRecharge",
@@ -60,11 +61,13 @@ else {
 }
 
 let gameWebView = source(at: "joyplay-ios/JoyPlayIntegration/GameWebView.swift")
-if !gameWebView.contains("isNativeDemo: Bool = false") {
-    fail("the distributable GameWebView should keep the Demo marker disabled by default")
-}
-if !gameWebView.contains("isNativeDemo: isNativeDemo") {
-    fail("GameWebView should forward the Demo marker to GameURLBuilder")
+for forbiddenSymbol in [
+    "isNativeDemo",
+    "UIAlertController",
+    "automaticallyShowsRechargePrompt",
+    "GameRechargePrompt"
+] where gameWebView.contains(forbiddenSymbol) {
+    fail("the distributable GameWebView should not know Demo or host UI symbol \(forbiddenSymbol)")
 }
 
 let configuration = source(at: "joyplay-ios/JoyPlayIntegration/GameConfiguration.swift")
@@ -92,8 +95,16 @@ else {
 for demoPath in [
     "joyplay-ios/GameViewController.swift",
     "joyplay-ios/GameModeTabBarController.swift"
-] where !source(at: demoPath).contains("isNativeDemo: true") {
-    fail("\(demoPath) should enable the native Demo URL marker")
+] where !source(at: demoPath).contains("additionalURLQueryItems: DemoGameURLConfiguration.additionalQueryItems") {
+    fail("\(demoPath) should inject the Demo-owned URL marker through the neutral core API")
+}
+
+let demoRechargePrompt = source(at: "joyplay-ios/DemoRechargePromptPresenter.swift")
+guard
+    demoRechargePrompt.contains("UIAlertController"),
+    demoRechargePrompt.contains("onNotifyGame")
+else {
+    fail("the Demo should own its recharge alert and notify action")
 }
 
 print("Integration guide tests passed")

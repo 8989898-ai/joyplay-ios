@@ -20,6 +20,7 @@
 除非用户明确要求复刻 Demo UI，否则不要复制以下 Demo 专用内容：
 
 - `DemoGameConfiguration.swift`
+- `DemoRechargePromptPresenter.swift`
 - `GameModeTabBarController.swift`
 - `GameViewController.swift`
 - `ViewController.swift`
@@ -32,8 +33,8 @@
 - 使用 iOS 原生本地化机制和 `String(localized:defaultValue:)`，跟随系统语言，英文作为源语言和默认回退语言。
 - 新增或修改本地文案时，必须同时更新 `Localizable.xcstrings` 中的英文和简体中文翻译，并更新本地化测试。
 - 控制台日志、URL、查询参数、资源名称、AppKey、Token、JS 脚本以及 H5 回调名称不属于本地文案，不要本地化。
-- `JoyPlayIntegration` 核心源码中的用户可见默认文案也必须使用本地化调用，并提供英文 `defaultValue`。
-- 接入其他业务工程时不要复制 Demo 的 `Localizable.xcstrings`；如果启用了核心源码提供的默认 UI，应将相同本地化键加入目标 App 自己的字符串资源。
+- 核心源码不展示充值 UI；Demo 充值文案只属于 `DemoRechargePromptPresenter.swift`。
+- 接入其他业务工程时不要复制 Demo 的 `Localizable.xcstrings`；目标 App 使用自己的充值文案和字符串资源。
 - 使用 `xcrun xcstringstool compile` 验证字符串目录，并通过无签名模拟器构建确认英中资源被打包。构建不能替代系统语言切换后的运行时视觉验证。
 
 ## 不得擅自改变的接入契约
@@ -43,9 +44,10 @@
 - 全屏、半屏、大半屏分别使用 `mini=0`、`mini=1`、`mini=2`。
 - 半屏和大半屏的 `widthHeightRatio`（宽 ÷ 高）来自宿主后端配置；使用 `GameAspectRatio` 校验并转换成高度 multiplier，底部对齐安全区。不要在 `GameDisplayMode` 或核心源码中写死比例。
 - H5 消息名称固定为 `recharge`、`clickRecharge`、`newTppClose`、`OpenGameSucc`。
+- 核心不认识 `isNativeDemo`；当前 Demo 通过 `additionalURLQueryItems` 附加 `isNativeDemo=1`，业务工程默认不传。
 - `newTppClose` 到达后，宿主根据模板选择移除游戏视图或 Pop；不要擅自关闭直播间、语聊房等业务控制器。
 - 宿主主动退出时调用 `stop()`。
-- 自定义充值流程使用 `automaticallyShowsRechargePrompt: false`；充值成功后调用 `notifyGameBalanceDidChange()`。
+- 收到充值事件后由宿主展示充值 UI；充值成功后调用 `notifyGameBalanceDidChange()`。
 - Demo AppKey 和 Token 允许公开，不要仅因其出现在源码或日志中而移除。
 
 ## AI 接入步骤

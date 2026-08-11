@@ -5,27 +5,6 @@ enum GameEvent: String, CaseIterable {
     case recharge = "clickRecharge"
     case close = "newTppClose"
     case openGameSuccess = "OpenGameSucc"
-
-    var showsRechargePrompt: Bool {
-        self == .insufficientBalance || self == .recharge
-    }
-}
-
-enum GameRechargePrompt {
-    static var message: String {
-        String(
-            localized: "game.recharge_prompt.message",
-            defaultValue: "Please show the app's recharge screen. After the player recharges successfully, call the JS method from native code to notify the game to refresh the player's balance."
-        )
-    }
-
-    static var notRechargedTitle: String {
-        String(localized: "game.recharge_prompt.not_recharged", defaultValue: "Not Recharged")
-    }
-
-    static var notifyGameTitle: String {
-        String(localized: "game.recharge_prompt.notify_game", defaultValue: "Notify Game")
-    }
 }
 
 enum GameBridgeScript {
@@ -70,7 +49,7 @@ enum GameURLBuilder {
         token: String,
         displayMode: GameDisplayMode,
         paddingBottom: CGFloat,
-        isNativeDemo: Bool = false
+        additionalURLQueryItems: [URLQueryItem] = []
     ) -> URL? {
         var components = URLComponents()
         components.scheme = "https"
@@ -89,9 +68,12 @@ enum GameURLBuilder {
                 value: String(Double(paddingBottom))
             ))
         }
-        if isNativeDemo {
-            queryItems.append(URLQueryItem(name: "isNativeDemo", value: "1"))
-        }
+        let reservedQueryNames = Set([
+            "appKey", "token", "gameId", "mini", "safeTop", "paddingBottom"
+        ])
+        queryItems.append(contentsOf: additionalURLQueryItems.filter {
+            !reservedQueryNames.contains($0.name)
+        })
         components.queryItems = queryItems
         return components.url
     }

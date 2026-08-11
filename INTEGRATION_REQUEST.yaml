@@ -29,7 +29,7 @@ layout:
   invalid_ratio_behavior: <请填写不打开游戏、提示或重试方式>
 
 recharge:
-  automatically_shows_demo_prompt: false
+  ui_owner: host
   recharge_handler: <请填写充值页面或处理方法>
   notify_game_after_success: true
 

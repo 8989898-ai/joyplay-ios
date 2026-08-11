@@ -25,12 +25,14 @@ let gameWebViewSource = source(at: "joyplay-ios/JoyPlayIntegration/GameWebView.s
 guard
     gameWebViewSource.contains("private let onEvent: (GameEvent) -> Void"),
     gameWebViewSource.contains("onEvent: @escaping (GameEvent) -> Void"),
-    gameWebViewSource.contains("private let automaticallyShowsRechargePrompt: Bool"),
+    gameWebViewSource.contains("additionalURLQueryItems: [URLQueryItem] = []"),
     gameWebViewSource.contains("func notifyGameBalanceDidChange()"),
     gameWebViewSource.contains("onEvent(event)"),
-    !gameWebViewSource.contains("onClose")
+    !gameWebViewSource.contains("onClose"),
+    !gameWebViewSource.contains("UIAlertController"),
+    !gameWebViewSource.contains("automaticallyShowsRechargePrompt")
 else {
-    fail("GameWebView should expose one complete host-facing event surface")
+    fail("GameWebView should expose events and URL extension without owning host UI")
 }
 
 guard gameWebViewSource.contains("webView.scrollView.contentInsetAdjustmentBehavior = .never") else {
@@ -58,11 +60,16 @@ else {
 let fullScreenHostSource = source(at: "joyplay-ios/GameViewController.swift")
 guard
     fullScreenHostSource.contains("onEvent:"),
-    fullScreenHostSource.contains("event == .close"),
+    fullScreenHostSource.contains("handleGameEvent"),
+    fullScreenHostSource.contains("case .insufficientBalance, .recharge:"),
+    fullScreenHostSource.contains("DemoRechargePromptPresenter.present"),
+    fullScreenHostSource.contains("gameWebView.notifyGameBalanceDidChange()"),
+    fullScreenHostSource.contains("case .close:"),
+    fullScreenHostSource.contains("case .openGameSuccess:"),
     fullScreenHostSource.contains("if isMovingFromParent"),
     fullScreenHostSource.contains("gameWebView.stop()")
 else {
-    fail("the full-screen host should close only for the close event and stop on host exit")
+    fail("the full-screen Demo host should explicitly own recharge, close, and success behavior")
 }
 
 guard
@@ -77,14 +84,19 @@ else {
 let embeddedHostSource = source(at: "joyplay-ios/GameModeTabBarController.swift")
 guard
     embeddedHostSource.contains("onEvent:"),
-    embeddedHostSource.contains("event == .close"),
+    embeddedHostSource.contains("handleEmbeddedGameEvent"),
+    embeddedHostSource.contains("case .insufficientBalance, .recharge:"),
+    embeddedHostSource.contains("DemoRechargePromptPresenter.present"),
+    embeddedHostSource.contains("embeddedGameView?.notifyGameBalanceDidChange()"),
+    embeddedHostSource.contains("case .close:"),
+    embeddedHostSource.contains("case .openGameSuccess:"),
     embeddedHostSource.contains("gameWebView.stop()"),
     embeddedHostSource.contains("aspectRatio: aspectRatio"),
     embeddedHostSource.contains("gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)"),
     !embeddedHostSource.contains("gameWebView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)"),
     !embeddedHostSource.contains("equalTo: gameWebView.widthAnchor")
 else {
-    fail("the embedded host should pass its ratio and pin the outer GameWebView to the screen bottom")
+    fail("the embedded Demo host should own all events and preserve its layout and release behavior")
 }
 
 print("Integration surface tests passed")

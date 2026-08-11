@@ -24,6 +24,18 @@ private enum DemoConfigurationTests {
         expect(GameDisplayMode.largeHalf.backDestination == .fullModeTab, "large-half back behavior should remain unchanged")
         expect(GameLaunchCredentials.appKey == "ste5a6lxxrtu10bmnc6g", "Demo AppKey should remain unchanged")
         expect(!GameLaunchCredentials.token.isEmpty, "Demo Token should remain configured")
+        expect(
+            DemoGameURLConfiguration.additionalQueryItems.count == 1,
+            "Demo URL configuration should contain only its native marker"
+        )
+        expect(
+            DemoGameURLConfiguration.additionalQueryItems.first?.name == "isNativeDemo",
+            "Demo URL configuration should own the native Demo marker name"
+        )
+        expect(
+            DemoGameURLConfiguration.additionalQueryItems.first?.value == "1",
+            "Demo URL configuration should keep isNativeDemo=1"
+        )
 
         print("Demo configuration tests passed")
     }

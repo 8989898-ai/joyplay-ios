@@ -259,12 +259,9 @@ private final class GameModeLaunchViewController: UIViewController {
             appKey: appKey,
             token: token,
             aspectRatio: aspectRatio,
-            isNativeDemo: true,
+            additionalURLQueryItems: DemoGameURLConfiguration.additionalQueryItems,
             onEvent: { [weak self] event in
-                guard event == .close else {
-                    return
-                }
-                self?.removeEmbeddedGame()
+                self?.handleEmbeddedGameEvent(event)
             }
         )
         gameWebView.translatesAutoresizingMaskIntoConstraints = false
@@ -276,6 +273,19 @@ private final class GameModeLaunchViewController: UIViewController {
         ])
         embeddedGameView = gameWebView
         gameButton.isHidden = true
+    }
+
+    private func handleEmbeddedGameEvent(_ event: GameEvent) {
+        switch event {
+        case .insufficientBalance, .recharge:
+            DemoRechargePromptPresenter.present(from: self) { [weak self] in
+                self?.embeddedGameView?.notifyGameBalanceDidChange()
+            }
+        case .close:
+            removeEmbeddedGame()
+        case .openGameSuccess:
+            break
+        }
     }
 
     private func removeEmbeddedGame() {

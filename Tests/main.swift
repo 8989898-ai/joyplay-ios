@@ -36,16 +36,6 @@ expect(
     GameEvent(rawValue: "unknown") == nil,
     "未知 JS 消息不应被识别"
 )
-expect(GameEvent.insufficientBalance.showsRechargePrompt, "余额不足事件应支持充值提示")
-expect(GameEvent.recharge.showsRechargePrompt, "主动充值事件应支持充值提示")
-expect(!GameEvent.close.showsRechargePrompt, "关闭事件不应展示充值弹窗")
-expect(!GameEvent.openGameSuccess.showsRechargePrompt, "加载成功事件不应展示充值弹窗")
-expect(
-    GameRechargePrompt.message == "Please show the app's recharge screen. After the player recharges successfully, call the JS method from native code to notify the game to refresh the player's balance.",
-    "不加载本地化资源时，充值弹窗提示应回退英文"
-)
-expect(GameRechargePrompt.notRechargedTitle == "Not Recharged", "取消按钮应回退英文")
-expect(GameRechargePrompt.notifyGameTitle == "Notify Game", "确认按钮应回退英文")
 expect(
     GameBridgeScript.balanceRefresh == "HttpTool.NativeToJs('recharge')",
     "通知游戏时应调用文档定义的余额刷新 JS"
@@ -71,14 +61,21 @@ for (displayMode, expectedMini) in zip(GameDisplayMode.allCases, ["0", "1", "2"]
         token: "demo-token",
         displayMode: displayMode,
         paddingBottom: 34,
-        isNativeDemo: true
+        additionalURLQueryItems: [
+            URLQueryItem(name: "isNativeDemo", value: "1"),
+            URLQueryItem(name: "gameId", value: "999"),
+            URLQueryItem(name: "mini", value: "99"),
+            URLQueryItem(name: "safeTop", value: "999"),
+            URLQueryItem(name: "paddingBottom", value: "999")
+        ]
     )
     expect(url != nil, "Demo 固定参数应生成游戏链接")
 
     if let url,
        let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+        let allQueryItems = components.queryItems ?? []
         let queryItems = Dictionary(
-            uniqueKeysWithValues: (components.queryItems ?? []).map { ($0.name, $0.value ?? "") }
+            uniqueKeysWithValues: allQueryItems.map { ($0.name, $0.value ?? "") }
         )
         expect(components.scheme == "https", "游戏链接应使用 HTTPS")
         expect(components.host == "joyplay.cn", "游戏链接域名应正确")
@@ -95,6 +92,8 @@ for (displayMode, expectedMini) in zip(GameDisplayMode.allCases, ["0", "1", "2"]
         observedGameIDs.insert(queryItems["gameId"] ?? "")
         expect(queryItems["mini"] == expectedMini, "mini 应来自展示模式")
         expect(queryItems["isNativeDemo"] == "1", "Demo 游戏链接应携带 isNativeDemo=1")
+        expect(allQueryItems.filter { $0.name == "gameId" }.count == 1, "附加参数不应覆盖固定 gameId")
+        expect(allQueryItems.filter { $0.name == "mini" }.count == 1, "附加参数不应覆盖模式 mini")
     }
 }
 

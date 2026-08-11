@@ -10,12 +10,9 @@ final class GameViewController: UIViewController {
         appKey: appKey,
         token: token,
         aspectRatio: aspectRatio,
-        isNativeDemo: true,
+        additionalURLQueryItems: DemoGameURLConfiguration.additionalQueryItems,
         onEvent: { [weak self] event in
-            guard event == .close else {
-                return
-            }
-            self?.navigationController?.popViewController(animated: true)
+            self?.handleGameEvent(event)
         }
     )
 
@@ -55,6 +52,19 @@ final class GameViewController: UIViewController {
             gameWebView.stop()
         }
         navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+
+    private func handleGameEvent(_ event: GameEvent) {
+        switch event {
+        case .insufficientBalance, .recharge:
+            DemoRechargePromptPresenter.present(from: self) { [weak self] in
+                self?.gameWebView.notifyGameBalanceDidChange()
+            }
+        case .close:
+            navigationController?.popViewController(animated: true)
+        case .openGameSuccess:
+            break
+        }
     }
 
     private func configureGameView() {

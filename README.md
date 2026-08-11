@@ -28,6 +28,7 @@ Demo AppKey 和 Token 允许公开，当前固定值仅用于让接入方直接�
 | `joyplay-ios/JoyPlayIntegration/GameConfiguration.swift` | 必需 | 游戏模式、URL 参数、事件名称、充值刷新 JS |
 | `joyplay-ios/JoyPlayIntegration/GameWebView.swift` | 必需 | WKWebView、URL 加载、JS 回调注册和释放 |
 | `joyplay-ios/DemoGameConfiguration.swift` | 可选 | Demo 固定凭证、模式文案、图标、背景和导航策略 |
+| `joyplay-ios/DemoRechargePromptPresenter.swift` | 可选 | Demo 充值提示弹窗 |
 | `joyplay-ios/GameViewController.swift` | 可选 | 全屏游戏的导航 Push 示例 |
 | `joyplay-ios/GameModeTabBarController.swift` | 可选 | 三种模式入口以及半屏嵌入示例 |
 | `joyplay-ios/Localizable.xcstrings` | 可选 | Demo 页面中英文文案 |
@@ -58,7 +59,9 @@ Demo AppKey 和 Token 允许公开，当前固定值仅用于让接入方直接�
 | `mini` | 全屏 `mini=0`、半屏 `mini=1`、大半屏 `mini=2` |
 | `safeTop` | 仅全屏添加，当前固定为 `safeTop=1` |
 | `paddingBottom` | 仅全屏添加；首次布局时读取当前窗口底部安全距离，单位为 UIKit 点 |
-| `isNativeDemo` | 当前 Demo 固定传 `isNativeDemo=1`；业务工程默认不传 |
+| `isNativeDemo` | 不属于核心固定参数；当前 Demo 通过 `additionalURLQueryItems` 附加 `isNativeDemo=1`，业务工程默认不传 |
+
+`additionalURLQueryItems` 不能覆盖 `appKey`、`token`、`gameId`、`mini`、`safeTop` 或 `paddingBottom`；同名附加项会被忽略。
 
 ## 最快接入方式
 
@@ -98,7 +101,6 @@ private func openEmbeddedGame(
         appKey: businessAppKey,
         token: businessToken,
         aspectRatio: aspectRatio,
-        automaticallyShowsRechargePrompt: false,
         onEvent: { [weak self] event in
             self?.handleGameEvent(event)
         }
@@ -149,23 +151,21 @@ private func handleGameEvent(_ event: GameEvent) {
 
 ## 充值处理
 
-`automaticallyShowsRechargePrompt` 默认为 `true`，行为与本 Demo 一致：收到 `recharge` 或 `clickRecharge` 后展示演示弹窗，点击“通知游戏”会执行：
+`GameWebView` 只上报 `.insufficientBalance` 和 `.recharge`，核心源码不展示充值 UI。宿主应在这两个事件中打开自己的充值页面；当前 Demo 由 `DemoRechargePromptPresenter.swift` 展示演示弹窗。
+
+Demo 充值弹窗点击“通知游戏”，以及业务 App 充值成功后，都通过以下方法通知游戏刷新余额：
+
+```swift
+gameWebView?.notifyGameBalanceDidChange()
+```
+
+该方法会执行：
 
 ```javascript
 HttpTool.NativeToJs('recharge')
 ```
 
-业务 App 有自己的充值页面时，创建 `GameWebView` 应传入：
-
-```swift
-automaticallyShowsRechargePrompt: false
-```
-
-在 `.insufficientBalance` 或 `.recharge` 事件中打开业务充值页面。充值成功并且游戏视图仍存在时调用：
-
-```swift
-gameWebView?.notifyGameBalanceDidChange()
-```
+充值页面、取消行为和失败提示都由宿主决定。核心不包含充值文案，因此接入其他业务工程时不需要复制 Demo 的充值本地化资源。
 
 ## 主动关闭与释放
 
@@ -186,7 +186,7 @@ gameWebView = nil
 - 半屏和大半屏使用后端 `widthHeightRatio`，并已处理无效比例。
 - 全屏、半屏和大半屏分别生成正确的 `mini`。
 - 四个 `GameEvent` 均已按业务需要处理。
-- 自定义充值流程关闭了自动 Demo 弹窗，并在充值成功后通知游戏。
+- 宿主在充值事件中展示自己的充值 UI，并在充值成功后通知游戏。
 - 主动退出场景时调用了 `stop()`。
 - 使用真实 H5 环境验证游戏渲染、关闭和充值回调。
 
