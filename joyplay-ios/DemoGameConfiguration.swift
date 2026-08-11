@@ -64,6 +64,20 @@ extension GameDisplayMode {
         }
     }
 
+    var openGameTitle: String {
+        switch self {
+        case .full:
+            return String(localized: "game.open.full", defaultValue: "Open Full-Screen Game")
+        case .half:
+            return String(localized: "game.open.half", defaultValue: "Open Half-Screen Game")
+        case .largeHalf:
+            return String(
+                localized: "game.open.large_half",
+                defaultValue: "Open Large Half-Screen Game"
+            )
+        }
+    }
+
     var tabIconFillRatio: CGFloat {
         switch self {
         case .full:

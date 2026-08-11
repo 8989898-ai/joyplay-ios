@@ -7,6 +7,14 @@ private enum DemoConfigurationTests {
             GameDisplayMode.allCases.map(\.title) == ["Full Screen", "Half Screen", "Large Half Screen"],
             "Demo mode titles should keep their English fallbacks"
         )
+        expect(
+            GameDisplayMode.allCases.map(\.openGameTitle) == [
+                "Open Full-Screen Game",
+                "Open Half-Screen Game",
+                "Open Large Half-Screen Game"
+            ],
+            "Demo launch-button titles should keep their English fallbacks"
+        )
         expect(GameDisplayMode.full.tabIconFillRatio == 1.0, "full-screen icon should remain filled")
         expect(GameDisplayMode.half.tabIconFillRatio == 0.5, "half-screen icon should remain half filled")
         expect(GameDisplayMode.largeHalf.tabIconFillRatio == 0.7, "large-half icon should remain 70% filled")
