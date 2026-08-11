@@ -106,10 +106,7 @@ final class GameModeSelectionViewController: UIViewController {
             return
         }
 
-        let gameViewController = GameViewController(
-            gameURL: gameURL,
-            displayMode: .full
-        )
+        let gameViewController = GameViewController(gameURL: gameURL)
         navigationController?.pushViewController(gameViewController, animated: true)
     }
 

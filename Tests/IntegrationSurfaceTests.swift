@@ -105,7 +105,9 @@ else {
 }
 
 guard
-    fullScreenHostSource.contains("widthHeightRatio:"),
+    fullScreenHostSource.contains("init(gameURL: URL)"),
+    fullScreenHostSource.contains("displayMode: .full"),
+    !fullScreenHostSource.contains("widthHeightRatio:"),
     !fullScreenHostSource.contains("GameAspectRatio"),
     !fullScreenHostSource.contains("gameWebView.translatesAutoresizingMaskIntoConstraints = false"),
     fullScreenHostSource.contains("gameWebView.topAnchor.constraint(equalTo: view.topAnchor)"),

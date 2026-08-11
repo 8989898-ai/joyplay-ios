@@ -2,25 +2,16 @@ import UIKit
 
 final class GameViewController: UIViewController {
     private let gameURL: URL
-    private let displayMode: GameDisplayMode
-    private let widthHeightRatio: CGFloat?
     private lazy var gameWebView: GameWebView? = GameWebView(
         gameURL: gameURL,
-        displayMode: displayMode,
-        widthHeightRatio: widthHeightRatio,
+        displayMode: .full,
         onEvent: { [weak self] event in
             self?.handleGameEvent(event)
         }
     )
 
-    init(
-        gameURL: URL,
-        displayMode: GameDisplayMode,
-        widthHeightRatio: CGFloat? = nil
-    ) {
+    init(gameURL: URL) {
         self.gameURL = gameURL
-        self.displayMode = displayMode
-        self.widthHeightRatio = widthHeightRatio
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -31,14 +22,14 @@ final class GameViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = displayMode.title
+        title = GameDisplayMode.full.title
         view.backgroundColor = .systemBackground
         configureGameView()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.setNavigationBarHidden(displayMode.hidesNavigationBar, animated: animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -68,21 +59,11 @@ final class GameViewController: UIViewController {
         }
         view.addSubview(gameWebView)
 
-        let verticalConstraints: [NSLayoutConstraint]
-        if displayMode != .full {
-            verticalConstraints = [
-                gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-            ]
-        } else {
-            verticalConstraints = [
-                gameWebView.topAnchor.constraint(equalTo: view.topAnchor),
-                gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-            ]
-        }
-
-        NSLayoutConstraint.activate(verticalConstraints + [
+        NSLayoutConstraint.activate([
+            gameWebView.topAnchor.constraint(equalTo: view.topAnchor),
             gameWebView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            gameWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            gameWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
 }

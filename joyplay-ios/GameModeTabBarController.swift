@@ -242,11 +242,7 @@ private final class GameModeLaunchViewController: UIViewController {
         switch displayMode.launchPresentation {
         case .pushed:
             stopGameButtonBreathing()
-            let gameViewController = GameViewController(
-                gameURL: gameURL,
-                displayMode: displayMode,
-                widthHeightRatio: widthHeightRatio
-            )
+            let gameViewController = GameViewController(gameURL: gameURL)
             gameViewController.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(gameViewController, animated: true)
         case .embedded:

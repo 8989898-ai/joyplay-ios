@@ -91,4 +91,17 @@ else {
     fail("the selection page should center its launch button and pin mode buttons to the safe-area bottom")
 }
 
+let fullSource = source(at: "joyplay-ios/GameViewController.swift")
+guard
+    fullSource.contains("init(gameURL: URL)"),
+    fullSource.contains("displayMode: .full"),
+    fullSource.contains("gameWebView.topAnchor.constraint(equalTo: view.topAnchor)"),
+    fullSource.contains("gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)"),
+    !fullSource.contains("private let displayMode"),
+    !fullSource.contains("private let widthHeightRatio"),
+    !fullSource.contains("if displayMode != .full")
+else {
+    fail("GameViewController should be a full-screen-only host")
+}
+
 print("Game mode navigation tests passed")
