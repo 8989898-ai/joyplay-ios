@@ -116,6 +116,7 @@ let agentInstructions = source(at: "AGENTS.md")
 let requiredAgentRules = [
     "INTEGRATION_REQUEST.yaml",
     "JoyPlayIntegration",
+    "attach(to:)",
     "DemoGameConfiguration.swift",
     "FullScreenGameViewController.swift",
     "GameModeSelectionViewController.swift",

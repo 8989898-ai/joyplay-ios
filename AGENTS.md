@@ -17,7 +17,7 @@
 - `GameConfiguration.swift`
 - `GameWebView.swift`
 
-宿主直接初始化 `GameWebView`，传入后端完整 URL、展示模式、嵌入模式的原始 `widthHeightRatio` 和事件回调。`GameWebView` 是唯一推荐的宿主入口；不要为普通接入额外增加 Session、Coordinator 或包装控制器。
+宿主直接初始化 `GameWebView`，传入后端完整 URL、展示模式、嵌入模式的原始 `widthHeightRatio` 和事件回调，再调用 `attach(to:)` 加入业务容器。`GameWebView` 会根据模式完成外层布局，是唯一推荐的宿主入口；不要让接入方重复实现游戏视图约束，也不要为普通接入额外增加 Session、Coordinator 或包装控制器。
 
 除非用户明确要求复刻 Demo UI，否则不要复制以下 Demo 专用内容：
 
@@ -59,7 +59,7 @@
 
 1. 根据 `INTEGRATION_REQUEST.yaml` 定位目标工程、Scheme、App Target、宿主控制器、后端完整游戏 URL 和宽高比来源。
 2. 复制 `JoyPlayIntegration` 目录，保持两个文件在同一个 Target 中。
-3. 将后端完整游戏 URL、模式和嵌入模式的原始比例直接传给 `GameWebView`；初始化返回 `nil` 时按模板处理无效 URL/比例，不要让宿主重复校验或引入 Demo 页面控制器、背景资源。
+3. 将后端完整游戏 URL、模式和嵌入模式的原始比例直接传给 `GameWebView`，初始化成功后调用 `attach(to:)` 加入业务容器；初始化返回 `nil` 时按模板处理无效 URL/比例，不要让宿主重复校验、重复实现布局，或引入 Demo 页面控制器、背景资源。
 4. 实现全部 `GameEvent` 分支，即使某个事件当前只记录日志。
 5. 按模板实现关闭与充值行为。
 6. 检查每个主动移除路径都调用 `stop()`。

@@ -63,6 +63,22 @@ final class GameWebView: UIView {
         loadGameIfNeeded()
     }
 
+    func attach(to containerView: UIView) {
+        containerView.addSubview(self)
+
+        var constraints = [
+            leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+        ]
+        if displayMode == .full {
+            constraints.append(
+                topAnchor.constraint(equalTo: containerView.topAnchor)
+            )
+        }
+        NSLayoutConstraint.activate(constraints)
+    }
+
     func stop() {
         guard !isStopped else {
             return

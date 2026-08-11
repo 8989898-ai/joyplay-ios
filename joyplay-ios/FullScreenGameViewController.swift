@@ -57,13 +57,6 @@ final class FullScreenGameViewController: UIViewController {
         guard let gameWebView else {
             return
         }
-        view.addSubview(gameWebView)
-
-        NSLayoutConstraint.activate([
-            gameWebView.topAnchor.constraint(equalTo: view.topAnchor),
-            gameWebView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            gameWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+        gameWebView.attach(to: view)
     }
 }

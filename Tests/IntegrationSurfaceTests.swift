@@ -61,6 +61,18 @@ guard gameWebViewSource.contains("self.translatesAutoresizingMaskIntoConstraints
 }
 
 guard
+    gameWebViewSource.contains("func attach(to containerView: UIView)"),
+    gameWebViewSource.contains("containerView.addSubview(self)"),
+    gameWebViewSource.contains("leadingAnchor.constraint(equalTo: containerView.leadingAnchor)"),
+    gameWebViewSource.contains("trailingAnchor.constraint(equalTo: containerView.trailingAnchor)"),
+    gameWebViewSource.contains("bottomAnchor.constraint(equalTo: containerView.bottomAnchor)"),
+    gameWebViewSource.contains("topAnchor.constraint(equalTo: containerView.topAnchor)"),
+    !gameWebViewSource.contains("private let containerView")
+else {
+    fail("GameWebView should mount itself using mode-specific host constraints without retaining the container")
+}
+
+guard
     gameWebViewSource.contains("private var isStopped = false"),
     gameWebViewSource.contains("guard !isStopped else"),
     gameWebViewSource.contains("deinit"),
@@ -112,11 +124,13 @@ guard
     !fullScreenHostSource.contains("widthHeightRatio:"),
     !fullScreenHostSource.contains("GameAspectRatio"),
     !fullScreenHostSource.contains("gameWebView.translatesAutoresizingMaskIntoConstraints = false"),
-    fullScreenHostSource.contains("gameWebView.topAnchor.constraint(equalTo: view.topAnchor)"),
-    fullScreenHostSource.contains("gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)"),
+    fullScreenHostSource.contains("gameWebView.attach(to: view)"),
+    !fullScreenHostSource.contains("view.addSubview(gameWebView)"),
+    !fullScreenHostSource.contains("gameWebView.topAnchor.constraint"),
+    !fullScreenHostSource.contains("gameWebView.bottomAnchor.constraint"),
     !fullScreenHostSource.contains("equalTo: view.safeAreaLayoutGuide.heightAnchor")
 else {
-    fail("the full-screen game should extend to every physical screen edge")
+    fail("the full-screen host should delegate physical-edge layout to GameWebView")
 }
 
 let embeddedHostSource = source(at: "joyplay-ios/PartialGameViewController.swift")
@@ -154,11 +168,12 @@ guard
     embeddedHostSource.contains("widthHeightRatio: gameData.widthHeightRatio"),
     !embeddedHostSource.contains("GameAspectRatio"),
     !embeddedHostSource.contains("gameWebView.translatesAutoresizingMaskIntoConstraints = false"),
-    embeddedHostSource.contains("gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)"),
-    !embeddedHostSource.contains("gameWebView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)"),
+    embeddedHostSource.contains("gameWebView.attach(to: view)"),
+    !embeddedHostSource.contains("view.addSubview(gameWebView)"),
+    !embeddedHostSource.contains("gameWebView.bottomAnchor.constraint"),
     !embeddedHostSource.contains("equalTo: gameWebView.widthAnchor")
 else {
-    fail("the embedded Demo host should own all events and preserve its layout and release behavior")
+    fail("the embedded Demo host should own all events while delegating layout to GameWebView")
 }
 
 print("Integration surface tests passed")

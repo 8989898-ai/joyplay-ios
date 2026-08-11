@@ -82,12 +82,7 @@ final class PartialGameViewController: UIViewController {
         }
 
         gameButton.stopBreathing()
-        view.addSubview(gameWebView)
-        NSLayoutConstraint.activate([
-            gameWebView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            gameWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+        gameWebView.attach(to: view)
         self.gameWebView = gameWebView
         gameButton.isHidden = true
     }

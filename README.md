@@ -77,7 +77,7 @@ App 启动后，首页 `GameModeSelectionViewController` 直接读取 `DemoGameD
 
 ## 最快接入方式
 
-`GameWebView` 初始化时已经设置 `translatesAutoresizingMaskIntoConstraints = false`，宿主添加视图后只需激活对应模式的布局约束。
+`GameWebView` 初始化后调用 `attach(to:)` 即可加入业务容器。该方法会根据展示模式完成外层布局：全屏铺满容器四边，半屏和大半屏贴容器左右及底部。接入方不需要调用 `addSubview` 或自行设置游戏视图约束。
 
 ### 方式一：直接接入全屏业务页面
 
@@ -97,13 +97,7 @@ private func openFullScreenGame(backendGameURL: URL) {
         handleInvalidGameConfiguration()
         return
     }
-    view.addSubview(gameWebView)
-    NSLayoutConstraint.activate([
-        gameWebView.topAnchor.constraint(equalTo: view.topAnchor),
-        gameWebView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-        gameWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-        gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-    ])
+    gameWebView.attach(to: view)
     self.gameWebView = gameWebView
 }
 ```
@@ -133,12 +127,7 @@ private func openEmbeddedGame(
         handleInvalidGameConfiguration()
         return
     }
-    view.addSubview(gameWebView)
-    NSLayoutConstraint.activate([
-        gameWebView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-        gameWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-        gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-    ])
+    gameWebView.attach(to: view)
     self.gameWebView = gameWebView
 }
 ```

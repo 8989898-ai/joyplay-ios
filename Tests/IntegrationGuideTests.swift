@@ -57,6 +57,10 @@ guard
     readme.contains("三条完整 URL 在 Demo 源码中直接声明"),
     readme.contains("后端 URL 不能预先包含 `safeTop` 或 `paddingBottom`"),
     readme.contains("全屏 `GameWebView` 首次布局时追加 `safeTop=1`"),
+    readme.contains("gameWebView.attach(to: view)"),
+    !readme.contains("view.addSubview(gameWebView)"),
+    !readme.contains("gameWebView.topAnchor.constraint"),
+    !readme.contains("gameWebView.bottomAnchor.constraint"),
     !readme.contains("gameWebView.translatesAutoresizingMaskIntoConstraints = false"),
     !readme.contains("appKey: businessAppKey"),
     !readme.contains("token: businessToken")
