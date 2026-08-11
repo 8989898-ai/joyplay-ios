@@ -10,13 +10,35 @@ final class GameWebView: UIView {
     private var scriptMessageHandler: WeakScriptMessageHandler?
     private var areScriptMessageHandlersRegistered = false
     private var hasLoadedGame = false
+    private var isStopped = false
 
-    init(
+    init?(
         gameURL: URL,
         displayMode: GameDisplayMode,
-        aspectRatio: GameAspectRatio? = nil,
+        widthHeightRatio: CGFloat? = nil,
         onEvent: @escaping (GameEvent) -> Void
     ) {
+        guard GameURLRuntimeAdapter.isValidBackendGameURL(gameURL) else {
+            return nil
+        }
+
+        let aspectRatio: GameAspectRatio?
+        switch displayMode {
+        case .full:
+            guard widthHeightRatio == nil else {
+                return nil
+            }
+            aspectRatio = nil
+        case .half, .largeHalf:
+            guard let widthHeightRatio,
+                  let validatedAspectRatio = GameAspectRatio(
+                      widthHeightRatio: widthHeightRatio
+                  ) else {
+                return nil
+            }
+            aspectRatio = validatedAspectRatio
+        }
+
         self.gameURL = gameURL
         self.displayMode = displayMode
         self.aspectRatio = aspectRatio
@@ -24,6 +46,10 @@ final class GameWebView: UIView {
         super.init(frame: .zero)
         configureWebView()
         registerScriptMessageHandlers()
+    }
+
+    deinit {
+        stop()
     }
 
     @available(*, unavailable)
@@ -37,6 +63,10 @@ final class GameWebView: UIView {
     }
 
     func stop() {
+        guard !isStopped else {
+            return
+        }
+        isStopped = true
         removeScriptMessageHandlers()
         webView.stopLoading()
     }
@@ -82,7 +112,7 @@ final class GameWebView: UIView {
     }
 
     private func loadGameIfNeeded() {
-        guard !hasLoadedGame, let window else {
+        guard !hasLoadedGame, !isStopped, let window else {
             return
         }
 

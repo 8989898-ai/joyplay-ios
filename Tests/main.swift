@@ -41,6 +41,28 @@ expect(
 let backendURL = URL(
     string: "https://joyplay.cn/release/index.html?token=a%2Bb%2Fc&mini=0#game"
 )!
+expect(
+    GameURLRuntimeAdapter.isValidBackendGameURL(backendURL),
+    "核心应接受不含 paddingBottom 的完整 HTTPS 游戏链接"
+)
+expect(
+    !GameURLRuntimeAdapter.isValidBackendGameURL(
+        URL(string: "http://joyplay.cn/release/index.html?mini=0")!
+    ),
+    "核心应拒绝非 HTTPS 游戏链接"
+)
+expect(
+    !GameURLRuntimeAdapter.isValidBackendGameURL(
+        URL(string: "https://joyplay.cn/release/index.html?paddingBottom=20")!
+    ),
+    "核心应拒绝后端预先携带 paddingBottom 的链接"
+)
+expect(
+    !GameURLRuntimeAdapter.isValidBackendGameURL(
+        URL(string: "https:/release/index.html?mini=0")!
+    ),
+    "核心应拒绝没有主机名的 HTTPS 链接"
+)
 let fullScreenURL = GameURLRuntimeAdapter.appendingPaddingBottom(34, to: backendURL)
 expect(
     fullScreenURL?.absoluteString

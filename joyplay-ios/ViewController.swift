@@ -9,13 +9,10 @@ final class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let aspectRatios = backendWidthHeightRatios.compactMapValues {
-            GameAspectRatio(widthHeightRatio: $0)
-        }
         let gameModeTabBarController = GameModeTabBarController(
             appKey: GameLaunchCredentials.appKey,
             token: GameLaunchCredentials.token,
-            aspectRatios: aspectRatios
+            widthHeightRatios: backendWidthHeightRatios
         )
         navigationController?.setViewControllers([gameModeTabBarController], animated: false)
     }

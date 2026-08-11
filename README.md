@@ -25,8 +25,8 @@ Demo AppKey 和 Token 允许公开，当前 Demo 使用它们模拟后端生成�
 
 | 文件 | 是否必需 | 作用 |
 | --- | --- | --- |
-| `joyplay-ios/JoyPlayIntegration/GameConfiguration.swift` | 必需 | 游戏模式、运行时底部安全区参数、事件名称、充值刷新 JS |
-| `joyplay-ios/JoyPlayIntegration/GameWebView.swift` | 必需 | WKWebView、后端 URL 加载、JS 回调注册和释放 |
+| `joyplay-ios/JoyPlayIntegration/GameConfiguration.swift` | 必需 | 游戏模式、URL 与比例校验、运行时底部安全区参数、事件名称、充值刷新 JS |
+| `joyplay-ios/JoyPlayIntegration/GameWebView.swift` | 必需 | 宿主唯一入口，负责 WKWebView、后端 URL 加载、布局、JS 回调注册和释放 |
 | `joyplay-ios/DemoGameConfiguration.swift` | 可选 | Demo 固定凭证、URL Builder、模式文案、图标、背景和导航策略 |
 | `joyplay-ios/DemoRechargePromptPresenter.swift` | 可选 | Demo 充值提示弹窗 |
 | `joyplay-ios/GameViewController.swift` | 可选 | 全屏游戏的导航 Push 示例 |
@@ -65,29 +65,41 @@ Demo AppKey 和 Token 允许公开，当前 Demo 使用它们模拟后端生成�
 
 ## 最快接入方式
 
-### 方式一：复用全屏示例控制器
+### 方式一：直接接入全屏业务页面
 
-同时复制 `GameViewController.swift` 后，将后端字符串校验并转换为 URL，再在现有导航控制器中 Push：
+在业务自己的全屏控制器中直接创建 `GameWebView`，全屏模式不传比例：
 
 ```swift
-guard let backendGameURL = URL(string: response.gameURL),
-      backendGameURL.scheme?.lowercased() == "https" else {
-    return
-}
+private var gameWebView: GameWebView?
 
-let gameViewController = GameViewController(
-    gameURL: backendGameURL,
-    displayMode: .full
-)
-gameViewController.hidesBottomBarWhenPushed = true
-navigationController?.pushViewController(gameViewController, animated: true)
+private func openFullScreenGame(backendGameURL: URL) {
+    guard let gameWebView = GameWebView(
+        gameURL: backendGameURL,
+        displayMode: .full,
+        onEvent: { [weak self] event in
+            self?.handleGameEvent(event)
+        }
+    ) else {
+        handleInvalidGameConfiguration()
+        return
+    }
+    gameWebView.translatesAutoresizingMaskIntoConstraints = false
+    view.addSubview(gameWebView)
+    NSLayoutConstraint.activate([
+        gameWebView.topAnchor.constraint(equalTo: view.topAnchor),
+        gameWebView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+        gameWebView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+        gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+    ])
+    self.gameWebView = gameWebView
+}
 ```
 
-游戏发送 `newTppClose` 时，示例控制器会自动返回上一页。
+宿主收到 `.close` 后，根据自己的导航结构 Pop、Dismiss 或移除游戏视图；核心会在回调前停止游戏。
 
 ### 方式二：直接嵌入业务页面
 
-直播间或语聊房只复制两个核心文件。业务后端返回 `widthHeightRatio`（宽 ÷ 高）后，宿主先校验比例，再直接添加 `GameWebView`：
+直播间或语聊房只复制两个核心文件。业务后端返回 `widthHeightRatio`（宽 ÷ 高）后，宿主把完整 URL、模式和原始比例直接传给 `GameWebView`：
 
 ```swift
 private var gameWebView: GameWebView?
@@ -97,18 +109,17 @@ private func openEmbeddedGame(
     displayMode: GameDisplayMode,
     widthHeightRatio: CGFloat
 ) {
-    guard let aspectRatio = GameAspectRatio(widthHeightRatio: widthHeightRatio) else {
-        return
-    }
-
-    let gameWebView = GameWebView(
+    guard let gameWebView = GameWebView(
         gameURL: backendGameURL,
         displayMode: displayMode,
-        aspectRatio: aspectRatio,
+        widthHeightRatio: widthHeightRatio,
         onEvent: { [weak self] event in
             self?.handleGameEvent(event)
         }
-    )
+    ) else {
+        handleInvalidGameConfiguration()
+        return
+    }
     gameWebView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(gameWebView)
     NSLayoutConstraint.activate([
@@ -120,9 +131,11 @@ private func openEmbeddedGame(
 }
 ```
 
-例如后端返回 `widthHeightRatio=1.0` 时，内部 `WKWebView` 为 `1:1`；返回约 `0.6667` 时，`WKWebView` 高度约为宽度的 `1.5` 倍。`GameWebView` 使用 `GameAspectRatio.heightMultiplier` 建立这条内部比例约束。半屏和大半屏的外层 `GameWebView` 底部贴屏幕底部，高度为 `WKWebView` 高度加底部安全距离；`WKWebView` 顶部与外层顶部对齐，底部安全区域显示外层黑色背景。`GameAspectRatio` 会拒绝小于等于零、无限或非数字的值。比例无效时如何提示或重试由业务宿主决定，不要在核心源码中写死兜底比例。
+例如后端返回 `widthHeightRatio=1.0` 时，内部 `WKWebView` 为 `1:1`；返回约 `0.6667` 时，`WKWebView` 高度约为宽度的 `1.5` 倍。半屏和大半屏的外层 `GameWebView` 底部贴屏幕底部，高度为 `WKWebView` 高度加底部安全距离；`WKWebView` 顶部与外层顶部对齐，底部安全区域显示外层黑色背景。
 
-直接嵌入全屏时使用 `.full`，让 `GameWebView` 约束到页面四条边，不读取 `widthHeightRatio`。比例只控制原生容器高度；`mini` 已包含在后端 URL 中。
+`GameWebView` 是可失败初始化：它会在内部拒绝非 HTTPS、缺少主机名、预先包含 `paddingBottom` 的 URL；半屏和大半屏还会拒绝缺少、小于等于零、无限或非数字的比例，全屏则不接收比例。初始化返回 `nil` 时如何提示或重试由业务宿主决定，核心不写死兜底 URL 或比例。
+
+直接嵌入全屏时使用 `.full` 且不传 `widthHeightRatio`，让 `GameWebView` 约束到页面四条边。比例只控制嵌入模式的原生容器高度；`mini` 已包含在后端 URL 中。
 
 ## 统一事件回调
 
@@ -186,8 +199,8 @@ gameWebView = nil
 ## 接入检查清单
 
 - 核心 Swift 文件已加入业务 App Target。
-- 后端下发的游戏 URL 有效、使用 HTTPS，且不包含 `paddingBottom`。
-- 半屏和大半屏使用后端 `widthHeightRatio`，并已处理无效比例。
+- 后端下发的游戏 URL 直接传给 `GameWebView`；初始化失败时已按业务要求提示或重试。
+- 半屏和大半屏将后端 `widthHeightRatio` 直接传给 `GameWebView`，全屏不传比例。
 - 后端为全屏、半屏和大半屏 URL 分别提供正确的 `mini=0/1/2`。
 - 全屏追加当前设备的 `paddingBottom`，半屏和大半屏不修改 URL。
 - 四个 `GameEvent` 均已按业务需要处理。

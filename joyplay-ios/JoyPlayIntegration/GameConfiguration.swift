@@ -33,19 +33,32 @@ enum GameDisplayMode: CaseIterable, Equatable {
 }
 
 enum GameURLRuntimeAdapter {
+    static func isValidBackendGameURL(_ gameURL: URL) -> Bool {
+        guard gameURL.scheme?.lowercased() == "https",
+              gameURL.host?.isEmpty == false,
+              let components = URLComponents(
+                  url: gameURL,
+                  resolvingAgainstBaseURL: false
+              ) else {
+            return false
+        }
+
+        return components.queryItems?.contains(
+            where: { $0.name == "paddingBottom" }
+        ) != true
+    }
+
     static func appendingPaddingBottom(
         _ paddingBottom: CGFloat,
         to gameURL: URL
     ) -> URL? {
-        guard paddingBottom.isFinite,
+        guard isValidBackendGameURL(gameURL),
+              paddingBottom.isFinite,
               paddingBottom >= 0,
               var components = URLComponents(
                   url: gameURL,
                   resolvingAgainstBaseURL: false
-              ),
-              components.queryItems?.contains(
-                  where: { $0.name == "paddingBottom" }
-              ) != true else {
+              ) else {
             return nil
         }
 

@@ -17,6 +17,8 @@
 - `GameConfiguration.swift`
 - `GameWebView.swift`
 
+宿主直接初始化 `GameWebView`，传入后端完整 URL、展示模式、嵌入模式的原始 `widthHeightRatio` 和事件回调。`GameWebView` 是唯一推荐的宿主入口；不要为普通接入额外增加 Session、Coordinator 或包装控制器。
+
 除非用户明确要求复刻 Demo UI，否则不要复制以下 Demo 专用内容：
 
 - `DemoGameConfiguration.swift`
@@ -43,7 +45,8 @@
 - 后端 URL 中的 `gameId=1`。
 - 后端为全屏、半屏、大半屏 URL 分别提供 `mini=0`、`mini=1`、`mini=2`。
 - 后端 URL 不得包含 `paddingBottom`；核心仅在全屏首次加载时追加当前窗口底部安全距离，半屏和大半屏不修改 URL。
-- 半屏和大半屏的 `widthHeightRatio`（宽 ÷ 高）来自宿主后端配置；使用 `GameAspectRatio` 校验并转换成高度 multiplier，底部对齐安全区。不要在 `GameDisplayMode` 或核心源码中写死比例。
+- 半屏和大半屏的 `widthHeightRatio`（宽 ÷ 高）来自宿主后端配置；宿主把原始值直接传给 `GameWebView`，由核心校验并转换成高度 multiplier，底部对齐安全区。不要让宿主构造核心比例类型，也不要在 `GameDisplayMode` 或核心源码中写死比例。
+- `GameWebView` 使用可失败初始化：非 HTTPS、缺少主机名、预先包含 `paddingBottom`、嵌入模式缺少或传入无效比例、全屏传入比例时均返回 `nil`。失败后的提示或重试方式仍由宿主决定。
 - H5 消息名称固定为 `recharge`、`clickRecharge`、`newTppClose`、`OpenGameSucc`。
 - 核心不认识 AppKey、Token、`gameId`、`mini` 或 `isNativeDemo`；当前 Demo 由 `DemoGameURLBuilder` 生成带 `isNativeDemo=1` 的完整 URL，业务后端默认不传该标记。
 - `newTppClose` 到达后，宿主根据模板选择移除游戏视图或 Pop；不要擅自关闭直播间、语聊房等业务控制器。
@@ -55,7 +58,7 @@
 
 1. 根据 `INTEGRATION_REQUEST.yaml` 定位目标工程、Scheme、App Target、宿主控制器、后端完整游戏 URL 和宽高比来源。
 2. 复制 `JoyPlayIntegration` 目录，保持两个文件在同一个 Target 中。
-3. 校验后端游戏 URL 并根据启用的模式创建 `GameWebView`；半屏和大半屏使用后端比例设置宿主高度约束，不要引入 Demo Tab Bar 或背景资源。
+3. 将后端完整游戏 URL、模式和嵌入模式的原始比例直接传给 `GameWebView`；初始化返回 `nil` 时按模板处理无效 URL/比例，不要让宿主重复校验或引入 Demo Tab Bar、背景资源。
 4. 实现全部 `GameEvent` 分支，即使某个事件当前只记录日志。
 5. 按模板实现关闭与充值行为。
 6. 检查每个主动移除路径都调用 `stop()`。

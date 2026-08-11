@@ -33,8 +33,6 @@ let requiredContent = [
     "paddingBottom",
     "isNativeDemo=1",
     "widthHeightRatio",
-    "GameAspectRatio",
-    "heightMultiplier",
     "GameWebView(",
     "gameURL:",
     "onEvent:",
@@ -60,6 +58,10 @@ else {
     fail("business integration examples should pass the complete backend game URL")
 }
 
+if readme.contains("同时复制 `GameViewController.swift`") {
+    fail("the shortest integration path should use GameWebView directly instead of copying a Demo controller")
+}
+
 let gameWebView = source(at: "joyplay-ios/JoyPlayIntegration/GameWebView.swift")
 for forbiddenSymbol in [
     "isNativeDemo",
@@ -78,18 +80,19 @@ if configuration.contains("var heightToWidthRatio") {
 let demoHost = source(at: "joyplay-ios/ViewController.swift")
 guard
     demoHost.contains("backendWidthHeightRatios"),
-    demoHost.contains("GameAspectRatio(widthHeightRatio:")
+    !demoHost.contains("GameAspectRatio")
 else {
-    fail("the Demo host should convert backend ratios before creating the game screen")
+    fail("the Demo host should pass backend ratios without constructing a core aspect-ratio type")
 }
 
 let embeddedHost = source(at: "joyplay-ios/GameModeTabBarController.swift")
 let gameWebViewSource = source(at: "joyplay-ios/JoyPlayIntegration/GameWebView.swift")
 guard
-    embeddedHost.contains("aspectRatio: aspectRatio"),
+    embeddedHost.contains("widthHeightRatio: widthHeightRatio"),
+    !embeddedHost.contains("GameAspectRatio"),
     gameWebViewSource.contains("aspectRatio.heightMultiplier")
 else {
-    fail("the embedded host should inject the backend ratio used to size the WKWebView")
+    fail("the embedded host should pass the backend ratio directly to GameWebView")
 }
 
 for demoPath in [

@@ -3,11 +3,11 @@ import UIKit
 final class GameViewController: UIViewController {
     private let gameURL: URL
     private let displayMode: GameDisplayMode
-    private let aspectRatio: GameAspectRatio?
-    private lazy var gameWebView = GameWebView(
+    private let widthHeightRatio: CGFloat?
+    private lazy var gameWebView: GameWebView? = GameWebView(
         gameURL: gameURL,
         displayMode: displayMode,
-        aspectRatio: aspectRatio,
+        widthHeightRatio: widthHeightRatio,
         onEvent: { [weak self] event in
             self?.handleGameEvent(event)
         }
@@ -16,11 +16,11 @@ final class GameViewController: UIViewController {
     init(
         gameURL: URL,
         displayMode: GameDisplayMode,
-        aspectRatio: GameAspectRatio? = nil
+        widthHeightRatio: CGFloat? = nil
     ) {
         self.gameURL = gameURL
         self.displayMode = displayMode
-        self.aspectRatio = aspectRatio
+        self.widthHeightRatio = widthHeightRatio
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -44,7 +44,7 @@ final class GameViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         if isMovingFromParent {
-            gameWebView.stop()
+            gameWebView?.stop()
         }
         navigationController?.setNavigationBarHidden(false, animated: animated)
     }
@@ -53,7 +53,7 @@ final class GameViewController: UIViewController {
         switch event {
         case .insufficientBalance, .recharge:
             DemoRechargePromptPresenter.present(from: self) { [weak self] in
-                self?.gameWebView.notifyGameBalanceDidChange()
+                self?.gameWebView?.notifyGameBalanceDidChange()
             }
         case .close:
             navigationController?.popViewController(animated: true)
@@ -63,11 +63,14 @@ final class GameViewController: UIViewController {
     }
 
     private func configureGameView() {
+        guard let gameWebView else {
+            return
+        }
         gameWebView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(gameWebView)
 
         let verticalConstraints: [NSLayoutConstraint]
-        if displayMode != .full, aspectRatio != nil {
+        if displayMode != .full {
             verticalConstraints = [
                 gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
             ]
