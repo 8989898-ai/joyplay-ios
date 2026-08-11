@@ -1,29 +1,64 @@
 import Foundation
 
-struct DemoGameData {
+struct DemoGameData: Decodable {
     let gameURL: URL
     let widthHeightRatio: CGFloat?
     let displayMode: GameDisplayMode
+
+    private enum CodingKeys: String, CodingKey {
+        case gameURL
+        case widthHeightRatio
+        case displayMode
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        gameURL = try container.decode(URL.self, forKey: .gameURL)
+        widthHeightRatio = try container.decodeIfPresent(CGFloat.self, forKey: .widthHeightRatio)
+
+        let displayModeValue = try container.decode(String.self, forKey: .displayMode)
+        switch displayModeValue {
+        case "full":
+            displayMode = .full
+        case "half":
+            displayMode = .half
+        case "largeHalf":
+            displayMode = .largeHalf
+        default:
+            throw DecodingError.dataCorruptedError(
+                forKey: .displayMode,
+                in: container,
+                debugDescription: "Unsupported display mode: \(displayModeValue)"
+            )
+        }
+    }
 }
 
 enum DemoGameDataSource {
-    static let gameData: [DemoGameData] = [
-        DemoGameData(
-            gameURL: URL(string: "https://joyplay.cn/release/index.html?appKey=ste5a6lxxrtu10bmnc6g&token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3ODU0OTExNzEsImFjY291bnRJZCI6IjIwODMxMjcwNzQxNzU0NTUyMzIifQ.gdzel2RMXHKwyEG6AaQg-sObDx6H_O9Tmo2XGzfcOJU&gameId=1&mini=0&isNativeDemo=1")!,
-            widthHeightRatio: nil,
-            displayMode: .full
-        ),
-        DemoGameData(
-            gameURL: URL(string: "https://joyplay.cn/release/index.html?appKey=ste5a6lxxrtu10bmnc6g&token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3ODU0OTExNzEsImFjY291bnRJZCI6IjIwODMxMjcwNzQxNzU0NTUyMzIifQ.gdzel2RMXHKwyEG6AaQg-sObDx6H_O9Tmo2XGzfcOJU&gameId=1&mini=1&isNativeDemo=1")!,
-            widthHeightRatio: 1.0,
-            displayMode: .half
-        ),
-        DemoGameData(
-            gameURL: URL(string: "https://joyplay.cn/release/index.html?appKey=ste5a6lxxrtu10bmnc6g&token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3ODU0OTExNzEsImFjY291bnRJZCI6IjIwODMxMjcwNzQxNzU0NTUyMzIifQ.gdzel2RMXHKwyEG6AaQg-sObDx6H_O9Tmo2XGzfcOJU&gameId=1&mini=2&isNativeDemo=1")!,
-            widthHeightRatio: 2.0 / 3.0,
-            displayMode: .largeHalf
-        )
+    static let mockBackendResponseJSON = """
+    [
+      {
+        "gameURL": "https://joyplay.cn/release/index.html?appKey=ste5a6lxxrtu10bmnc6g&token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3ODU0OTExNzEsImFjY291bnRJZCI6IjIwODMxMjcwNzQxNzU0NTUyMzIifQ.gdzel2RMXHKwyEG6AaQg-sObDx6H_O9Tmo2XGzfcOJU&gameId=1&mini=0&isNativeDemo=1",
+        "widthHeightRatio": null,
+        "displayMode": "full"
+      },
+      {
+        "gameURL": "https://joyplay.cn/release/index.html?appKey=ste5a6lxxrtu10bmnc6g&token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3ODU0OTExNzEsImFjY291bnRJZCI6IjIwODMxMjcwNzQxNzU0NTUyMzIifQ.gdzel2RMXHKwyEG6AaQg-sObDx6H_O9Tmo2XGzfcOJU&gameId=1&mini=1&isNativeDemo=1",
+        "widthHeightRatio": 1.0,
+        "displayMode": "half"
+      },
+      {
+        "gameURL": "https://joyplay.cn/release/index.html?appKey=ste5a6lxxrtu10bmnc6g&token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3ODU0OTExNzEsImFjY291bnRJZCI6IjIwODMxMjcwNzQxNzU0NTUyMzIifQ.gdzel2RMXHKwyEG6AaQg-sObDx6H_O9Tmo2XGzfcOJU&gameId=1&mini=2&isNativeDemo=1",
+        "widthHeightRatio": 0.6666666666666666,
+        "displayMode": "largeHalf"
+      }
     ]
+    """
+
+    static let gameData = try! JSONDecoder().decode(
+        [DemoGameData].self,
+        from: Data(mockBackendResponseJSON.utf8)
+    )
 }
 
 extension GameDisplayMode {

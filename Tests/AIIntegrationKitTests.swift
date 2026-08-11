@@ -91,16 +91,16 @@ for obsoleteSymbol in [
     fail("the Demo configuration should remove obsolete Tab Bar symbol \(obsoleteSymbol)")
 }
 guard
-    demoConfiguration.contains("struct DemoGameData"),
+    demoConfiguration.contains("struct DemoGameData: Decodable"),
     demoConfiguration.contains("DemoGameDataSource"),
-    demoConfiguration.contains("static let gameData: [DemoGameData] = ["),
-    demoConfiguration.contains("URL(string:"),
+    demoConfiguration.contains("static let mockBackendResponseJSON = \"\"\""),
+    demoConfiguration.contains("static let gameData = try! JSONDecoder().decode("),
     !demoConfiguration.contains("GameLaunchCredentials"),
     !demoConfiguration.contains("URLComponents"),
     !demoConfiguration.contains("makeURL"),
     !demoConfiguration.contains("demoMiniValue")
 else {
-    fail("the Demo configuration should directly declare three complete game dictionaries")
+    fail("the Demo configuration should decode three complete game dictionaries from its mock JSON")
 }
 
 let demoRechargePrompt = source(at: demoRechargePromptPath)
@@ -129,7 +129,7 @@ let requiredAgentRules = [
     "widthHeightRatio",
     "notifyGameBalanceDidChange()",
     "核心源码不展示充值 UI",
-    "三条完整 URL 直接声明",
+    "源码内模拟 JSON 展示三条完整 URL",
     "后端 URL 不得包含 `safeTop` 或 `paddingBottom`",
     "追加 `safeTop=1`",
     "xcodebuild",

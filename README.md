@@ -17,7 +17,7 @@
 2. 选择 `joyplay-ios` Scheme 和任意 iPhone 模拟器或真机。
 3. 运行工程：底部三个普通模式按钮默认选中全屏；中央圆形按钮打开全屏游戏，半屏和大半屏按钮先进入对应场景页。
 
-Demo AppKey 和 Token 允许公开，当前 Demo 用三条预先拼好的完整 URL 模拟首页一次取得三条游戏数据。迁移到业务工程时，宿主直接使用后端下发的完整游戏 URL、模式和宽高比，不在客户端拼接 AppKey、Token 或游戏参数。
+Demo AppKey 和 Token 允许公开，当前 Demo 用一份源码内的模拟 JSON 表示首页一次取得的三条游戏数据，再通过 `JSONDecoder` 解码。迁移到业务工程时，宿主直接使用后端下发的完整游戏 URL、模式和宽高比，不在客户端拼接 AppKey、Token 或游戏参数。
 
 ## 文件说明
 
@@ -27,7 +27,7 @@ Demo AppKey 和 Token 允许公开，当前 Demo 用三条预先拼好的完整 
 | --- | --- | --- |
 | `joyplay-ios/JoyPlayIntegration/GameConfiguration.swift` | 必需 | 游戏模式、URL 与比例校验、全屏运行时参数、事件名称、充值刷新 JS |
 | `joyplay-ios/JoyPlayIntegration/GameWebView.swift` | 必需 | 宿主唯一入口，负责 WKWebView、后端 URL 加载、布局、JS 回调注册和释放 |
-| `joyplay-ios/DemoGameConfiguration.swift` | 可选 | Demo 三条固定游戏数据、完整 URL、模式文案、图标和背景配置 |
+| `joyplay-ios/DemoGameConfiguration.swift` | 可选 | Demo 模拟 JSON、解码后的三条游戏数据、模式文案、图标和背景配置 |
 | `joyplay-ios/DemoRechargePromptPresenter.swift` | 可选 | Demo 充值提示弹窗 |
 | `joyplay-ios/DemoGameLaunchButton.swift` | 可选 | Demo 共用的圆形游戏启动按钮和呼吸动画 |
 | `joyplay-ios/FullScreenGameViewController.swift` | 可选 | 全屏游戏的导航 Push 示例 |
@@ -51,7 +51,7 @@ Demo AppKey 和 Token 允许公开，当前 Demo 用三条预先拼好的完整 
 
 ## Demo 的接入方数据流
 
-App 启动后，首页 `GameModeSelectionViewController` 直接读取 `DemoGameDataSource` 中的三条 `DemoGameData`。三条完整 URL 在 Demo 源码中直接声明，不通过 AppKey、Token 或模式代码动态拼接。每条数据包含：
+`DemoGameDataSource.mockBackendResponseJSON` 是一份顶层数组形式的 Demo 模拟响应，不代表正式后端协议。它直接展示三条完整 URL、展示模式和比例，再由 `JSONDecoder` 解码成 `[DemoGameData]`。App 启动后，首页 `GameModeSelectionViewController` 读取解码结果；客户端不通过 AppKey、Token 或模式代码动态拼接 URL。每条数据包含：
 
 - 后端完整游戏 URL。
 - 展示模式 `displayMode`。

@@ -54,7 +54,8 @@ for content in requiredContent where !readme.contains(content) {
 
 guard
     readme.contains("gameURL: backendGameURL"),
-    readme.contains("三条完整 URL 在 Demo 源码中直接声明"),
+    readme.contains("DemoGameDataSource.mockBackendResponseJSON"),
+    readme.contains("再由 `JSONDecoder` 解码成 `[DemoGameData]`"),
     readme.contains("后端 URL 不能预先包含 `safeTop` 或 `paddingBottom`"),
     readme.contains("全屏 `GameWebView` 首次布局时追加 `safeTop=1`"),
     readme.contains("gameWebView.attach(to: view)"),

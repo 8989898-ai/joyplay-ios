@@ -20,8 +20,27 @@ private enum DemoConfigurationTests {
         expect(GameDisplayMode.largeHalf.modeIconFillRatio == 0.7, "large-half icon should remain 70% filled")
         expect(GameDisplayMode.half.backgroundImageName == "live-room-bg", "half-screen background should remain unchanged")
         expect(GameDisplayMode.largeHalf.backgroundImageName == "voice-room-bg", "large-half background should remain unchanged")
+
+        let mockResponseData = Data(DemoGameDataSource.mockBackendResponseJSON.utf8)
+        guard let mockResponse = try? JSONSerialization.jsonObject(
+            with: mockResponseData
+        ) as? [[String: Any]] else {
+            expect(false, "Demo backend response should be a top-level JSON array")
+            return
+        }
+        expect(mockResponse.count == 3, "Demo backend response should contain three game dictionaries")
+        let expectedFields = Set([
+            "gameURL",
+            "widthHeightRatio",
+            "displayMode"
+        ])
+        expect(
+            mockResponse.allSatisfy { Set($0.keys) == expectedFields },
+            "Demo backend response should expose only the three host-facing fields"
+        )
+
         let gameData = DemoGameDataSource.gameData
-        expect(gameData.count == 3, "Demo home should receive three directly declared game dictionaries")
+        expect(gameData.count == mockResponse.count, "Demo home should receive every decoded game dictionary")
 
         for (displayMode, expectedMini) in zip(GameDisplayMode.allCases, ["0", "1", "2"]) {
             guard let data = gameData.first(where: { $0.displayMode == displayMode }),
