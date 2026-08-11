@@ -55,4 +55,40 @@ else {
     fail("invalid GameWebView configuration should leave the launch button active")
 }
 
+let selectionSource = source(at: "joyplay-ios/GameModeSelectionViewController.swift")
+
+for requiredSource in [
+    "final class GameModeSelectionViewController: UIViewController",
+    "DemoGameLaunchButton(",
+    "UIStackView(",
+    "axis = .horizontal",
+    "distribution = .fillEqually",
+    "fullModeButton.isSelected = true",
+    "DemoGameURLBuilder.makeURL(",
+    "displayMode: .full",
+    "GameViewController(",
+    "PartialGameViewController(",
+    "displayMode: displayMode",
+    "widthHeightRatio: widthHeightRatio"
+] where !selectionSource.contains(requiredSource) {
+    fail("GameModeSelectionViewController should preserve \(requiredSource)")
+}
+
+guard
+    !selectionSource.contains("UITabBarController"),
+    !selectionSource.contains("GameWebView(")
+else {
+    fail("the selection page should use ordinary buttons and should not mount a game WebView")
+}
+
+guard
+    selectionSource.contains("gameButton.centerXAnchor.constraint(equalTo: view.centerXAnchor)"),
+    selectionSource.contains("gameButton.centerYAnchor.constraint(equalTo: view.centerYAnchor)"),
+    selectionSource.contains("gameButton.widthAnchor.constraint(equalToConstant: 160)"),
+    selectionSource.contains("gameButton.heightAnchor.constraint(equalTo: gameButton.widthAnchor)"),
+    selectionSource.contains("modeButtonStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)")
+else {
+    fail("the selection page should center its launch button and pin mode buttons to the safe-area bottom")
+}
+
 print("Game mode navigation tests passed")
