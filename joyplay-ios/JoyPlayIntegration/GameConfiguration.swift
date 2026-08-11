@@ -30,51 +30,31 @@ enum GameDisplayMode: CaseIterable, Equatable {
     case full
     case half
     case largeHalf
-
-    var miniValue: Int {
-        switch self {
-        case .full:
-            return 0
-        case .half:
-            return 1
-        case .largeHalf:
-            return 2
-        }
-    }
 }
 
-enum GameURLBuilder {
-    static func makeURL(
-        appKey: String,
-        token: String,
-        displayMode: GameDisplayMode,
-        paddingBottom: CGFloat,
-        additionalURLQueryItems: [URLQueryItem] = []
+enum GameURLRuntimeAdapter {
+    static func appendingPaddingBottom(
+        _ paddingBottom: CGFloat,
+        to gameURL: URL
     ) -> URL? {
-        var components = URLComponents()
-        components.scheme = "https"
-        components.host = "joyplay.cn"
-        components.path = "/release/index.html"
-        var queryItems = [
-            URLQueryItem(name: "appKey", value: appKey),
-            URLQueryItem(name: "token", value: token),
-            URLQueryItem(name: "gameId", value: "1"),
-            URLQueryItem(name: "mini", value: String(displayMode.miniValue))
-        ]
-        if displayMode == .full {
-            queryItems.append(URLQueryItem(name: "safeTop", value: "1"))
-            queryItems.append(URLQueryItem(
-                name: "paddingBottom",
-                value: String(Double(paddingBottom))
-            ))
+        guard paddingBottom.isFinite,
+              paddingBottom >= 0,
+              var components = URLComponents(
+                  url: gameURL,
+                  resolvingAgainstBaseURL: false
+              ),
+              components.queryItems?.contains(
+                  where: { $0.name == "paddingBottom" }
+              ) != true else {
+            return nil
         }
-        let reservedQueryNames = Set([
-            "appKey", "token", "gameId", "mini", "safeTop", "paddingBottom"
-        ])
-        queryItems.append(contentsOf: additionalURLQueryItems.filter {
-            !reservedQueryNames.contains($0.name)
-        })
-        components.queryItems = queryItems
+
+        let paddingBottomItem = "paddingBottom=\(String(Double(paddingBottom)))"
+        if let query = components.percentEncodedQuery, !query.isEmpty {
+            components.percentEncodedQuery = "\(query)&\(paddingBottomItem)"
+        } else {
+            components.percentEncodedQuery = paddingBottomItem
+        }
         return components.url
     }
 }

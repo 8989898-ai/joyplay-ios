@@ -36,8 +36,9 @@ let requiredContent = [
     "GameAspectRatio",
     "heightMultiplier",
     "GameWebView(",
+    "gameURL:",
     "onEvent:",
-    "additionalURLQueryItems",
+    "后端下发",
     "notifyGameBalanceDidChange()",
     "recharge",
     "clickRecharge",
@@ -52,12 +53,11 @@ for content in requiredContent where !readme.contains(content) {
 }
 
 guard
-    readme.contains("appKey: businessAppKey"),
-    readme.contains("token: businessToken"),
-    !readme.contains("appKey: GameLaunchCredentials.appKey"),
-    !readme.contains("token: GameLaunchCredentials.token")
+    readme.contains("gameURL: backendGameURL"),
+    !readme.contains("appKey: businessAppKey"),
+    !readme.contains("token: businessToken")
 else {
-    fail("business integration examples should use host-provided credentials instead of Demo credentials")
+    fail("business integration examples should pass the complete backend game URL")
 }
 
 let gameWebView = source(at: "joyplay-ios/JoyPlayIntegration/GameWebView.swift")
@@ -95,8 +95,8 @@ else {
 for demoPath in [
     "joyplay-ios/GameViewController.swift",
     "joyplay-ios/GameModeTabBarController.swift"
-] where !source(at: demoPath).contains("additionalURLQueryItems: DemoGameURLConfiguration.additionalQueryItems") {
-    fail("\(demoPath) should inject the Demo-owned URL marker through the neutral core API")
+] where !source(at: demoPath).contains("gameURL:") {
+    fail("\(demoPath) should pass a complete Demo-owned URL into the core API")
 }
 
 let demoRechargePrompt = source(at: "joyplay-ios/DemoRechargePromptPresenter.swift")

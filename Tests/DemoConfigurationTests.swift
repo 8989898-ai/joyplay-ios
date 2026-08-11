@@ -24,18 +24,38 @@ private enum DemoConfigurationTests {
         expect(GameDisplayMode.largeHalf.backDestination == .fullModeTab, "large-half back behavior should remain unchanged")
         expect(GameLaunchCredentials.appKey == "ste5a6lxxrtu10bmnc6g", "Demo AppKey should remain unchanged")
         expect(!GameLaunchCredentials.token.isEmpty, "Demo Token should remain configured")
-        expect(
-            DemoGameURLConfiguration.additionalQueryItems.count == 1,
-            "Demo URL configuration should contain only its native marker"
-        )
-        expect(
-            DemoGameURLConfiguration.additionalQueryItems.first?.name == "isNativeDemo",
-            "Demo URL configuration should own the native Demo marker name"
-        )
-        expect(
-            DemoGameURLConfiguration.additionalQueryItems.first?.value == "1",
-            "Demo URL configuration should keep isNativeDemo=1"
-        )
+
+        for (displayMode, expectedMini) in zip(GameDisplayMode.allCases, ["0", "1", "2"]) {
+            let url = DemoGameURLBuilder.makeURL(
+                appKey: "demo-app-key",
+                token: "demo-token",
+                displayMode: displayMode
+            )
+            expect(url != nil, "Demo should build a game URL for every display mode")
+
+            guard let url,
+                  let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+                continue
+            }
+            let queryItems = Dictionary(
+                uniqueKeysWithValues: (components.queryItems ?? []).map {
+                    ($0.name, $0.value ?? "")
+                }
+            )
+            expect(components.scheme == "https", "Demo game URL should use HTTPS")
+            expect(components.host == "joyplay.cn", "Demo game URL host should remain unchanged")
+            expect(components.path == "/release/index.html", "Demo game URL path should remain unchanged")
+            expect(queryItems["appKey"] == "demo-app-key", "Demo URL should include its AppKey")
+            expect(queryItems["token"] == "demo-token", "Demo URL should include its Token")
+            expect(queryItems["gameId"] == "1", "Demo gameId should remain fixed at 1")
+            expect(queryItems["mini"] == expectedMini, "Demo mini should match its display mode")
+            expect(queryItems["isNativeDemo"] == "1", "Demo URL should keep isNativeDemo=1")
+            expect(queryItems["paddingBottom"] == nil, "Demo URL builder should leave paddingBottom to GameWebView")
+            expect(
+                queryItems["safeTop"] == (displayMode == .full ? "1" : nil),
+                "Only the full-screen Demo URL should contain safeTop=1"
+            )
+        }
 
         print("Demo configuration tests passed")
     }

@@ -1,30 +1,25 @@
 import UIKit
 
 final class GameViewController: UIViewController {
+    private let gameURL: URL
     private let displayMode: GameDisplayMode
-    private let appKey: String
-    private let token: String
     private let aspectRatio: GameAspectRatio?
     private lazy var gameWebView = GameWebView(
+        gameURL: gameURL,
         displayMode: displayMode,
-        appKey: appKey,
-        token: token,
         aspectRatio: aspectRatio,
-        additionalURLQueryItems: DemoGameURLConfiguration.additionalQueryItems,
         onEvent: { [weak self] event in
             self?.handleGameEvent(event)
         }
     )
 
     init(
+        gameURL: URL,
         displayMode: GameDisplayMode,
-        appKey: String,
-        token: String,
         aspectRatio: GameAspectRatio? = nil
     ) {
+        self.gameURL = gameURL
         self.displayMode = displayMode
-        self.appKey = appKey
-        self.token = token
         self.aspectRatio = aspectRatio
         super.init(nibName: nil, bundle: nil)
     }

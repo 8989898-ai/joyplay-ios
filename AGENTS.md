@@ -6,7 +6,7 @@
 
 1. 阅读根目录 `README.md`，确认游戏模式、事件、充值和释放规则。
 2. 阅读并填写 `INTEGRATION_REQUEST.yaml`。
-3. 如果模板中仍有 `<请填写>`，停止接入并向用户确认；不要猜测业务控制器、Token 来源、关闭方式或充值页面。
+3. 如果模板中仍有 `<请填写>`，停止接入并向用户确认；不要猜测业务控制器、游戏 URL 来源、关闭方式或充值页面。
 4. 检查目标工程及其父目录中的其他 `AGENTS.md`，同时遵守目标工程规则。
 5. `docs/plans/` 是历史实施记录，可能保留旧文件路径或已被后续需求替代的参数；接入时不要把它作为当前契约，当前契约以 `README.md`、本文件和核心源码为准。
 
@@ -39,12 +39,13 @@
 
 ## 不得擅自改变的接入契约
 
-- 游戏地址由 `GameURLBuilder` 生成。
-- `gameId=1`。
-- 全屏、半屏、大半屏分别使用 `mini=0`、`mini=1`、`mini=2`。
+- 游戏地址由宿主后端下发完整 HTTPS URL，核心 `GameWebView` 直接接收 `URL`。
+- 后端 URL 中的 `gameId=1`。
+- 后端为全屏、半屏、大半屏 URL 分别提供 `mini=0`、`mini=1`、`mini=2`。
+- 后端 URL 不得包含 `paddingBottom`；核心仅在全屏首次加载时追加当前窗口底部安全距离，半屏和大半屏不修改 URL。
 - 半屏和大半屏的 `widthHeightRatio`（宽 ÷ 高）来自宿主后端配置；使用 `GameAspectRatio` 校验并转换成高度 multiplier，底部对齐安全区。不要在 `GameDisplayMode` 或核心源码中写死比例。
 - H5 消息名称固定为 `recharge`、`clickRecharge`、`newTppClose`、`OpenGameSucc`。
-- 核心不认识 `isNativeDemo`；当前 Demo 通过 `additionalURLQueryItems` 附加 `isNativeDemo=1`，业务工程默认不传。
+- 核心不认识 AppKey、Token、`gameId`、`mini` 或 `isNativeDemo`；当前 Demo 由 `DemoGameURLBuilder` 生成带 `isNativeDemo=1` 的完整 URL，业务后端默认不传该标记。
 - `newTppClose` 到达后，宿主根据模板选择移除游戏视图或 Pop；不要擅自关闭直播间、语聊房等业务控制器。
 - 宿主主动退出时调用 `stop()`。
 - 收到充值事件后由宿主展示充值 UI；充值成功后调用 `notifyGameBalanceDidChange()`。
@@ -52,9 +53,9 @@
 
 ## AI 接入步骤
 
-1. 根据 `INTEGRATION_REQUEST.yaml` 定位目标工程、Scheme、App Target、宿主控制器和宽高比来源。
+1. 根据 `INTEGRATION_REQUEST.yaml` 定位目标工程、Scheme、App Target、宿主控制器、后端完整游戏 URL 和宽高比来源。
 2. 复制 `JoyPlayIntegration` 目录，保持两个文件在同一个 Target 中。
-3. 根据启用的模式创建 `GameWebView`；半屏和大半屏使用后端比例设置宿主高度约束，不要引入 Demo Tab Bar 或背景资源。
+3. 校验后端游戏 URL 并根据启用的模式创建 `GameWebView`；半屏和大半屏使用后端比例设置宿主高度约束，不要引入 Demo Tab Bar 或背景资源。
 4. 实现全部 `GameEvent` 分支，即使某个事件当前只记录日志。
 5. 按模板实现关闭与充值行为。
 6. 检查每个主动移除路径都调用 `stop()`。
@@ -82,6 +83,6 @@ AI 完成后必须报告：
 
 - 复制或修改了哪些文件。
 - 每种启用模式接入到哪个宿主控制器。
-- AppKey、Token、宽高比、无效比例处理、关闭和充值行为来自模板中的哪项配置。
+- 游戏 URL、宽高比、无效 URL/比例处理、关闭和充值行为来自模板中的哪项配置。
 - 执行了哪些测试或 `xcodebuild` 命令及其结果。
 - 哪些真实 H5 或视觉验证仍待人工完成。

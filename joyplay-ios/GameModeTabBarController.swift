@@ -231,23 +231,30 @@ private final class GameModeLaunchViewController: UIViewController {
     }
 
     @objc private func openGame() {
+        guard let gameURL = DemoGameURLBuilder.makeURL(
+            appKey: appKey,
+            token: token,
+            displayMode: displayMode
+        ) else {
+            return
+        }
+
         switch displayMode.launchPresentation {
         case .pushed:
             stopGameButtonBreathing()
             let gameViewController = GameViewController(
+                gameURL: gameURL,
                 displayMode: displayMode,
-                appKey: appKey,
-                token: token,
                 aspectRatio: aspectRatio
             )
             gameViewController.hidesBottomBarWhenPushed = true
             navigationController?.pushViewController(gameViewController, animated: true)
         case .embedded:
-            embedGame()
+            embedGame(gameURL: gameURL)
         }
     }
 
-    private func embedGame() {
+    private func embedGame(gameURL: URL) {
         guard embeddedGameView == nil,
               let aspectRatio else {
             return
@@ -255,11 +262,9 @@ private final class GameModeLaunchViewController: UIViewController {
 
         stopGameButtonBreathing()
         let gameWebView = GameWebView(
+            gameURL: gameURL,
             displayMode: displayMode,
-            appKey: appKey,
-            token: token,
             aspectRatio: aspectRatio,
-            additionalURLQueryItems: DemoGameURLConfiguration.additionalQueryItems,
             onEvent: { [weak self] event in
                 self?.handleEmbeddedGameEvent(event)
             }

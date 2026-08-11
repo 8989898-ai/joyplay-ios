@@ -17,17 +17,26 @@ guard configurationSource.contains("enum GameEvent: String, CaseIterable") else 
     fail("GameConfiguration should expose the documented callbacks as GameEvent")
 }
 
-guard configurationSource.contains("if displayMode == .full") else {
-    fail("safeTop and paddingBottom should only be added for full-screen games")
+guard
+    configurationSource.contains("enum GameURLRuntimeAdapter"),
+    configurationSource.contains("appendingPaddingBottom"),
+    !configurationSource.contains("enum GameURLBuilder"),
+    !configurationSource.contains("var miniValue")
+else {
+    fail("the core should only adapt the backend URL with runtime paddingBottom")
 }
 
 let gameWebViewSource = source(at: "joyplay-ios/JoyPlayIntegration/GameWebView.swift")
 guard
     gameWebViewSource.contains("private let onEvent: (GameEvent) -> Void"),
     gameWebViewSource.contains("onEvent: @escaping (GameEvent) -> Void"),
-    gameWebViewSource.contains("additionalURLQueryItems: [URLQueryItem] = []"),
+    gameWebViewSource.contains("private let gameURL: URL"),
+    gameWebViewSource.contains("gameURL: URL"),
     gameWebViewSource.contains("func notifyGameBalanceDidChange()"),
     gameWebViewSource.contains("onEvent(event)"),
+    !gameWebViewSource.contains("private let appKey"),
+    !gameWebViewSource.contains("private let token"),
+    !gameWebViewSource.contains("additionalURLQueryItems"),
     !gameWebViewSource.contains("onClose"),
     !gameWebViewSource.contains("UIAlertController"),
     !gameWebViewSource.contains("automaticallyShowsRechargePrompt")
@@ -52,9 +61,11 @@ else {
 guard
     gameWebViewSource.contains("override func layoutSubviews()"),
     gameWebViewSource.contains("window.safeAreaInsets.bottom"),
-    gameWebViewSource.contains("paddingBottom: paddingBottom")
+    gameWebViewSource.contains("if displayMode == .full"),
+    gameWebViewSource.contains("GameURLRuntimeAdapter.appendingPaddingBottom"),
+    gameWebViewSource.contains("to: gameURL")
 else {
-    fail("GameWebView should load with the window's bottom safe-area height")
+    fail("GameWebView should append the window's bottom safe-area height only for full screen")
 }
 
 let fullScreenHostSource = source(at: "joyplay-ios/GameViewController.swift")

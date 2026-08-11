@@ -20,9 +20,12 @@ modes:
     host_controller: <请填写语聊房控制器>
     close_behavior: remove_game_view
 
-credentials:
-  app_key_source: <固定值或代码表达式>
-  token_source: <固定值或代码表达式>
+game_url:
+  game_url_source: <请填写后端完整游戏URL字段或代码表达式>
+  invalid_url_behavior: <请填写不打开游戏、提示或重试方式>
+  requires_https: true
+  backend_must_omit_padding_bottom: true
+  client_appends_padding_bottom_for_full_screen: true
 
 layout:
   width_height_ratio_source: <请填写后端字段或代码表达式，语义为宽除以高>

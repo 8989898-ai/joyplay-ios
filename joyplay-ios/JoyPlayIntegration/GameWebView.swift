@@ -2,11 +2,9 @@ import UIKit
 import WebKit
 
 final class GameWebView: UIView {
+    private let gameURL: URL
     private let displayMode: GameDisplayMode
-    private let appKey: String
-    private let token: String
     private let aspectRatio: GameAspectRatio?
-    private let additionalURLQueryItems: [URLQueryItem]
     private let onEvent: (GameEvent) -> Void
     private let webView = WKWebView()
     private var scriptMessageHandler: WeakScriptMessageHandler?
@@ -14,18 +12,14 @@ final class GameWebView: UIView {
     private var hasLoadedGame = false
 
     init(
+        gameURL: URL,
         displayMode: GameDisplayMode,
-        appKey: String,
-        token: String,
         aspectRatio: GameAspectRatio? = nil,
-        additionalURLQueryItems: [URLQueryItem] = [],
         onEvent: @escaping (GameEvent) -> Void
     ) {
+        self.gameURL = gameURL
         self.displayMode = displayMode
-        self.appKey = appKey
-        self.token = token
         self.aspectRatio = aspectRatio
-        self.additionalURLQueryItems = additionalURLQueryItems
         self.onEvent = onEvent
         super.init(frame: .zero)
         configureWebView()
@@ -92,19 +86,22 @@ final class GameWebView: UIView {
             return
         }
 
-        let paddingBottom = window.safeAreaInsets.bottom
-        guard let url = GameURLBuilder.makeURL(
-            appKey: appKey,
-            token: token,
-            displayMode: displayMode,
-            paddingBottom: paddingBottom,
-            additionalURLQueryItems: additionalURLQueryItems
-        ) else {
-            return
+        let loadURL: URL
+        if displayMode == .full {
+            guard let url = GameURLRuntimeAdapter.appendingPaddingBottom(
+                window.safeAreaInsets.bottom,
+                to: gameURL
+            ) else {
+                print("游戏链接追加 paddingBottom 失败")
+                return
+            }
+            loadURL = url
+        } else {
+            loadURL = gameURL
         }
         hasLoadedGame = true
-        print("打开游戏链接：\(url.absoluteString)")
-        webView.load(URLRequest(url: url))
+        print("开始加载游戏")
+        webView.load(URLRequest(url: loadURL))
     }
 
     private func registerScriptMessageHandlers() {

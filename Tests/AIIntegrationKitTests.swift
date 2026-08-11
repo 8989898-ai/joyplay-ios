@@ -60,6 +60,9 @@ for symbol in demoOnlySymbols where coreConfiguration.contains(symbol) {
 
 let forbiddenCoreSymbols = [
     "isNativeDemo",
+    "enum GameURLBuilder",
+    "var miniValue",
+    "additionalURLQueryItems",
     "GameRechargePrompt",
     "automaticallyShowsRechargePrompt",
     "UIAlertController",
@@ -70,8 +73,12 @@ for symbol in forbiddenCoreSymbols where coreSource.contains(symbol) {
     fail("the distributable core should not contain Demo or host UI symbol \(symbol)")
 }
 
-guard coreSource.contains("additionalURLQueryItems: [URLQueryItem] = []") else {
-    fail("the distributable core should expose a neutral optional URL query-item extension point")
+guard
+    coreSource.contains("enum GameURLRuntimeAdapter"),
+    coreSource.contains("appendingPaddingBottom"),
+    coreSource.contains("gameURL: URL")
+else {
+    fail("the distributable core should accept a backend URL and only add runtime paddingBottom")
 }
 
 let demoConfiguration = source(at: demoConfigurationPath)
@@ -79,7 +86,7 @@ for symbol in demoOnlySymbols where !demoConfiguration.contains(symbol) {
     fail("the Demo configuration should contain \(symbol)")
 }
 guard
-    demoConfiguration.contains("DemoGameURLConfiguration"),
+    demoConfiguration.contains("DemoGameURLBuilder"),
     demoConfiguration.contains("URLQueryItem(name: \"isNativeDemo\", value: \"1\")")
 else {
     fail("the Demo configuration should own the native Demo URL marker")
@@ -126,8 +133,8 @@ let requiredRequestFields = [
     "large_half:",
     "host_controller:",
     "close_behavior:",
-    "app_key_source:",
-    "token_source:",
+    "game_url_source:",
+    "invalid_url_behavior:",
     "width_height_ratio_source:",
     "invalid_ratio_behavior:",
     "ui_owner: host",

@@ -5,10 +5,41 @@ enum GameLaunchCredentials {
     static let token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3ODU0OTExNzEsImFjY291bnRJZCI6IjIwODMxMjcwNzQxNzU0NTUyMzIifQ.gdzel2RMXHKwyEG6AaQg-sObDx6H_O9Tmo2XGzfcOJU"
 }
 
-enum DemoGameURLConfiguration {
-    static let additionalQueryItems = [
-        URLQueryItem(name: "isNativeDemo", value: "1")
-    ]
+enum DemoGameURLBuilder {
+    static func makeURL(
+        appKey: String,
+        token: String,
+        displayMode: GameDisplayMode
+    ) -> URL? {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = "joyplay.cn"
+        components.path = "/release/index.html"
+        components.queryItems = [
+            URLQueryItem(name: "appKey", value: appKey),
+            URLQueryItem(name: "token", value: token),
+            URLQueryItem(name: "gameId", value: "1"),
+            URLQueryItem(name: "mini", value: String(displayMode.demoMiniValue)),
+            URLQueryItem(name: "isNativeDemo", value: "1")
+        ]
+        if displayMode == .full {
+            components.queryItems?.append(URLQueryItem(name: "safeTop", value: "1"))
+        }
+        return components.url
+    }
+}
+
+private extension GameDisplayMode {
+    var demoMiniValue: Int {
+        switch self {
+        case .full:
+            return 0
+        case .half:
+            return 1
+        case .largeHalf:
+            return 2
+        }
+    }
 }
 
 enum GameLaunchPresentation {
