@@ -19,6 +19,7 @@
 
 除非用户明确要求复刻 Demo UI，否则不要复制以下 Demo 专用内容：
 
+- `DemoGameConfiguration.swift`
 - `GameModeTabBarController.swift`
 - `GameViewController.swift`
 - `ViewController.swift`

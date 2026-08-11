@@ -29,10 +29,39 @@ for path in obsoletePaths where fileManager.fileExists(atPath: path) {
     fail("the core source should have one canonical location; remove \(path)")
 }
 
+let demoConfigurationPath = "joyplay-ios/DemoGameConfiguration.swift"
+guard fileManager.fileExists(atPath: demoConfigurationPath) else {
+    fail("Demo-only game configuration should exist at \(demoConfigurationPath)")
+}
+
+let coreConfiguration = source(at: corePaths[0])
+let demoOnlySymbols = [
+    "GameLaunchCredentials",
+    "GameLaunchPresentation",
+    "GameBackDestination",
+    "var title: String",
+    "var tabIconFillRatio: CGFloat",
+    "var launchPresentation: GameLaunchPresentation",
+    "var usesGameBackground: Bool",
+    "var backgroundImageName: String",
+    "var hidesNavigationBar: Bool",
+    "var hidesModeTabBar: Bool",
+    "var backDestination: GameBackDestination"
+]
+for symbol in demoOnlySymbols where coreConfiguration.contains(symbol) {
+    fail("the distributable core should not contain Demo-only symbol \(symbol)")
+}
+
+let demoConfiguration = source(at: demoConfigurationPath)
+for symbol in demoOnlySymbols where !demoConfiguration.contains(symbol) {
+    fail("the Demo configuration should contain \(symbol)")
+}
+
 let agentInstructions = source(at: "AGENTS.md")
 let requiredAgentRules = [
     "INTEGRATION_REQUEST.yaml",
     "JoyPlayIntegration",
+    "DemoGameConfiguration.swift",
     "GameModeTabBarController",
     "不要复制",
     "docs/plans",

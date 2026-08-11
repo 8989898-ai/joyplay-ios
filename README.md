@@ -27,6 +27,7 @@ Demo AppKey 和 Token 允许公开，当前固定值仅用于让接入方直接�
 | --- | --- | --- |
 | `joyplay-ios/JoyPlayIntegration/GameConfiguration.swift` | 必需 | 游戏模式、URL 参数、事件名称、充值刷新 JS |
 | `joyplay-ios/JoyPlayIntegration/GameWebView.swift` | 必需 | WKWebView、URL 加载、JS 回调注册和释放 |
+| `joyplay-ios/DemoGameConfiguration.swift` | 可选 | Demo 固定凭证、模式文案、图标、背景和导航策略 |
 | `joyplay-ios/GameViewController.swift` | 可选 | 全屏游戏的导航 Push 示例 |
 | `joyplay-ios/GameModeTabBarController.swift` | 可选 | 三种模式入口以及半屏嵌入示例 |
 | `joyplay-ios/Localizable.xcstrings` | 可选 | Demo 页面中英文文案 |
@@ -63,13 +64,13 @@ Demo AppKey 和 Token 允许公开，当前固定值仅用于让接入方直接�
 
 ### 方式一：复用全屏示例控制器
 
-同时复制 `GameViewController.swift` 后，在现有导航控制器中 Push：
+同时复制 `GameViewController.swift` 后，使用业务工程自己的 `businessAppKey` 和 `businessToken`，在现有导航控制器中 Push：
 
 ```swift
 let gameViewController = GameViewController(
     displayMode: .full,
-    appKey: GameLaunchCredentials.appKey,
-    token: GameLaunchCredentials.token
+    appKey: businessAppKey,
+    token: businessToken
 )
 gameViewController.hidesBottomBarWhenPushed = true
 navigationController?.pushViewController(gameViewController, animated: true)
@@ -94,8 +95,8 @@ private func openEmbeddedGame(
 
     let gameWebView = GameWebView(
         displayMode: displayMode,
-        appKey: GameLaunchCredentials.appKey,
-        token: GameLaunchCredentials.token,
+        appKey: businessAppKey,
+        token: businessToken,
         aspectRatio: aspectRatio,
         automaticallyShowsRechargePrompt: false,
         onEvent: { [weak self] event in
@@ -197,6 +198,16 @@ gameWebView = nil
 swiftc -module-cache-path /tmp/joyplay-module-cache \
   joyplay-ios/JoyPlayIntegration/GameConfiguration.swift Tests/main.swift \
   -o /tmp/joyplay-tests && /tmp/joyplay-tests
+```
+
+Demo 展示策略测试：
+
+```sh
+swiftc -module-cache-path /tmp/joyplay-demo-module-cache \
+  joyplay-ios/JoyPlayIntegration/GameConfiguration.swift \
+  joyplay-ios/DemoGameConfiguration.swift \
+  Tests/DemoConfigurationTests.swift \
+  -o /tmp/joyplay-demo-tests && /tmp/joyplay-demo-tests
 ```
 
 无签名模拟器构建：

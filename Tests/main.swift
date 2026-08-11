@@ -19,36 +19,9 @@ expect(GameAspectRatio(widthHeightRatio: 0) == nil, "零宽高比应被拒绝")
 expect(GameAspectRatio(widthHeightRatio: -1) == nil, "负宽高比应被拒绝")
 expect(GameAspectRatio(widthHeightRatio: .infinity) == nil, "无限宽高比应被拒绝")
 expect(GameAspectRatio(widthHeightRatio: .nan) == nil, "非数字宽高比应被拒绝")
-expect(
-    GameDisplayMode.allCases.map(\.title) == ["Full Screen", "Half Screen", "Large Half Screen"],
-    "不加载本地化资源时，底部 Tab 应回退英文"
-)
-expect(GameDisplayMode.full.tabIconFillRatio == 1.0, "全屏 Tab 图标应填满屏幕轮廓")
-expect(GameDisplayMode.half.tabIconFillRatio == 0.5, "半屏 Tab 图标应填充一半屏幕轮廓")
-expect(GameDisplayMode.largeHalf.tabIconFillRatio == 0.7, "大半屏 Tab 图标应填充七成屏幕轮廓")
 expect(GameDisplayMode.full.miniValue == 0, "全屏应映射为 mini=0")
 expect(GameDisplayMode.half.miniValue == 1, "半屏应映射为 mini=1")
 expect(GameDisplayMode.largeHalf.miniValue == 2, "大半屏应映射为 mini=2")
-expect(GameDisplayMode.full.launchPresentation == .pushed, "全屏游戏应通过导航 push 展示")
-expect(GameDisplayMode.half.launchPresentation == .embedded, "半屏游戏应在当前 Tab 展示")
-expect(GameDisplayMode.largeHalf.launchPresentation == .embedded, "大半屏游戏应在当前 Tab 展示")
-expect(!GameDisplayMode.full.usesGameBackground, "全屏入口不需要游戏背景")
-expect(GameDisplayMode.half.usesGameBackground, "半屏入口应使用游戏背景")
-expect(GameDisplayMode.largeHalf.usesGameBackground, "大半屏入口应使用游戏背景")
-expect(GameDisplayMode.half.backgroundImageName == "live-room-bg", "半屏应使用直播间背景")
-expect(GameDisplayMode.largeHalf.backgroundImageName == "voice-room-bg", "大半屏应使用语聊房背景")
-expect(GameDisplayMode.full.hidesNavigationBar, "全屏游戏应隐藏导航栏")
-expect(!GameDisplayMode.half.hidesNavigationBar, "半屏游戏应显示导航栏")
-expect(!GameDisplayMode.largeHalf.hidesNavigationBar, "大半屏游戏应显示导航栏")
-expect(!GameDisplayMode.full.hidesModeTabBar, "全屏入口应保留模式 Tab Bar")
-expect(GameDisplayMode.half.hidesModeTabBar, "进入半屏场景后应隐藏模式 Tab Bar")
-expect(GameDisplayMode.largeHalf.hidesModeTabBar, "进入大半屏场景后应隐藏模式 Tab Bar")
-expect(GameDisplayMode.full.backDestination == .previousScreen, "全屏返回应保留原导航行为")
-expect(GameDisplayMode.half.backDestination == .fullModeTab, "半屏返回应切换到全屏 Tab")
-expect(GameDisplayMode.largeHalf.backDestination == .fullModeTab, "大半屏返回应切换到全屏 Tab")
-
-expect(GameLaunchCredentials.appKey == "ste5a6lxxrtu10bmnc6g", "AppKey 应使用固定配置")
-expect(!GameLaunchCredentials.token.isEmpty, "Token 应使用固定配置")
 
 let eventNames = Set(GameEvent.allCases.map(\.rawValue))
 expect(
@@ -82,8 +55,8 @@ var observedGameIDs = Set<String>()
 
 for (displayMode, expectedMini) in zip(GameDisplayMode.allCases, ["0", "1", "2"]) {
     let integrationURL = GameURLBuilder.makeURL(
-        appKey: GameLaunchCredentials.appKey,
-        token: GameLaunchCredentials.token,
+        appKey: "integration-app-key",
+        token: "integration-token",
         displayMode: displayMode,
         paddingBottom: 34
     )
@@ -94,8 +67,8 @@ for (displayMode, expectedMini) in zip(GameDisplayMode.allCases, ["0", "1", "2"]
     }
 
     let url = GameURLBuilder.makeURL(
-        appKey: GameLaunchCredentials.appKey,
-        token: GameLaunchCredentials.token,
+        appKey: "demo-app-key",
+        token: "demo-token",
         displayMode: displayMode,
         paddingBottom: 34,
         isNativeDemo: true
@@ -110,8 +83,8 @@ for (displayMode, expectedMini) in zip(GameDisplayMode.allCases, ["0", "1", "2"]
         expect(components.scheme == "https", "游戏链接应使用 HTTPS")
         expect(components.host == "joyplay.cn", "游戏链接域名应正确")
         expect(components.path == "/release/index.html", "游戏链接路径应正确")
-        expect(queryItems["appKey"] == GameLaunchCredentials.appKey, "AppKey 应使用固定配置")
-        expect(queryItems["token"] == GameLaunchCredentials.token, "Token 应使用固定配置")
+        expect(queryItems["appKey"] == "demo-app-key", "URL 应使用调用方传入的 AppKey")
+        expect(queryItems["token"] == "demo-token", "URL 应使用调用方传入的 Token")
         if displayMode == .full {
             expect(queryItems["safeTop"] == "1", "全屏游戏链接应携带 safeTop=1")
             expect(queryItems["paddingBottom"] == "34.0", "全屏游戏链接应携带系统底部安全距离")

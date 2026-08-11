@@ -20,6 +20,7 @@ let requiredContent = [
     "iOS 15.6",
     "joyplay-ios/JoyPlayIntegration/GameConfiguration.swift",
     "joyplay-ios/JoyPlayIntegration/GameWebView.swift",
+    "DemoGameConfiguration.swift",
     "GameViewController.swift",
     "GameModeTabBarController.swift",
     "AGENTS.md",
@@ -47,6 +48,15 @@ let requiredContent = [
 
 for content in requiredContent where !readme.contains(content) {
     fail("README should document \(content)")
+}
+
+guard
+    readme.contains("appKey: businessAppKey"),
+    readme.contains("token: businessToken"),
+    !readme.contains("appKey: GameLaunchCredentials.appKey"),
+    !readme.contains("token: GameLaunchCredentials.token")
+else {
+    fail("business integration examples should use host-provided credentials instead of Demo credentials")
 }
 
 let gameWebView = source(at: "joyplay-ios/JoyPlayIntegration/GameWebView.swift")
