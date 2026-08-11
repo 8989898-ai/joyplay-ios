@@ -23,7 +23,9 @@
 
 - `DemoGameConfiguration.swift`
 - `DemoRechargePromptPresenter.swift`
-- `GameModeTabBarController.swift`
+- `DemoGameLaunchButton.swift`
+- `GameModeSelectionViewController.swift`
+- `PartialGameViewController.swift`
 - `GameViewController.swift`
 - `ViewController.swift`
 - `Localizable.xcstrings`
@@ -58,7 +60,7 @@
 
 1. 根据 `INTEGRATION_REQUEST.yaml` 定位目标工程、Scheme、App Target、宿主控制器、后端完整游戏 URL 和宽高比来源。
 2. 复制 `JoyPlayIntegration` 目录，保持两个文件在同一个 Target 中。
-3. 将后端完整游戏 URL、模式和嵌入模式的原始比例直接传给 `GameWebView`；初始化返回 `nil` 时按模板处理无效 URL/比例，不要让宿主重复校验或引入 Demo Tab Bar、背景资源。
+3. 将后端完整游戏 URL、模式和嵌入模式的原始比例直接传给 `GameWebView`；初始化返回 `nil` 时按模板处理无效 URL/比例，不要让宿主重复校验或引入 Demo 页面控制器、背景资源。
 4. 实现全部 `GameEvent` 分支，即使某个事件当前只记录日志。
 5. 按模板实现关闭与充值行为。
 6. 检查每个主动移除路径都调用 `stop()`。

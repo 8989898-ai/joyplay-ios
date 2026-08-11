@@ -43,16 +43,10 @@ let coreConfiguration = source(at: corePaths[0])
 let coreSource = corePaths.map(source).joined(separator: "\n")
 let demoOnlySymbols = [
     "GameLaunchCredentials",
-    "GameLaunchPresentation",
-    "GameBackDestination",
     "var title: String",
-    "var tabIconFillRatio: CGFloat",
-    "var launchPresentation: GameLaunchPresentation",
-    "var usesGameBackground: Bool",
-    "var backgroundImageName: String",
-    "var hidesNavigationBar: Bool",
-    "var hidesModeTabBar: Bool",
-    "var backDestination: GameBackDestination"
+    "var openGameTitle: String",
+    "var modeIconFillRatio: CGFloat",
+    "var backgroundImageName: String"
 ]
 for symbol in demoOnlySymbols where coreConfiguration.contains(symbol) {
     fail("the distributable core should not contain Demo-only symbol \(symbol)")
@@ -85,6 +79,18 @@ let demoConfiguration = source(at: demoConfigurationPath)
 for symbol in demoOnlySymbols where !demoConfiguration.contains(symbol) {
     fail("the Demo configuration should contain \(symbol)")
 }
+for obsoleteSymbol in [
+    "GameLaunchPresentation",
+    "GameBackDestination",
+    "tabIconFillRatio",
+    "launchPresentation",
+    "usesGameBackground",
+    "hidesNavigationBar",
+    "hidesModeTabBar",
+    "backDestination"
+] where demoConfiguration.contains(obsoleteSymbol) {
+    fail("the Demo configuration should remove obsolete Tab Bar symbol \(obsoleteSymbol)")
+}
 guard
     demoConfiguration.contains("DemoGameURLBuilder"),
     demoConfiguration.contains("URLQueryItem(name: \"isNativeDemo\", value: \"1\")")
@@ -106,7 +112,8 @@ let requiredAgentRules = [
     "INTEGRATION_REQUEST.yaml",
     "JoyPlayIntegration",
     "DemoGameConfiguration.swift",
-    "GameModeTabBarController",
+    "GameModeSelectionViewController.swift",
+    "PartialGameViewController.swift",
     "DemoRechargePromptPresenter",
     "不要复制",
     "docs/plans",

@@ -9,11 +9,11 @@ final class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let gameModeTabBarController = GameModeTabBarController(
+        let gameModeSelectionViewController = GameModeSelectionViewController(
             appKey: GameLaunchCredentials.appKey,
             token: GameLaunchCredentials.token,
             widthHeightRatios: backendWidthHeightRatios
         )
-        navigationController?.setViewControllers([gameModeTabBarController], animated: false)
+        navigationController?.setViewControllers([gameModeSelectionViewController], animated: false)
     }
 }

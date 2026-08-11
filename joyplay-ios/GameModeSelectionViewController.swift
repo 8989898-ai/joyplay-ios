@@ -80,7 +80,7 @@ final class GameModeSelectionViewController: UIViewController {
     private func makeModeButton(for mode: GameDisplayMode) -> UIButton {
         var configuration = UIButton.Configuration.plain()
         configuration.title = mode.title
-        configuration.image = GameModeIcon.make(fillRatio: mode.tabIconFillRatio)
+        configuration.image = GameModeIcon.make(fillRatio: mode.modeIconFillRatio)
         configuration.imagePlacement = .top
         configuration.imagePadding = 4
 

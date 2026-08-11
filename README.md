@@ -15,7 +15,7 @@
 
 1. 使用 Xcode 打开 `joyplay-ios.xcodeproj`。
 2. 选择 `joyplay-ios` Scheme 和任意 iPhone 模拟器或真机。
-3. 运行工程，在底部选择全屏、半屏或大半屏模式。
+3. 运行工程：底部三个普通模式按钮默认选中全屏；中央圆形按钮打开全屏游戏，半屏和大半屏按钮先进入对应场景页。
 
 Demo AppKey 和 Token 允许公开，当前 Demo 使用它们模拟后端生成完整游戏 URL。迁移到业务工程时，宿主直接使用后端下发的完整游戏 URL，不在客户端拼接 AppKey、Token 或游戏参数。
 
@@ -27,10 +27,12 @@ Demo AppKey 和 Token 允许公开，当前 Demo 使用它们模拟后端生成�
 | --- | --- | --- |
 | `joyplay-ios/JoyPlayIntegration/GameConfiguration.swift` | 必需 | 游戏模式、URL 与比例校验、运行时底部安全区参数、事件名称、充值刷新 JS |
 | `joyplay-ios/JoyPlayIntegration/GameWebView.swift` | 必需 | 宿主唯一入口，负责 WKWebView、后端 URL 加载、布局、JS 回调注册和释放 |
-| `joyplay-ios/DemoGameConfiguration.swift` | 可选 | Demo 固定凭证、URL Builder、模式文案、图标、背景和导航策略 |
+| `joyplay-ios/DemoGameConfiguration.swift` | 可选 | Demo 固定凭证、URL Builder、模式文案、图标和背景配置 |
 | `joyplay-ios/DemoRechargePromptPresenter.swift` | 可选 | Demo 充值提示弹窗 |
+| `joyplay-ios/DemoGameLaunchButton.swift` | 可选 | Demo 共用的圆形游戏启动按钮和呼吸动画 |
 | `joyplay-ios/GameViewController.swift` | 可选 | 全屏游戏的导航 Push 示例 |
-| `joyplay-ios/GameModeTabBarController.swift` | 可选 | 三种模式入口以及半屏嵌入示例 |
+| `joyplay-ios/GameModeSelectionViewController.swift` | 可选 | 三种普通模式按钮和全屏启动入口示例 |
+| `joyplay-ios/PartialGameViewController.swift` | 可选 | 半屏与大半屏场景、延迟加载和关闭后重开示例 |
 | `joyplay-ios/Localizable.xcstrings` | 可选 | Demo 页面中英文文案 |
 | `joyplay-ios/Assets.xcassets` | 可选 | Demo 按钮颜色和场景背景图 |
 
@@ -45,7 +47,7 @@ Demo AppKey 和 Token 允许公开，当前 Demo 使用它们模拟后端生成�
 
 先将 `INTEGRATION_REQUEST.yaml` 中所有 `<请填写>` 替换为业务工程真实信息，再让 AI 执行：
 
-> 阅读 `AGENTS.md`、`README.md` 和 `INTEGRATION_REQUEST.yaml`，将 `joyplay-ios/JoyPlayIntegration/` 接入目标工程。不要复制 Demo Tab Bar、背景资源和导航结构；完成后执行目标 Scheme 的无签名模拟器构建，并单独报告尚未完成的真实 H5 验证。
+> 阅读 `AGENTS.md`、`README.md` 和 `INTEGRATION_REQUEST.yaml`，将 `joyplay-ios/JoyPlayIntegration/` 接入目标工程。不要复制 Demo 页面控制器、背景资源和导航结构；完成后执行目标 Scheme 的无签名模拟器构建，并单独报告尚未完成的真实 H5 验证。
 
 ## 游戏 URL 参数
 

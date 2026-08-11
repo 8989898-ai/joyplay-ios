@@ -42,16 +42,6 @@ private extension GameDisplayMode {
     }
 }
 
-enum GameLaunchPresentation {
-    case pushed
-    case embedded
-}
-
-enum GameBackDestination {
-    case previousScreen
-    case fullModeTab
-}
-
 extension GameDisplayMode {
     var title: String {
         switch self {
@@ -78,7 +68,7 @@ extension GameDisplayMode {
         }
     }
 
-    var tabIconFillRatio: CGFloat {
+    var modeIconFillRatio: CGFloat {
         switch self {
         case .full:
             return 1.0
@@ -89,27 +79,7 @@ extension GameDisplayMode {
         }
     }
 
-    var launchPresentation: GameLaunchPresentation {
-        self == .full ? .pushed : .embedded
-    }
-
-    var usesGameBackground: Bool {
-        launchPresentation == .embedded
-    }
-
     var backgroundImageName: String {
         self == .largeHalf ? "voice-room-bg" : "live-room-bg"
-    }
-
-    var hidesNavigationBar: Bool {
-        self == .full
-    }
-
-    var hidesModeTabBar: Bool {
-        self != .full
-    }
-
-    var backDestination: GameBackDestination {
-        self == .full ? .previousScreen : .fullModeTab
     }
 }

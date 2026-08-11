@@ -12,6 +12,18 @@ private func source(at path: String) -> String {
     return source
 }
 
+let viewControllerSource = source(at: "joyplay-ios/ViewController.swift")
+guard
+    viewControllerSource.contains("GameModeSelectionViewController("),
+    !viewControllerSource.contains("GameModeTabBarController")
+else {
+    fail("the Demo root should use the ordinary-button selection controller")
+}
+
+guard !FileManager.default.fileExists(atPath: "joyplay-ios/GameModeTabBarController.swift") else {
+    fail("the obsolete Tab Bar controller should be removed")
+}
+
 let partialSource = source(at: "joyplay-ios/PartialGameViewController.swift")
 
 for requiredSource in [

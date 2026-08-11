@@ -22,7 +22,8 @@ let requiredContent = [
     "joyplay-ios/JoyPlayIntegration/GameWebView.swift",
     "DemoGameConfiguration.swift",
     "GameViewController.swift",
-    "GameModeTabBarController.swift",
+    "GameModeSelectionViewController.swift",
+    "PartialGameViewController.swift",
     "DemoRechargePromptPresenter.swift",
     "AGENTS.md",
     "INTEGRATION_REQUEST.yaml",
@@ -86,7 +87,7 @@ else {
     fail("the Demo host should pass backend ratios without constructing a core aspect-ratio type")
 }
 
-let embeddedHost = source(at: "joyplay-ios/GameModeTabBarController.swift")
+let embeddedHost = source(at: "joyplay-ios/PartialGameViewController.swift")
 let gameWebViewSource = source(at: "joyplay-ios/JoyPlayIntegration/GameWebView.swift")
 guard
     embeddedHost.contains("widthHeightRatio: widthHeightRatio"),
@@ -98,7 +99,8 @@ else {
 
 for demoPath in [
     "joyplay-ios/GameViewController.swift",
-    "joyplay-ios/GameModeTabBarController.swift"
+    "joyplay-ios/GameModeSelectionViewController.swift",
+    "joyplay-ios/PartialGameViewController.swift"
 ] where !source(at: demoPath).contains("gameURL:") {
     fail("\(demoPath) should pass a complete Demo-owned URL into the core API")
 }

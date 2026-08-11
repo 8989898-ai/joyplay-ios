@@ -117,11 +117,11 @@ else {
     fail("the full-screen game should extend to every physical screen edge")
 }
 
-let embeddedHostSource = source(at: "joyplay-ios/GameModeTabBarController.swift")
+let embeddedHostSource = source(at: "joyplay-ios/PartialGameViewController.swift")
 guard
-    let embedStart = embeddedHostSource.range(of: "private func embedGame(gameURL: URL)"),
+    let embedStart = embeddedHostSource.range(of: "@objc private func openGame()"),
     let embedEnd = embeddedHostSource.range(
-        of: "private func handleEmbeddedGameEvent",
+        of: "private func handleGameEvent",
         range: embedStart.upperBound..<embeddedHostSource.endIndex
     )
 else {
@@ -130,7 +130,7 @@ else {
 let embedFunctionSource = embeddedHostSource[embedStart.lowerBound..<embedEnd.lowerBound]
 guard
     let gameViewCreation = embedFunctionSource.range(of: "guard let gameWebView = GameWebView("),
-    let stopButtonAnimation = embedFunctionSource.range(of: "stopGameButtonBreathing()"),
+    let stopButtonAnimation = embedFunctionSource.range(of: "gameButton.stopBreathing()"),
     gameViewCreation.lowerBound < stopButtonAnimation.lowerBound
 else {
     fail("an invalid embedded configuration should leave the Demo launch button active")
@@ -138,12 +138,14 @@ else {
 
 guard
     embeddedHostSource.contains("onEvent:"),
-    embeddedHostSource.contains("handleEmbeddedGameEvent"),
+    embeddedHostSource.contains("handleGameEvent"),
     embeddedHostSource.contains("case .insufficientBalance, .recharge:"),
     embeddedHostSource.contains("DemoRechargePromptPresenter.present"),
-    embeddedHostSource.contains("embeddedGameView?.notifyGameBalanceDidChange()"),
+    embeddedHostSource.contains("gameWebView?.notifyGameBalanceDidChange()"),
     embeddedHostSource.contains("case .close:"),
     embeddedHostSource.contains("case .openGameSuccess:"),
+    embeddedHostSource.contains("removeGameView()"),
+    embeddedHostSource.contains("gameButton.isHidden = false"),
     embeddedHostSource.contains("gameWebView.stop()"),
     embeddedHostSource.contains("widthHeightRatio: widthHeightRatio"),
     !embeddedHostSource.contains("GameAspectRatio"),
