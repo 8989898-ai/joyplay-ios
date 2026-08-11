@@ -78,7 +78,7 @@ for requiredSource in [
     "fullModeButton.isSelected = true",
     "DemoGameURLBuilder.makeURL(",
     "displayMode: .full",
-    "GameViewController(",
+    "FullScreenGameViewController(",
     "PartialGameViewController(",
     "displayMode: displayMode",
     "widthHeightRatio: widthHeightRatio"
@@ -103,8 +103,13 @@ else {
     fail("the selection page should center its launch button and pin mode buttons to the safe-area bottom")
 }
 
-let fullSource = source(at: "joyplay-ios/GameViewController.swift")
+guard !FileManager.default.fileExists(atPath: "joyplay-ios/GameViewController.swift") else {
+    fail("the generic full-screen controller filename should be removed")
+}
+
+let fullSource = source(at: "joyplay-ios/FullScreenGameViewController.swift")
 guard
+    fullSource.contains("final class FullScreenGameViewController: UIViewController"),
     fullSource.contains("init(gameURL: URL)"),
     fullSource.contains("displayMode: .full"),
     fullSource.contains("gameWebView.topAnchor.constraint(equalTo: view.topAnchor)"),
@@ -113,7 +118,7 @@ guard
     !fullSource.contains("private let widthHeightRatio"),
     !fullSource.contains("if displayMode != .full")
 else {
-    fail("GameViewController should be a full-screen-only host")
+    fail("FullScreenGameViewController should be a full-screen-only host")
 }
 
 print("Game mode navigation tests passed")

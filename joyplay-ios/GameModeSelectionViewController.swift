@@ -106,8 +106,8 @@ final class GameModeSelectionViewController: UIViewController {
             return
         }
 
-        let gameViewController = GameViewController(gameURL: gameURL)
-        navigationController?.pushViewController(gameViewController, animated: true)
+        let fullScreenGameViewController = FullScreenGameViewController(gameURL: gameURL)
+        navigationController?.pushViewController(fullScreenGameViewController, animated: true)
     }
 
     @objc private func selectMode(_ sender: UIButton) {

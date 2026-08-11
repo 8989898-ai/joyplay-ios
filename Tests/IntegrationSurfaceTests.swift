@@ -89,7 +89,7 @@ else {
     fail("GameWebView should append the window's bottom safe-area height only for full screen")
 }
 
-let fullScreenHostSource = source(at: "joyplay-ios/GameViewController.swift")
+let fullScreenHostSource = source(at: "joyplay-ios/FullScreenGameViewController.swift")
 guard
     fullScreenHostSource.contains("onEvent:"),
     fullScreenHostSource.contains("handleGameEvent"),

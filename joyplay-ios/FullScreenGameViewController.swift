@@ -1,6 +1,6 @@
 import UIKit
 
-final class GameViewController: UIViewController {
+final class FullScreenGameViewController: UIViewController {
     private let gameURL: URL
     private lazy var gameWebView: GameWebView? = GameWebView(
         gameURL: gameURL,

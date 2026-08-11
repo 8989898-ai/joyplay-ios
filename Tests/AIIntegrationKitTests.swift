@@ -112,6 +112,7 @@ let requiredAgentRules = [
     "INTEGRATION_REQUEST.yaml",
     "JoyPlayIntegration",
     "DemoGameConfiguration.swift",
+    "FullScreenGameViewController.swift",
     "GameModeSelectionViewController.swift",
     "PartialGameViewController.swift",
     "DemoRechargePromptPresenter",

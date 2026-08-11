@@ -26,7 +26,7 @@
 - `DemoGameLaunchButton.swift`
 - `GameModeSelectionViewController.swift`
 - `PartialGameViewController.swift`
-- `GameViewController.swift`
+- `FullScreenGameViewController.swift`
 - `ViewController.swift`
 - `Localizable.xcstrings`
 - `Assets.xcassets` 中的按钮颜色和场景背景图

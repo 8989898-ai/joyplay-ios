@@ -21,7 +21,7 @@ let requiredContent = [
     "joyplay-ios/JoyPlayIntegration/GameConfiguration.swift",
     "joyplay-ios/JoyPlayIntegration/GameWebView.swift",
     "DemoGameConfiguration.swift",
-    "GameViewController.swift",
+    "FullScreenGameViewController.swift",
     "GameModeSelectionViewController.swift",
     "PartialGameViewController.swift",
     "DemoRechargePromptPresenter.swift",
@@ -60,7 +60,7 @@ else {
     fail("business integration examples should pass the complete backend game URL")
 }
 
-if readme.contains("同时复制 `GameViewController.swift`") {
+if readme.contains("同时复制 `FullScreenGameViewController.swift`") {
     fail("the shortest integration path should use GameWebView directly instead of copying a Demo controller")
 }
 
@@ -98,7 +98,7 @@ else {
 }
 
 for demoPath in [
-    "joyplay-ios/GameViewController.swift",
+    "joyplay-ios/FullScreenGameViewController.swift",
     "joyplay-ios/GameModeSelectionViewController.swift",
     "joyplay-ios/PartialGameViewController.swift"
 ] where !source(at: demoPath).contains("gameURL:") {

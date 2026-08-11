@@ -30,7 +30,7 @@ Demo AppKey 和 Token 允许公开，当前 Demo 使用它们模拟后端生成�
 | `joyplay-ios/DemoGameConfiguration.swift` | 可选 | Demo 固定凭证、URL Builder、模式文案、图标和背景配置 |
 | `joyplay-ios/DemoRechargePromptPresenter.swift` | 可选 | Demo 充值提示弹窗 |
 | `joyplay-ios/DemoGameLaunchButton.swift` | 可选 | Demo 共用的圆形游戏启动按钮和呼吸动画 |
-| `joyplay-ios/GameViewController.swift` | 可选 | 全屏游戏的导航 Push 示例 |
+| `joyplay-ios/FullScreenGameViewController.swift` | 可选 | 全屏游戏的导航 Push 示例 |
 | `joyplay-ios/GameModeSelectionViewController.swift` | 可选 | 三种普通模式按钮和全屏启动入口示例 |
 | `joyplay-ios/PartialGameViewController.swift` | 可选 | 半屏与大半屏场景、延迟加载和关闭后重开示例 |
 | `joyplay-ios/Localizable.xcstrings` | 可选 | Demo 页面中英文文案 |
