@@ -20,11 +20,11 @@ guard configurationSource.contains("enum GameEvent: String, CaseIterable") else 
 guard
     configurationSource.contains("enum GameURLRuntimeAdapter"),
     configurationSource.contains("isValidBackendGameURL"),
-    configurationSource.contains("appendingPaddingBottom"),
+    configurationSource.contains("appendingFullScreenParameters"),
     !configurationSource.contains("enum GameURLBuilder"),
     !configurationSource.contains("var miniValue")
 else {
-    fail("the core should only adapt the backend URL with runtime paddingBottom")
+    fail("the core should only adapt the backend URL with full-screen runtime parameters")
 }
 
 let gameWebViewSource = source(at: "joyplay-ios/JoyPlayIntegration/GameWebView.swift")
@@ -83,10 +83,10 @@ guard
     gameWebViewSource.contains("override func layoutSubviews()"),
     gameWebViewSource.contains("window.safeAreaInsets.bottom"),
     gameWebViewSource.contains("if displayMode == .full"),
-    gameWebViewSource.contains("GameURLRuntimeAdapter.appendingPaddingBottom"),
+    gameWebViewSource.contains("GameURLRuntimeAdapter.appendingFullScreenParameters"),
     gameWebViewSource.contains("to: gameURL")
 else {
-    fail("GameWebView should append the window's bottom safe-area height only for full screen")
+    fail("GameWebView should append safeTop and the window's bottom safe-area height only for full screen")
 }
 
 let fullScreenHostSource = source(at: "joyplay-ios/FullScreenGameViewController.swift")
@@ -105,7 +105,9 @@ else {
 }
 
 guard
-    fullScreenHostSource.contains("init(gameURL: URL)"),
+    fullScreenHostSource.contains("private let gameData: DemoGameData"),
+    fullScreenHostSource.contains("init(gameData: DemoGameData)"),
+    fullScreenHostSource.contains("gameURL: gameData.gameURL"),
     fullScreenHostSource.contains("displayMode: .full"),
     !fullScreenHostSource.contains("widthHeightRatio:"),
     !fullScreenHostSource.contains("GameAspectRatio"),
@@ -147,7 +149,9 @@ guard
     embeddedHostSource.contains("removeGameView()"),
     embeddedHostSource.contains("gameButton.isHidden = false"),
     embeddedHostSource.contains("gameWebView.stop()"),
-    embeddedHostSource.contains("widthHeightRatio: widthHeightRatio"),
+    embeddedHostSource.contains("gameURL: gameData.gameURL"),
+    embeddedHostSource.contains("displayMode: gameData.displayMode"),
+    embeddedHostSource.contains("widthHeightRatio: gameData.widthHeightRatio"),
     !embeddedHostSource.contains("GameAspectRatio"),
     !embeddedHostSource.contains("gameWebView.translatesAutoresizingMaskIntoConstraints = false"),
     embeddedHostSource.contains("gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)"),

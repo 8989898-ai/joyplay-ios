@@ -31,6 +31,7 @@ let requiredContent = [
     "mini=0",
     "mini=1",
     "mini=2",
+    "safeTop",
     "paddingBottom",
     "isNativeDemo=1",
     "widthHeightRatio",
@@ -53,6 +54,8 @@ for content in requiredContent where !readme.contains(content) {
 
 guard
     readme.contains("gameURL: backendGameURL"),
+    readme.contains("后端 URL 不能预先包含 `safeTop` 或 `paddingBottom`"),
+    readme.contains("全屏 `GameWebView` 首次布局时追加 `safeTop=1`"),
     !readme.contains("gameWebView.translatesAutoresizingMaskIntoConstraints = false"),
     !readme.contains("appKey: businessAppKey"),
     !readme.contains("token: businessToken")
@@ -79,18 +82,22 @@ if configuration.contains("var heightToWidthRatio") {
     fail("display modes should not define host layout ratios")
 }
 
-let demoHost = source(at: "joyplay-ios/ViewController.swift")
+let demoHost = source(at: "joyplay-ios/GameModeSelectionViewController.swift")
 guard
     demoHost.contains("backendWidthHeightRatios"),
+    demoHost.contains("DemoGameDataSource.makeGameData("),
+    demoHost.contains("self.gameData = gameData"),
     !demoHost.contains("GameAspectRatio")
 else {
-    fail("the Demo host should pass backend ratios without constructing a core aspect-ratio type")
+    fail("the Demo host should receive three game dictionaries without constructing a core aspect-ratio type")
 }
 
 let embeddedHost = source(at: "joyplay-ios/PartialGameViewController.swift")
 let gameWebViewSource = source(at: "joyplay-ios/JoyPlayIntegration/GameWebView.swift")
 guard
-    embeddedHost.contains("widthHeightRatio: widthHeightRatio"),
+    embeddedHost.contains("gameURL: gameData.gameURL"),
+    embeddedHost.contains("displayMode: gameData.displayMode"),
+    embeddedHost.contains("widthHeightRatio: gameData.widthHeightRatio"),
     !embeddedHost.contains("GameAspectRatio"),
     gameWebViewSource.contains("aspectRatio.heightMultiplier")
 else {
@@ -99,10 +106,17 @@ else {
 
 for demoPath in [
     "joyplay-ios/FullScreenGameViewController.swift",
-    "joyplay-ios/GameModeSelectionViewController.swift",
     "joyplay-ios/PartialGameViewController.swift"
-] where !source(at: demoPath).contains("gameURL:") {
+] where !source(at: demoPath).contains("gameURL: gameData.gameURL") {
     fail("\(demoPath) should pass a complete Demo-owned URL into the core API")
+}
+
+let selectionHost = source(at: "joyplay-ios/GameModeSelectionViewController.swift")
+guard
+    selectionHost.contains("private var gameData: [DemoGameData] = []"),
+    selectionHost.contains("gameData: selectedGameData")
+else {
+    fail("the selection page should pass the selected game dictionary to its game host")
 }
 
 let demoRechargePrompt = source(at: "joyplay-ios/DemoRechargePromptPresenter.swift")

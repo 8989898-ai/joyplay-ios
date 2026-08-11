@@ -44,12 +44,12 @@ enum GameURLRuntimeAdapter {
         }
 
         return components.queryItems?.contains(
-            where: { $0.name == "paddingBottom" }
+            where: { $0.name == "safeTop" || $0.name == "paddingBottom" }
         ) != true
     }
 
-    static func appendingPaddingBottom(
-        _ paddingBottom: CGFloat,
+    static func appendingFullScreenParameters(
+        paddingBottom: CGFloat,
         to gameURL: URL
     ) -> URL? {
         guard isValidBackendGameURL(gameURL),
@@ -62,11 +62,11 @@ enum GameURLRuntimeAdapter {
             return nil
         }
 
-        let paddingBottomItem = "paddingBottom=\(String(Double(paddingBottom)))"
+        let runtimeParameters = "safeTop=1&paddingBottom=\(String(Double(paddingBottom)))"
         if let query = components.percentEncodedQuery, !query.isEmpty {
-            components.percentEncodedQuery = "\(query)&\(paddingBottomItem)"
+            components.percentEncodedQuery = "\(query)&\(runtimeParameters)"
         } else {
-            components.percentEncodedQuery = paddingBottomItem
+            components.percentEncodedQuery = runtimeParameters
         }
         return components.url
     }

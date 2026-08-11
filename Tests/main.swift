@@ -43,7 +43,7 @@ let backendURL = URL(
 )!
 expect(
     GameURLRuntimeAdapter.isValidBackendGameURL(backendURL),
-    "核心应接受不含 paddingBottom 的完整 HTTPS 游戏链接"
+    "核心应接受不含全屏运行时参数的完整 HTTPS 游戏链接"
 )
 expect(
     !GameURLRuntimeAdapter.isValidBackendGameURL(
@@ -59,34 +59,59 @@ expect(
 )
 expect(
     !GameURLRuntimeAdapter.isValidBackendGameURL(
+        URL(string: "https://joyplay.cn/release/index.html?safeTop=1")!
+    ),
+    "核心应拒绝后端预先携带 safeTop 的链接"
+)
+expect(
+    !GameURLRuntimeAdapter.isValidBackendGameURL(
         URL(string: "https:/release/index.html?mini=0")!
     ),
     "核心应拒绝没有主机名的 HTTPS 链接"
 )
-let fullScreenURL = GameURLRuntimeAdapter.appendingPaddingBottom(34, to: backendURL)
-expect(
-    fullScreenURL?.absoluteString
-        == "https://joyplay.cn/release/index.html?token=a%2Bb%2Fc&mini=0&paddingBottom=34.0#game",
-    "全屏应保留后端完整链接并只追加 paddingBottom"
+let fullScreenURL = GameURLRuntimeAdapter.appendingFullScreenParameters(
+    paddingBottom: 34,
+    to: backendURL
 )
 expect(
-    GameURLRuntimeAdapter.appendingPaddingBottom(0, to: backendURL) != nil,
+    fullScreenURL?.absoluteString
+        == "https://joyplay.cn/release/index.html?token=a%2Bb%2Fc&mini=0&safeTop=1&paddingBottom=34.0#game",
+    "全屏应保留后端完整链接并追加 safeTop 与 paddingBottom"
+)
+expect(
+    GameURLRuntimeAdapter.appendingFullScreenParameters(
+        paddingBottom: 0,
+        to: backendURL
+    ) != nil,
     "没有底部安全距离时也应追加 paddingBottom=0"
 )
 expect(
-    GameURLRuntimeAdapter.appendingPaddingBottom(-1, to: backendURL) == nil,
+    GameURLRuntimeAdapter.appendingFullScreenParameters(
+        paddingBottom: -1,
+        to: backendURL
+    ) == nil,
     "负 paddingBottom 应被拒绝"
 )
 expect(
-    GameURLRuntimeAdapter.appendingPaddingBottom(.infinity, to: backendURL) == nil,
+    GameURLRuntimeAdapter.appendingFullScreenParameters(
+        paddingBottom: .infinity,
+        to: backendURL
+    ) == nil,
     "无限 paddingBottom 应被拒绝"
 )
 expect(
-    GameURLRuntimeAdapter.appendingPaddingBottom(
-        34,
+    GameURLRuntimeAdapter.appendingFullScreenParameters(
+        paddingBottom: 34,
         to: URL(string: "https://joyplay.cn/release/index.html?paddingBottom=20")!
     ) == nil,
     "后端链接不应预先携带 paddingBottom"
+)
+expect(
+    GameURLRuntimeAdapter.appendingFullScreenParameters(
+        paddingBottom: 34,
+        to: URL(string: "https://joyplay.cn/release/index.html?safeTop=1")!
+    ) == nil,
+    "后端链接不应预先携带 safeTop"
 )
 
 print("GameConfiguration tests passed")

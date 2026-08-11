@@ -23,16 +23,23 @@ private enum DemoConfigurationTests {
         expect(GameLaunchCredentials.appKey == "ste5a6lxxrtu10bmnc6g", "Demo AppKey should remain unchanged")
         expect(!GameLaunchCredentials.token.isEmpty, "Demo Token should remain configured")
 
-        for (displayMode, expectedMini) in zip(GameDisplayMode.allCases, ["0", "1", "2"]) {
-            let url = DemoGameURLBuilder.makeURL(
-                appKey: "demo-app-key",
-                token: "demo-token",
-                displayMode: displayMode
-            )
-            expect(url != nil, "Demo should build a game URL for every display mode")
+        let gameData = DemoGameDataSource.makeGameData(
+            appKey: "demo-app-key",
+            token: "demo-token",
+            widthHeightRatios: [
+                .half: 1.0,
+                .largeHalf: 2.0 / 3.0
+            ]
+        )
+        expect(gameData?.count == 3, "Demo home should receive one game dictionary per display mode")
 
-            guard let url,
-                  let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+        for (displayMode, expectedMini) in zip(GameDisplayMode.allCases, ["0", "1", "2"]) {
+            guard let data = gameData?.first(where: { $0.displayMode == displayMode }),
+                  let components = URLComponents(
+                      url: data.gameURL,
+                      resolvingAgainstBaseURL: false
+                  ) else {
+                expect(false, "Demo should provide game data for every display mode")
                 continue
             }
             let queryItems = Dictionary(
@@ -49,10 +56,19 @@ private enum DemoConfigurationTests {
             expect(queryItems["mini"] == expectedMini, "Demo mini should match its display mode")
             expect(queryItems["isNativeDemo"] == "1", "Demo URL should keep isNativeDemo=1")
             expect(queryItems["paddingBottom"] == nil, "Demo URL builder should leave paddingBottom to GameWebView")
-            expect(
-                queryItems["safeTop"] == (displayMode == .full ? "1" : nil),
-                "Only the full-screen Demo URL should contain safeTop=1"
-            )
+            expect(queryItems["safeTop"] == nil, "Every backend Demo URL should leave safeTop to GameWebView")
+
+            switch displayMode {
+            case .full:
+                expect(data.widthHeightRatio == nil, "Full-screen game data should omit widthHeightRatio")
+            case .half:
+                expect(data.widthHeightRatio == 1.0, "Half-screen game data should include its backend ratio")
+            case .largeHalf:
+                expect(
+                    data.widthHeightRatio == 2.0 / 3.0,
+                    "Large-half game data should include its backend ratio"
+                )
+            }
         }
 
         print("Demo configuration tests passed")

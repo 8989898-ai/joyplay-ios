@@ -69,10 +69,10 @@ for symbol in forbiddenCoreSymbols where coreSource.contains(symbol) {
 
 guard
     coreSource.contains("enum GameURLRuntimeAdapter"),
-    coreSource.contains("appendingPaddingBottom"),
+    coreSource.contains("appendingFullScreenParameters"),
     coreSource.contains("gameURL: URL")
 else {
-    fail("the distributable core should accept a backend URL and only add runtime paddingBottom")
+    fail("the distributable core should accept a backend URL and only add full-screen runtime parameters")
 }
 
 let demoConfiguration = source(at: demoConfigurationPath)
@@ -92,10 +92,11 @@ for obsoleteSymbol in [
     fail("the Demo configuration should remove obsolete Tab Bar symbol \(obsoleteSymbol)")
 }
 guard
-    demoConfiguration.contains("DemoGameURLBuilder"),
+    demoConfiguration.contains("struct DemoGameData"),
+    demoConfiguration.contains("DemoGameDataSource"),
     demoConfiguration.contains("URLQueryItem(name: \"isNativeDemo\", value: \"1\")")
 else {
-    fail("the Demo configuration should own the native Demo URL marker")
+    fail("the Demo configuration should own its three game dictionaries and native Demo URL marker")
 }
 
 let demoRechargePrompt = source(at: demoRechargePromptPath)
@@ -123,11 +124,17 @@ let requiredAgentRules = [
     "widthHeightRatio",
     "notifyGameBalanceDidChange()",
     "核心源码不展示充值 UI",
+    "后端 URL 不得包含 `safeTop` 或 `paddingBottom`",
+    "追加 `safeTop=1`",
     "xcodebuild",
     "真实 H5"
 ]
 for rule in requiredAgentRules where !agentInstructions.contains(rule) {
     fail("AGENTS.md should document \(rule)")
+}
+
+if agentInstructions.contains("- `ViewController.swift`") {
+    fail("AGENTS.md should not list the removed redundant Demo root controller")
 }
 
 let requestTemplate = source(at: "INTEGRATION_REQUEST.yaml")
@@ -143,6 +150,8 @@ let requiredRequestFields = [
     "close_behavior:",
     "game_url_source:",
     "invalid_url_behavior:",
+    "backend_must_omit_safe_top: true",
+    "client_appends_safe_top_for_full_screen: true",
     "width_height_ratio_source:",
     "invalid_ratio_behavior:",
     "ui_owner: host",

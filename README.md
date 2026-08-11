@@ -17,7 +17,7 @@
 2. 选择 `joyplay-ios` Scheme 和任意 iPhone 模拟器或真机。
 3. 运行工程：底部三个普通模式按钮默认选中全屏；中央圆形按钮打开全屏游戏，半屏和大半屏按钮先进入对应场景页。
 
-Demo AppKey 和 Token 允许公开，当前 Demo 使用它们模拟后端生成完整游戏 URL。迁移到业务工程时，宿主直接使用后端下发的完整游戏 URL，不在客户端拼接 AppKey、Token 或游戏参数。
+Demo AppKey 和 Token 允许公开，当前 Demo 使用它们模拟首页一次取得三条游戏数据。迁移到业务工程时，宿主直接使用后端下发的完整游戏 URL、模式和宽高比，不在客户端拼接 AppKey、Token 或游戏参数。
 
 ## 文件说明
 
@@ -25,9 +25,9 @@ Demo AppKey 和 Token 允许公开，当前 Demo 使用它们模拟后端生成�
 
 | 文件 | 是否必需 | 作用 |
 | --- | --- | --- |
-| `joyplay-ios/JoyPlayIntegration/GameConfiguration.swift` | 必需 | 游戏模式、URL 与比例校验、运行时底部安全区参数、事件名称、充值刷新 JS |
+| `joyplay-ios/JoyPlayIntegration/GameConfiguration.swift` | 必需 | 游戏模式、URL 与比例校验、全屏运行时参数、事件名称、充值刷新 JS |
 | `joyplay-ios/JoyPlayIntegration/GameWebView.swift` | 必需 | 宿主唯一入口，负责 WKWebView、后端 URL 加载、布局、JS 回调注册和释放 |
-| `joyplay-ios/DemoGameConfiguration.swift` | 可选 | Demo 固定凭证、URL Builder、模式文案、图标和背景配置 |
+| `joyplay-ios/DemoGameConfiguration.swift` | 可选 | Demo 三条游戏数据、固定凭证、URL 生成、模式文案、图标和背景配置 |
 | `joyplay-ios/DemoRechargePromptPresenter.swift` | 可选 | Demo 充值提示弹窗 |
 | `joyplay-ios/DemoGameLaunchButton.swift` | 可选 | Demo 共用的圆形游戏启动按钮和呼吸动画 |
 | `joyplay-ios/FullScreenGameViewController.swift` | 可选 | 全屏游戏的导航 Push 示例 |
@@ -49,6 +49,16 @@ Demo AppKey 和 Token 允许公开，当前 Demo 使用它们模拟后端生成�
 
 > 阅读 `AGENTS.md`、`README.md` 和 `INTEGRATION_REQUEST.yaml`，将 `joyplay-ios/JoyPlayIntegration/` 接入目标工程。不要复制 Demo 页面控制器、背景资源和导航结构；完成后执行目标 Scheme 的无签名模拟器构建，并单独报告尚未完成的真实 H5 验证。
 
+## Demo 的接入方数据流
+
+App 启动后，首页 `GameModeSelectionViewController` 使用 `DemoGameDataSource` 一次取得三条 `DemoGameData`，每条数据包含：
+
+- 后端完整游戏 URL。
+- 展示模式 `displayMode`。
+- 后端原始 `widthHeightRatio`；全屏为 `nil`，半屏和大半屏为有效的宽 ÷ 高比例。
+
+模式选择页只按模式取出对应数据并传给后续控制器。全屏、半屏和大半屏页面不再接收 AppKey、Token，也不再自行拼接 URL。业务工程可把后端 JSON 字典解码成等价的强类型数据，再将三个字段直接传给 `GameWebView`。
+
 ## 游戏 URL 参数
 
 业务接入时由后端下发可直接打开的完整 HTTPS 游戏 URL，宿主转换成 `URL` 后传给 `GameWebView`。后端负责以下参数：
@@ -59,11 +69,11 @@ Demo AppKey 和 Token 允许公开，当前 Demo 使用它们模拟后端生成�
 | `token` | 后端加入完整 URL |
 | `gameId` | 固定为 `gameId=1` |
 | `mini` | 全屏 `mini=0`、半屏 `mini=1`、大半屏 `mini=2` |
-| `safeTop` | 后端仅在全屏 URL 中添加，当前为 `safeTop=1` |
+| `safeTop` | 后端不传；全屏 `GameWebView` 首次布局时追加 `safeTop=1` |
 | `paddingBottom` | 后端不传；全屏 `GameWebView` 首次布局时追加当前窗口底部安全距离，单位为 UIKit 点 |
-| `isNativeDemo` | 仅 `DemoGameURLBuilder` 添加 `isNativeDemo=1`；业务后端默认不传 |
+| `isNativeDemo` | 仅 `DemoGameDataSource` 生成 Demo 数据时添加 `isNativeDemo=1`；业务后端默认不传 |
 
-后端 URL 不能预先包含 `paddingBottom`。如果 URL 使用签名，服务端验签规则必须允许客户端追加该参数，或将它排除在签名字段之外。半屏和大半屏直接加载后端 URL，不修改查询参数。
+后端 URL 不能预先包含 `safeTop` 或 `paddingBottom`。如果 URL 使用签名，服务端验签规则必须允许客户端追加这两个参数，或将它们排除在签名字段之外。全屏首次加载时追加 `safeTop=1` 和当前底部安全距离；半屏和大半屏直接加载后端 URL，不修改查询参数。
 
 ## 最快接入方式
 
@@ -135,7 +145,7 @@ private func openEmbeddedGame(
 
 例如后端返回 `widthHeightRatio=1.0` 时，内部 `WKWebView` 为 `1:1`；返回约 `0.6667` 时，`WKWebView` 高度约为宽度的 `1.5` 倍。半屏和大半屏的外层 `GameWebView` 底部贴屏幕底部，高度为 `WKWebView` 高度加底部安全距离；`WKWebView` 顶部与外层顶部对齐，底部安全区域显示外层黑色背景。
 
-`GameWebView` 是可失败初始化：它会在内部拒绝非 HTTPS、缺少主机名、预先包含 `paddingBottom` 的 URL；半屏和大半屏还会拒绝缺少、小于等于零、无限或非数字的比例，全屏则不接收比例。初始化返回 `nil` 时如何提示或重试由业务宿主决定，核心不写死兜底 URL 或比例。
+`GameWebView` 是可失败初始化：它会在内部拒绝非 HTTPS、缺少主机名、预先包含 `safeTop` 或 `paddingBottom` 的 URL；半屏和大半屏还会拒绝缺少、小于等于零、无限或非数字的比例，全屏则不接收比例。初始化返回 `nil` 时如何提示或重试由业务宿主决定，核心不写死兜底 URL 或比例。
 
 直接嵌入全屏时使用 `.full` 且不传 `widthHeightRatio`，让 `GameWebView` 约束到页面四条边。比例只控制嵌入模式的原生容器高度；`mini` 已包含在后端 URL 中。
 
@@ -204,7 +214,7 @@ gameWebView = nil
 - 后端下发的游戏 URL 直接传给 `GameWebView`；初始化失败时已按业务要求提示或重试。
 - 半屏和大半屏将后端 `widthHeightRatio` 直接传给 `GameWebView`，全屏不传比例。
 - 后端为全屏、半屏和大半屏 URL 分别提供正确的 `mini=0/1/2`。
-- 全屏追加当前设备的 `paddingBottom`，半屏和大半屏不修改 URL。
+- 全屏追加 `safeTop=1` 和当前设备的 `paddingBottom`，半屏和大半屏不修改 URL。
 - 四个 `GameEvent` 均已按业务需要处理。
 - 宿主在充值事件中展示自己的充值 UI，并在充值成功后通知游戏。
 - 主动退出场景时调用了 `stop()`。

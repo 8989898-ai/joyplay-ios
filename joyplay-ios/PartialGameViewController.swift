@@ -1,11 +1,12 @@
 import UIKit
 
 final class PartialGameViewController: UIViewController {
-    private let displayMode: GameDisplayMode
-    private let appKey: String
-    private let token: String
-    private let widthHeightRatio: CGFloat
+    private let gameData: DemoGameData
     private var gameWebView: GameWebView?
+
+    private var displayMode: GameDisplayMode {
+        gameData.displayMode
+    }
 
     private lazy var backgroundImageView: UIImageView = {
         let imageView = UIImageView(image: UIImage(named: displayMode.backgroundImageName))
@@ -16,16 +17,8 @@ final class PartialGameViewController: UIViewController {
 
     private lazy var gameButton = DemoGameLaunchButton(title: displayMode.openGameTitle)
 
-    init(
-        displayMode: GameDisplayMode,
-        appKey: String,
-        token: String,
-        widthHeightRatio: CGFloat
-    ) {
-        self.displayMode = displayMode
-        self.appKey = appKey
-        self.token = token
-        self.widthHeightRatio = widthHeightRatio
+    init(gameData: DemoGameData) {
+        self.gameData = gameData
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -73,19 +66,14 @@ final class PartialGameViewController: UIViewController {
     }
 
     @objc private func openGame() {
-        guard gameWebView == nil,
-              let gameURL = DemoGameURLBuilder.makeURL(
-                  appKey: appKey,
-                  token: token,
-                  displayMode: displayMode
-              ) else {
+        guard gameWebView == nil else {
             return
         }
 
         guard let gameWebView = GameWebView(
-            gameURL: gameURL,
-            displayMode: displayMode,
-            widthHeightRatio: widthHeightRatio,
+            gameURL: gameData.gameURL,
+            displayMode: gameData.displayMode,
+            widthHeightRatio: gameData.widthHeightRatio,
             onEvent: { [weak self] event in
                 self?.handleGameEvent(event)
             }

@@ -24,7 +24,9 @@ game_url:
   game_url_source: <请填写后端完整游戏URL字段或代码表达式>
   invalid_url_behavior: <请填写不打开游戏、提示或重试方式>
   requires_https: true
+  backend_must_omit_safe_top: true
   backend_must_omit_padding_bottom: true
+  client_appends_safe_top_for_full_screen: true
   client_appends_padding_bottom_for_full_screen: true
 
 layout:

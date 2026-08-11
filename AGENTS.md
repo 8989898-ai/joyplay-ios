@@ -27,7 +27,6 @@
 - `GameModeSelectionViewController.swift`
 - `PartialGameViewController.swift`
 - `FullScreenGameViewController.swift`
-- `ViewController.swift`
 - `Localizable.xcstrings`
 - `Assets.xcassets` 中的按钮颜色和场景背景图
 
@@ -46,11 +45,11 @@
 - 游戏地址由宿主后端下发完整 HTTPS URL，核心 `GameWebView` 直接接收 `URL`。
 - 后端 URL 中的 `gameId=1`。
 - 后端为全屏、半屏、大半屏 URL 分别提供 `mini=0`、`mini=1`、`mini=2`。
-- 后端 URL 不得包含 `paddingBottom`；核心仅在全屏首次加载时追加当前窗口底部安全距离，半屏和大半屏不修改 URL。
+- 后端 URL 不得包含 `safeTop` 或 `paddingBottom`；核心仅在全屏首次加载时追加 `safeTop=1` 和当前窗口底部安全距离，半屏和大半屏不修改 URL。
 - 半屏和大半屏的 `widthHeightRatio`（宽 ÷ 高）来自宿主后端配置；宿主把原始值直接传给 `GameWebView`，由核心校验并转换成高度 multiplier，底部对齐安全区。不要让宿主构造核心比例类型，也不要在 `GameDisplayMode` 或核心源码中写死比例。
-- `GameWebView` 使用可失败初始化：非 HTTPS、缺少主机名、预先包含 `paddingBottom`、嵌入模式缺少或传入无效比例、全屏传入比例时均返回 `nil`。失败后的提示或重试方式仍由宿主决定。
+- `GameWebView` 使用可失败初始化：非 HTTPS、缺少主机名、预先包含 `safeTop` 或 `paddingBottom`、嵌入模式缺少或传入无效比例、全屏传入比例时均返回 `nil`。失败后的提示或重试方式仍由宿主决定。
 - H5 消息名称固定为 `recharge`、`clickRecharge`、`newTppClose`、`OpenGameSucc`。
-- 核心不认识 AppKey、Token、`gameId`、`mini` 或 `isNativeDemo`；当前 Demo 由 `DemoGameURLBuilder` 生成带 `isNativeDemo=1` 的完整 URL，业务后端默认不传该标记。
+- 核心不认识 AppKey、Token、`gameId`、`mini` 或 `isNativeDemo`；当前 Demo 由 `DemoGameDataSource` 生成带 `isNativeDemo=1` 的三条游戏数据，业务后端默认不传该标记。
 - `newTppClose` 到达后，宿主根据模板选择移除游戏视图或 Pop；不要擅自关闭直播间、语聊房等业务控制器。
 - 宿主主动退出时调用 `stop()`。
 - 收到充值事件后由宿主展示充值 UI；充值成功后调用 `notifyGameBalanceDidChange()`。

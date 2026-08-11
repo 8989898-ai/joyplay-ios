@@ -119,11 +119,11 @@ final class GameWebView: UIView {
 
         let loadURL: URL
         if displayMode == .full {
-            guard let url = GameURLRuntimeAdapter.appendingPaddingBottom(
-                window.safeAreaInsets.bottom,
+            guard let url = GameURLRuntimeAdapter.appendingFullScreenParameters(
+                paddingBottom: window.safeAreaInsets.bottom,
                 to: gameURL
             ) else {
-                print("游戏链接追加 paddingBottom 失败")
+                print("游戏链接追加全屏参数失败")
                 return
             }
             loadURL = url

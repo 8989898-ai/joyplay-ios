@@ -5,8 +5,39 @@ enum GameLaunchCredentials {
     static let token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYmYiOjE3ODU0OTExNzEsImFjY291bnRJZCI6IjIwODMxMjcwNzQxNzU0NTUyMzIifQ.gdzel2RMXHKwyEG6AaQg-sObDx6H_O9Tmo2XGzfcOJU"
 }
 
-enum DemoGameURLBuilder {
-    static func makeURL(
+struct DemoGameData {
+    let gameURL: URL
+    let widthHeightRatio: CGFloat?
+    let displayMode: GameDisplayMode
+}
+
+enum DemoGameDataSource {
+    static func makeGameData(
+        appKey: String,
+        token: String,
+        widthHeightRatios: [GameDisplayMode: CGFloat]
+    ) -> [DemoGameData]? {
+        var gameData: [DemoGameData] = []
+        for displayMode in GameDisplayMode.allCases {
+            guard let gameURL = makeURL(
+                appKey: appKey,
+                token: token,
+                displayMode: displayMode
+            ) else {
+                return nil
+            }
+            gameData.append(
+                DemoGameData(
+                    gameURL: gameURL,
+                    widthHeightRatio: widthHeightRatios[displayMode],
+                    displayMode: displayMode
+                )
+            )
+        }
+        return gameData
+    }
+
+    private static func makeURL(
         appKey: String,
         token: String,
         displayMode: GameDisplayMode
@@ -22,9 +53,6 @@ enum DemoGameURLBuilder {
             URLQueryItem(name: "mini", value: String(displayMode.demoMiniValue)),
             URLQueryItem(name: "isNativeDemo", value: "1")
         ]
-        if displayMode == .full {
-            components.queryItems?.append(URLQueryItem(name: "safeTop", value: "1"))
-        }
         return components.url
     }
 }

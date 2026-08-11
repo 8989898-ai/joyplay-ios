@@ -12,12 +12,16 @@ private func source(at path: String) -> String {
     return source
 }
 
-let viewControllerSource = source(at: "joyplay-ios/ViewController.swift")
+guard !FileManager.default.fileExists(atPath: "joyplay-ios/ViewController.swift") else {
+    fail("the redundant root ViewController should be removed")
+}
+
+let storyboardSource = source(at: "joyplay-ios/Base.lproj/Main.storyboard")
 guard
-    viewControllerSource.contains("GameModeSelectionViewController("),
-    !viewControllerSource.contains("GameModeTabBarController")
+    storyboardSource.contains("customClass=\"GameModeSelectionViewController\""),
+    !storyboardSource.contains("customClass=\"ViewController\"")
 else {
-    fail("the Demo root should use the ordinary-button selection controller")
+    fail("the navigation controller should use GameModeSelectionViewController as its storyboard root")
 }
 
 guard !FileManager.default.fileExists(atPath: "joyplay-ios/GameModeTabBarController.swift") else {
@@ -28,12 +32,12 @@ let partialSource = source(at: "joyplay-ios/PartialGameViewController.swift")
 
 for requiredSource in [
     "final class PartialGameViewController: UIViewController",
-    "private let displayMode: GameDisplayMode",
-    "private let widthHeightRatio: CGFloat",
+    "private let gameData: DemoGameData",
     "DemoGameLaunchButton(",
-    "DemoGameURLBuilder.makeURL(",
     "guard let gameWebView = GameWebView(",
-    "widthHeightRatio: widthHeightRatio",
+    "gameURL: gameData.gameURL",
+    "displayMode: gameData.displayMode",
+    "widthHeightRatio: gameData.widthHeightRatio",
     "gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)",
     "case .insufficientBalance, .recharge:",
     "case .close:",
@@ -76,21 +80,24 @@ for requiredSource in [
     "axis = .horizontal",
     "distribution = .fillEqually",
     "fullModeButton.isSelected = true",
-    "DemoGameURLBuilder.makeURL(",
-    "displayMode: .full",
+    "private let backendWidthHeightRatios: [GameDisplayMode: CGFloat]",
+    "private var gameData: [DemoGameData] = []",
+    "DemoGameDataSource.makeGameData(",
+    "self.gameData = gameData",
+    "first(where: { $0.displayMode == displayMode })",
     "FullScreenGameViewController(",
     "PartialGameViewController(",
-    "displayMode: displayMode",
-    "widthHeightRatio: widthHeightRatio"
+    "gameData: selectedGameData"
 ] where !selectionSource.contains(requiredSource) {
     fail("GameModeSelectionViewController should preserve \(requiredSource)")
 }
 
 guard
     !selectionSource.contains("UITabBarController"),
-    !selectionSource.contains("GameWebView(")
+    !selectionSource.contains("GameWebView("),
+    !selectionSource.contains("init(gameData:")
 else {
-    fail("the selection page should use ordinary buttons and should not mount a game WebView")
+    fail("the storyboard selection page should own its data without mounting a game WebView")
 }
 
 guard
@@ -110,7 +117,9 @@ guard !FileManager.default.fileExists(atPath: "joyplay-ios/GameViewController.sw
 let fullSource = source(at: "joyplay-ios/FullScreenGameViewController.swift")
 guard
     fullSource.contains("final class FullScreenGameViewController: UIViewController"),
-    fullSource.contains("init(gameURL: URL)"),
+    fullSource.contains("private let gameData: DemoGameData"),
+    fullSource.contains("init(gameData: DemoGameData)"),
+    fullSource.contains("gameURL: gameData.gameURL"),
     fullSource.contains("displayMode: .full"),
     fullSource.contains("gameWebView.topAnchor.constraint(equalTo: view.topAnchor)"),
     fullSource.contains("gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)"),

@@ -1,17 +1,17 @@
 import UIKit
 
 final class FullScreenGameViewController: UIViewController {
-    private let gameURL: URL
+    private let gameData: DemoGameData
     private lazy var gameWebView: GameWebView? = GameWebView(
-        gameURL: gameURL,
+        gameURL: gameData.gameURL,
         displayMode: .full,
         onEvent: { [weak self] event in
             self?.handleGameEvent(event)
         }
     )
 
-    init(gameURL: URL) {
-        self.gameURL = gameURL
+    init(gameData: DemoGameData) {
+        self.gameData = gameData
         super.init(nibName: nil, bundle: nil)
     }
 

@@ -1,9 +1,11 @@
 import UIKit
 
 final class GameModeSelectionViewController: UIViewController {
-    private let appKey: String
-    private let token: String
-    private let widthHeightRatios: [GameDisplayMode: CGFloat]
+    private let backendWidthHeightRatios: [GameDisplayMode: CGFloat] = [
+        .half: 1.0,
+        .largeHalf: 2.0 / 3.0
+    ]
+    private var gameData: [DemoGameData] = []
 
     private lazy var gameButton = DemoGameLaunchButton(title: GameDisplayMode.full.openGameTitle)
     private lazy var fullModeButton = makeModeButton(for: .full)
@@ -19,24 +21,17 @@ final class GameModeSelectionViewController: UIViewController {
         return stack
     }()
 
-    init(
-        appKey: String,
-        token: String,
-        widthHeightRatios: [GameDisplayMode: CGFloat]
-    ) {
-        self.appKey = appKey
-        self.token = token
-        self.widthHeightRatios = widthHeightRatios
-        super.init(nibName: nil, bundle: nil)
-    }
-
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        guard let gameData = DemoGameDataSource.makeGameData(
+            appKey: GameLaunchCredentials.appKey,
+            token: GameLaunchCredentials.token,
+            widthHeightRatios: backendWidthHeightRatios
+        ) else {
+            return
+        }
+        self.gameData = gameData
         title = String(localized: "game.title", defaultValue: "Game")
         view.backgroundColor = .systemBackground
         configureLayout()
@@ -98,15 +93,13 @@ final class GameModeSelectionViewController: UIViewController {
     }
 
     @objc private func openFullScreenGame() {
-        guard let gameURL = DemoGameURLBuilder.makeURL(
-            appKey: appKey,
-            token: token,
-            displayMode: .full
-        ) else {
+        guard let selectedGameData = gameData(for: .full) else {
             return
         }
 
-        let fullScreenGameViewController = FullScreenGameViewController(gameURL: gameURL)
+        let fullScreenGameViewController = FullScreenGameViewController(
+            gameData: selectedGameData
+        )
         navigationController?.pushViewController(fullScreenGameViewController, animated: true)
     }
 
@@ -118,17 +111,18 @@ final class GameModeSelectionViewController: UIViewController {
 
         let displayMode = modes[sender.tag]
         guard displayMode != .full,
-              let widthHeightRatio = widthHeightRatios[displayMode] else {
+              let selectedGameData = gameData(for: displayMode) else {
             return
         }
 
         let partialGameViewController = PartialGameViewController(
-            displayMode: displayMode,
-            appKey: appKey,
-            token: token,
-            widthHeightRatio: widthHeightRatio
+            gameData: selectedGameData
         )
         navigationController?.pushViewController(partialGameViewController, animated: true)
+    }
+
+    private func gameData(for displayMode: GameDisplayMode) -> DemoGameData? {
+        gameData.first(where: { $0.displayMode == displayMode })
     }
 }
 
