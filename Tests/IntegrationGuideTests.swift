@@ -54,6 +54,7 @@ for content in requiredContent where !readme.contains(content) {
 
 guard
     readme.contains("gameURL: backendGameURL"),
+    readme.contains("三条完整 URL 在 Demo 源码中直接声明"),
     readme.contains("后端 URL 不能预先包含 `safeTop` 或 `paddingBottom`"),
     readme.contains("全屏 `GameWebView` 首次布局时追加 `safeTop=1`"),
     !readme.contains("gameWebView.translatesAutoresizingMaskIntoConstraints = false"),
@@ -84,9 +85,7 @@ if configuration.contains("var heightToWidthRatio") {
 
 let demoHost = source(at: "joyplay-ios/GameModeSelectionViewController.swift")
 guard
-    demoHost.contains("backendWidthHeightRatios"),
-    demoHost.contains("DemoGameDataSource.makeGameData("),
-    demoHost.contains("self.gameData = gameData"),
+    demoHost.contains("private let gameData = DemoGameDataSource.gameData"),
     !demoHost.contains("GameAspectRatio")
 else {
     fail("the Demo host should receive three game dictionaries without constructing a core aspect-ratio type")
@@ -113,7 +112,7 @@ for demoPath in [
 
 let selectionHost = source(at: "joyplay-ios/GameModeSelectionViewController.swift")
 guard
-    selectionHost.contains("private var gameData: [DemoGameData] = []"),
+    selectionHost.contains("private let gameData = DemoGameDataSource.gameData"),
     selectionHost.contains("gameData: selectedGameData")
 else {
     fail("the selection page should pass the selected game dictionary to its game host")

@@ -17,7 +17,7 @@
 2. 选择 `joyplay-ios` Scheme 和任意 iPhone 模拟器或真机。
 3. 运行工程：底部三个普通模式按钮默认选中全屏；中央圆形按钮打开全屏游戏，半屏和大半屏按钮先进入对应场景页。
 
-Demo AppKey 和 Token 允许公开，当前 Demo 使用它们模拟首页一次取得三条游戏数据。迁移到业务工程时，宿主直接使用后端下发的完整游戏 URL、模式和宽高比，不在客户端拼接 AppKey、Token 或游戏参数。
+Demo AppKey 和 Token 允许公开，当前 Demo 用三条预先拼好的完整 URL 模拟首页一次取得三条游戏数据。迁移到业务工程时，宿主直接使用后端下发的完整游戏 URL、模式和宽高比，不在客户端拼接 AppKey、Token 或游戏参数。
 
 ## 文件说明
 
@@ -27,7 +27,7 @@ Demo AppKey 和 Token 允许公开，当前 Demo 使用它们模拟首页一次�
 | --- | --- | --- |
 | `joyplay-ios/JoyPlayIntegration/GameConfiguration.swift` | 必需 | 游戏模式、URL 与比例校验、全屏运行时参数、事件名称、充值刷新 JS |
 | `joyplay-ios/JoyPlayIntegration/GameWebView.swift` | 必需 | 宿主唯一入口，负责 WKWebView、后端 URL 加载、布局、JS 回调注册和释放 |
-| `joyplay-ios/DemoGameConfiguration.swift` | 可选 | Demo 三条游戏数据、固定凭证、URL 生成、模式文案、图标和背景配置 |
+| `joyplay-ios/DemoGameConfiguration.swift` | 可选 | Demo 三条固定游戏数据、完整 URL、模式文案、图标和背景配置 |
 | `joyplay-ios/DemoRechargePromptPresenter.swift` | 可选 | Demo 充值提示弹窗 |
 | `joyplay-ios/DemoGameLaunchButton.swift` | 可选 | Demo 共用的圆形游戏启动按钮和呼吸动画 |
 | `joyplay-ios/FullScreenGameViewController.swift` | 可选 | 全屏游戏的导航 Push 示例 |
@@ -51,7 +51,7 @@ Demo AppKey 和 Token 允许公开，当前 Demo 使用它们模拟首页一次�
 
 ## Demo 的接入方数据流
 
-App 启动后，首页 `GameModeSelectionViewController` 使用 `DemoGameDataSource` 一次取得三条 `DemoGameData`，每条数据包含：
+App 启动后，首页 `GameModeSelectionViewController` 直接读取 `DemoGameDataSource` 中的三条 `DemoGameData`。三条完整 URL 在 Demo 源码中直接声明，不通过 AppKey、Token 或模式代码动态拼接。每条数据包含：
 
 - 后端完整游戏 URL。
 - 展示模式 `displayMode`。
@@ -71,7 +71,7 @@ App 启动后，首页 `GameModeSelectionViewController` 使用 `DemoGameDataSou
 | `mini` | 全屏 `mini=0`、半屏 `mini=1`、大半屏 `mini=2` |
 | `safeTop` | 后端不传；全屏 `GameWebView` 首次布局时追加 `safeTop=1` |
 | `paddingBottom` | 后端不传；全屏 `GameWebView` 首次布局时追加当前窗口底部安全距离，单位为 UIKit 点 |
-| `isNativeDemo` | 仅 `DemoGameDataSource` 生成 Demo 数据时添加 `isNativeDemo=1`；业务后端默认不传 |
+| `isNativeDemo` | 仅 Demo 的三条固定 URL 包含 `isNativeDemo=1`；业务后端默认不传 |
 
 后端 URL 不能预先包含 `safeTop` 或 `paddingBottom`。如果 URL 使用签名，服务端验签规则必须允许客户端追加这两个参数，或将它们排除在签名字段之外。全屏首次加载时追加 `safeTop=1` 和当前底部安全距离；半屏和大半屏直接加载后端 URL，不修改查询参数。
 

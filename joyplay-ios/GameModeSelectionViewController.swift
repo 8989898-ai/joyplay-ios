@@ -1,11 +1,7 @@
 import UIKit
 
 final class GameModeSelectionViewController: UIViewController {
-    private let backendWidthHeightRatios: [GameDisplayMode: CGFloat] = [
-        .half: 1.0,
-        .largeHalf: 2.0 / 3.0
-    ]
-    private var gameData: [DemoGameData] = []
+    private let gameData = DemoGameDataSource.gameData
 
     private lazy var gameButton = DemoGameLaunchButton(title: GameDisplayMode.full.openGameTitle)
     private lazy var fullModeButton = makeModeButton(for: .full)
@@ -24,14 +20,6 @@ final class GameModeSelectionViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        guard let gameData = DemoGameDataSource.makeGameData(
-            appKey: GameLaunchCredentials.appKey,
-            token: GameLaunchCredentials.token,
-            widthHeightRatios: backendWidthHeightRatios
-        ) else {
-            return
-        }
-        self.gameData = gameData
         title = String(localized: "game.title", defaultValue: "Game")
         view.backgroundColor = .systemBackground
         configureLayout()

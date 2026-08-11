@@ -42,7 +42,6 @@ guard fileManager.fileExists(atPath: demoRechargePromptPath) else {
 let coreConfiguration = source(at: corePaths[0])
 let coreSource = corePaths.map(source).joined(separator: "\n")
 let demoOnlySymbols = [
-    "GameLaunchCredentials",
     "var title: String",
     "var openGameTitle: String",
     "var modeIconFillRatio: CGFloat",
@@ -94,9 +93,14 @@ for obsoleteSymbol in [
 guard
     demoConfiguration.contains("struct DemoGameData"),
     demoConfiguration.contains("DemoGameDataSource"),
-    demoConfiguration.contains("URLQueryItem(name: \"isNativeDemo\", value: \"1\")")
+    demoConfiguration.contains("static let gameData: [DemoGameData] = ["),
+    demoConfiguration.contains("URL(string:"),
+    !demoConfiguration.contains("GameLaunchCredentials"),
+    !demoConfiguration.contains("URLComponents"),
+    !demoConfiguration.contains("makeURL"),
+    !demoConfiguration.contains("demoMiniValue")
 else {
-    fail("the Demo configuration should own its three game dictionaries and native Demo URL marker")
+    fail("the Demo configuration should directly declare three complete game dictionaries")
 }
 
 let demoRechargePrompt = source(at: demoRechargePromptPath)
@@ -124,6 +128,7 @@ let requiredAgentRules = [
     "widthHeightRatio",
     "notifyGameBalanceDidChange()",
     "核心源码不展示充值 UI",
+    "三条完整 URL 直接声明",
     "后端 URL 不得包含 `safeTop` 或 `paddingBottom`",
     "追加 `safeTop=1`",
     "xcodebuild",
