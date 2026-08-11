@@ -65,6 +65,8 @@ Demo AppKey 和 Token 允许公开，当前 Demo 使用它们模拟后端生成�
 
 ## 最快接入方式
 
+`GameWebView` 初始化时已经设置 `translatesAutoresizingMaskIntoConstraints = false`，宿主添加视图后只需激活对应模式的布局约束。
+
 ### 方式一：直接接入全屏业务页面
 
 在业务自己的全屏控制器中直接创建 `GameWebView`，全屏模式不传比例：
@@ -83,7 +85,6 @@ private func openFullScreenGame(backendGameURL: URL) {
         handleInvalidGameConfiguration()
         return
     }
-    gameWebView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(gameWebView)
     NSLayoutConstraint.activate([
         gameWebView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -120,7 +121,6 @@ private func openEmbeddedGame(
         handleInvalidGameConfiguration()
         return
     }
-    gameWebView.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(gameWebView)
     NSLayoutConstraint.activate([
         gameWebView.leadingAnchor.constraint(equalTo: view.leadingAnchor),

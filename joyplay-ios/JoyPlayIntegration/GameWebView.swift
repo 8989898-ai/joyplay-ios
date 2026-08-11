@@ -44,6 +44,7 @@ final class GameWebView: UIView {
         self.aspectRatio = aspectRatio
         self.onEvent = onEvent
         super.init(frame: .zero)
+        self.translatesAutoresizingMaskIntoConstraints = false
         configureWebView()
         registerScriptMessageHandlers()
     }

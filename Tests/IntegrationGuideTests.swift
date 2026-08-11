@@ -52,6 +52,7 @@ for content in requiredContent where !readme.contains(content) {
 
 guard
     readme.contains("gameURL: backendGameURL"),
+    !readme.contains("gameWebView.translatesAutoresizingMaskIntoConstraints = false"),
     !readme.contains("appKey: businessAppKey"),
     !readme.contains("token: businessToken")
 else {

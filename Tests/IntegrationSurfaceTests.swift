@@ -56,6 +56,10 @@ guard gameWebViewSource.contains("webView.scrollView.contentInsetAdjustmentBehav
     fail("GameWebView should not automatically inset content for the safe area")
 }
 
+guard gameWebViewSource.contains("self.translatesAutoresizingMaskIntoConstraints = false") else {
+    fail("GameWebView should declare its own Auto Layout participation")
+}
+
 guard
     gameWebViewSource.contains("private var isStopped = false"),
     gameWebViewSource.contains("guard !isStopped else"),
@@ -103,6 +107,7 @@ else {
 guard
     fullScreenHostSource.contains("widthHeightRatio:"),
     !fullScreenHostSource.contains("GameAspectRatio"),
+    !fullScreenHostSource.contains("gameWebView.translatesAutoresizingMaskIntoConstraints = false"),
     fullScreenHostSource.contains("gameWebView.topAnchor.constraint(equalTo: view.topAnchor)"),
     fullScreenHostSource.contains("gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)"),
     !fullScreenHostSource.contains("equalTo: view.safeAreaLayoutGuide.heightAnchor")
@@ -140,6 +145,7 @@ guard
     embeddedHostSource.contains("gameWebView.stop()"),
     embeddedHostSource.contains("widthHeightRatio: widthHeightRatio"),
     !embeddedHostSource.contains("GameAspectRatio"),
+    !embeddedHostSource.contains("gameWebView.translatesAutoresizingMaskIntoConstraints = false"),
     embeddedHostSource.contains("gameWebView.bottomAnchor.constraint(equalTo: view.bottomAnchor)"),
     !embeddedHostSource.contains("gameWebView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)"),
     !embeddedHostSource.contains("equalTo: gameWebView.widthAnchor")

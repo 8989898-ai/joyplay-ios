@@ -271,7 +271,6 @@ private final class GameModeLaunchViewController: UIViewController {
             return
         }
         stopGameButtonBreathing()
-        gameWebView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(gameWebView)
         NSLayoutConstraint.activate([
             gameWebView.leadingAnchor.constraint(equalTo: view.leadingAnchor),

@@ -66,7 +66,6 @@ final class GameViewController: UIViewController {
         guard let gameWebView else {
             return
         }
-        gameWebView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(gameWebView)
 
         let verticalConstraints: [NSLayoutConstraint]
