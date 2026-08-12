@@ -1,0 +1,45 @@
+# 本文件是可选的业务覆盖和接入记录，不是接入前置申请表。
+# null 表示未指定：AI 自动扫描目标工程；只有无法唯一确定的业务决策才向用户确认。
+# 接入完成后，AI 可将自动发现或用户确认的结果回填，便于复核和后续维护。
+project_path: null
+project_kind: null
+scheme: null
+app_target: null
+ui_framework: UIKit
+minimum_ios: '15.6'
+
+modes:
+  full:
+    enabled: null
+    host_controller: null
+    close_behavior: null
+  half:
+    enabled: null
+    host_controller: null
+    close_behavior: null
+  large_half:
+    enabled: null
+    host_controller: null
+    close_behavior: null
+
+game_url:
+  game_url_source: null
+  invalid_url_behavior: null
+  requires_https: true
+  backend_must_omit_safe_top: true
+  backend_must_omit_padding_bottom: true
+  client_appends_safe_top_for_full_screen: true
+  client_appends_padding_bottom_for_full_screen: true
+
+layout:
+  width_height_ratio_source: null
+  invalid_ratio_behavior: null
+
+recharge:
+  ui_owner: host
+  recharge_handler: null
+  notify_game_after_success: true
+
+validation:
+  configuration: Debug
+  destination: generic/platform=iOS Simulator
