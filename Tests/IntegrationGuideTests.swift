@@ -53,13 +53,45 @@ for content in requiredContent where !readme.contains(content) {
 }
 
 guard
+    let minimumIntegrationRange = readme.range(of: "## 业务工程最小接入"),
+    let demoReferenceRange = readme.range(of: "## Demo 实现参考"),
+    minimumIntegrationRange.lowerBound < demoReferenceRange.lowerBound
+else {
+    fail("README should present business minimum integration before Demo implementation details")
+}
+
+let minimumIntegrationSection = String(
+    readme[minimumIntegrationRange.upperBound..<demoReferenceRange.lowerBound]
+)
+for demoOnlySymbol in [
+    "DemoGameData",
+    "DemoGameDataSource",
+    "DemoRechargePromptPresenter",
+    "FullScreenGameViewController",
+    "PartialGameViewController"
+] where minimumIntegrationSection.contains(demoOnlySymbol) {
+    fail("the business minimum integration section should not depend on Demo symbol \(demoOnlySymbol)")
+}
+
+let demoReferenceSection = String(readme[demoReferenceRange.lowerBound...])
+guard
+    readme.contains("业务工程只复制 `joyplay-ios/JoyPlayIntegration/` 目录"),
+    readme.contains("不要复制 Demo 页面控制器、导航结构、充值弹窗或资源"),
+    demoReferenceSection.contains("以下内容只用于让本仓库 Demo 可以直接运行，不属于业务接入代码"),
+    demoReferenceSection.contains("`joyplay-ios/FullScreenGameViewController.swift`"),
+    demoReferenceSection.contains("`joyplay-ios/DemoRechargePromptPresenter.swift`")
+else {
+    fail("README should clearly distinguish copyable business code from Demo-only implementation")
+}
+
+guard
     readme.contains("gameURL: backendGameURL"),
     readme.contains("DemoGameDataSource.mockBackendResponseJSON"),
     readme.contains("再由 `JSONDecoder` 解码成 `[DemoGameData]`"),
     readme.contains("后端 URL 不能预先包含 `safeTop` 或 `paddingBottom`"),
     readme.contains("全屏 `GameWebView` 首次布局时追加 `safeTop=1`"),
     readme.contains("gameWebView.attach(to: view)"),
-    readme.contains("不要复制 `PartialGameViewController`"),
+    readme.contains("不要复制 Demo 页面控制器"),
     readme.contains("private func removeEmbeddedGame()"),
     !readme.contains("view.addSubview(gameWebView)"),
     !readme.contains("gameWebView.topAnchor.constraint"),

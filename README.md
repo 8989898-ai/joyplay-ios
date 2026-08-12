@@ -19,26 +19,20 @@
 
 Demo AppKey 和 Token 允许公开，当前 Demo 用一份源码内的模拟 JSON 表示首页一次取得的三条游戏数据，再通过 `JSONDecoder` 解码。迁移到业务工程时，宿主直接使用后端下发的完整游戏 URL、模式和宽高比，不在客户端拼接 AppKey、Token 或游戏参数。
 
-## 文件说明
+## 业务工程最小接入
 
-接入业务工程时，只需要复制核心文件。不要直接复制整个 Demo 页面结构。
+> 业务工程只复制 `joyplay-ios/JoyPlayIntegration/` 目录。不要复制 Demo 页面控制器、导航结构、充值弹窗或资源。
 
-| 文件 | 是否必需 | 作用 |
-| --- | --- | --- |
-| `joyplay-ios/JoyPlayIntegration/GameConfiguration.swift` | 必需 | 游戏模式、URL 与比例校验、全屏运行时参数、事件名称、充值刷新 JS |
-| `joyplay-ios/JoyPlayIntegration/GameWebView.swift` | 必需 | 宿主唯一入口，负责 WKWebView、后端 URL 加载、布局、JS 回调注册和释放 |
-| `joyplay-ios/DemoGameConfiguration.swift` | 可选 | Demo 模拟 JSON、解码后的三条游戏数据、模式文案、图标和背景配置 |
-| `joyplay-ios/DemoRechargePromptPresenter.swift` | 可选 | Demo 充值提示弹窗 |
-| `joyplay-ios/DemoGameLaunchButton.swift` | 可选 | Demo 共用的圆形游戏启动按钮和呼吸动画 |
-| `joyplay-ios/FullScreenGameViewController.swift` | 可选 | 全屏游戏的导航 Push 示例 |
-| `joyplay-ios/GameModeSelectionViewController.swift` | 可选 | 三种普通模式按钮和全屏启动入口示例 |
-| `joyplay-ios/PartialGameViewController.swift` | 可选 | 半屏与大半屏场景、延迟加载和关闭后重开示例 |
-| `joyplay-ios/Localizable.xcstrings` | 可选 | Demo 页面中英文文案 |
-| `joyplay-ios/Assets.xcassets` | 可选 | Demo 按钮颜色和场景背景图 |
+### 需要复制的核心文件
 
-接入时建议复制整个 `joyplay-ios/JoyPlayIntegration/` 文件夹，避免漏掉依赖文件。复制后在 Xcode 的 File Inspector 中确认两个 Swift 文件都已加入业务 App Target。
+| 文件 | 作用 |
+| --- | --- |
+| `joyplay-ios/JoyPlayIntegration/GameConfiguration.swift` | 游戏模式、URL 与比例校验、全屏运行时参数、事件名称、充值刷新 JS |
+| `joyplay-ios/JoyPlayIntegration/GameWebView.swift` | 宿主唯一入口，负责 WKWebView、后端 URL 加载、布局、JS 回调注册和释放 |
 
-## 使用 AI 直接接入
+复制整个目录可以避免漏掉依赖文件。复制后在 Xcode 的 File Inspector 中确认两个 Swift 文件都已加入业务 App Target。
+
+### 使用 AI 直接接入
 
 本工程同时提供：
 
@@ -49,17 +43,7 @@ Demo AppKey 和 Token 允许公开，当前 Demo 用一份源码内的模拟 JSO
 
 > 阅读 `AGENTS.md`、`README.md` 和 `INTEGRATION_REQUEST.yaml`，将 `joyplay-ios/JoyPlayIntegration/` 接入目标工程。不要复制 Demo 页面控制器、背景资源和导航结构；完成后执行目标 Scheme 的无签名模拟器构建，并单独报告尚未完成的真实 H5 验证。
 
-## Demo 的接入方数据流
-
-`DemoGameDataSource.mockBackendResponseJSON` 是一份顶层数组形式的 Demo 模拟响应，不代表正式后端协议。它直接展示三条完整 URL、展示模式和比例，再由 `JSONDecoder` 解码成 `[DemoGameData]`。App 启动后，首页 `GameModeSelectionViewController` 读取解码结果；客户端不通过 AppKey、Token 或模式代码动态拼接 URL。每条数据包含：
-
-- 后端完整游戏 URL。
-- 展示模式 `displayMode`。
-- 后端原始 `widthHeightRatio`；全屏为 `nil`，半屏和大半屏为有效的宽 ÷ 高比例。
-
-模式选择页只按模式取出对应数据并传给后续控制器。全屏、半屏和大半屏页面不再接收 AppKey、Token，也不再自行拼接 URL。业务工程可把后端 JSON 字典解码成等价的强类型数据，再将三个字段直接传给 `GameWebView`。
-
-## 游戏 URL 参数
+### 游戏 URL 参数
 
 业务接入时由后端下发可直接打开的完整 HTTPS 游戏 URL，宿主转换成 `URL` 后传给 `GameWebView`。后端负责以下参数：
 
@@ -75,13 +59,13 @@ Demo AppKey 和 Token 允许公开，当前 Demo 用一份源码内的模拟 JSO
 
 后端 URL 不能预先包含 `safeTop` 或 `paddingBottom`。如果 URL 使用签名，服务端验签规则必须允许客户端追加这两个参数，或将它们排除在签名字段之外。全屏首次加载时追加 `safeTop=1` 和当前底部安全距离；半屏和大半屏直接加载后端 URL，不修改查询参数。
 
-## 最快接入方式
+### 添加到业务控制器
 
 `GameWebView` 初始化后调用 `attach(to:)` 即可加入业务容器。该方法会根据展示模式完成外层布局：全屏铺满容器四边，半屏和大半屏贴容器左右及底部。接入方不需要调用 `addSubview` 或自行设置游戏视图约束。
 
-下面代码应加入接入方已有的业务控制器。不要复制 `PartialGameViewController`；也不要复制 `FullScreenGameViewController`。它们只是用于演示导航、场景背景、启动按钮和关闭后重开的 Demo 页面。
+下面代码应加入接入方已有的业务控制器，不要复制 Demo 页面控制器。
 
-### 方式一：直接接入全屏业务页面
+#### 方式一：直接接入全屏业务页面
 
 在业务自己的全屏控制器中直接创建 `GameWebView`，全屏模式不传比例：
 
@@ -106,7 +90,7 @@ private func openFullScreenGame(backendGameURL: URL) {
 
 宿主收到 `.close` 后，根据自己的导航结构 Pop、Dismiss 或移除游戏视图；核心会在回调前停止游戏。
 
-### 方式二：直接嵌入业务页面
+#### 方式二：直接嵌入业务页面
 
 直播间或语聊房只复制两个核心文件，并把以下最小接入代码放进已有的直播间或语聊房控制器。业务后端返回 `widthHeightRatio`（宽 ÷ 高）后，宿主把完整 URL、模式和原始比例直接传给 `GameWebView`：
 
@@ -159,7 +143,7 @@ private func removeEmbeddedGame() {
 
 直接嵌入全屏时使用 `.full` 且不传 `widthHeightRatio`，让 `GameWebView` 约束到页面四条边。比例只控制嵌入模式的原生容器高度；`mini` 已包含在后端 URL 中。
 
-## 统一事件回调
+### 统一事件回调
 
 `onEvent` 会把所有已注册的 JS 回调传给宿主：
 
@@ -172,11 +156,11 @@ private func removeEmbeddedGame() {
 
 前面的最小接入示例已经处理全部四类事件。`newTppClose` 到达时，`GameWebView` 会先停止加载并移除 JS handler，再发送 `.close` 事件。宿主只需要决定是移除视图、Pop 页面还是执行自己的场景关闭逻辑。
 
-## 充值处理
+### 充值处理
 
-`GameWebView` 只上报 `.insufficientBalance` 和 `.recharge`，核心源码不展示充值 UI。宿主应在这两个事件中打开自己的充值页面；当前 Demo 由 `DemoRechargePromptPresenter.swift` 展示演示弹窗。
+`GameWebView` 只上报 `.insufficientBalance` 和 `.recharge`，核心源码不展示充值 UI。宿主应在这两个事件中打开自己的充值页面。
 
-Demo 充值弹窗点击“通知游戏”，以及业务 App 充值成功后，都通过以下方法通知游戏刷新余额：
+业务 App 充值成功后，通过以下方法通知游戏刷新余额：
 
 ```swift
 gameWebView?.notifyGameBalanceDidChange()
@@ -190,7 +174,7 @@ HttpTool.NativeToJs('recharge')
 
 充值页面、取消行为和失败提示都由宿主决定。核心不包含充值文案，因此接入其他业务工程时不需要复制 Demo 的充值本地化资源。
 
-## 主动关闭与释放
+### 主动关闭与释放
 
 如果是宿主主动退出页面，而不是收到 `newTppClose`，请先停止 WebView，再移除它：
 
@@ -202,7 +186,7 @@ gameWebView = nil
 
 `stop()` 会停止页面加载并注销全部 JS 消息 handler。全屏页面可在 Pop 前调用；嵌入式页面可在场景退出或重新创建游戏前调用。
 
-## 接入检查清单
+### 接入检查清单
 
 - 核心 Swift 文件已加入业务 App Target。
 - 后端下发的游戏 URL 直接传给 `GameWebView`；初始化失败时已按业务要求提示或重试。
@@ -213,6 +197,37 @@ gameWebView = nil
 - 宿主在充值事件中展示自己的充值 UI，并在充值成功后通知游戏。
 - 主动退出场景时调用了 `stop()`。
 - 使用真实 H5 环境验证游戏渲染、关闭和充值回调。
+
+## Demo 实现参考
+
+以下内容只用于让本仓库 Demo 可以直接运行，不属于业务接入代码。接入方不需要复制这些文件，也不应照搬其中的导航和充值策略。
+
+| 文件 | Demo 中的作用 |
+| --- | --- |
+| `joyplay-ios/DemoGameConfiguration.swift` | 模拟 JSON、解码后的三条游戏数据、模式文案、图标和背景配置 |
+| `joyplay-ios/DemoRechargePromptPresenter.swift` | 演示充值提示弹窗 |
+| `joyplay-ios/DemoGameLaunchButton.swift` | 共用的圆形游戏启动按钮和呼吸动画 |
+| `joyplay-ios/FullScreenGameViewController.swift` | 全屏游戏的导航 Push 示例 |
+| `joyplay-ios/GameModeSelectionViewController.swift` | 三种普通模式按钮和全屏启动入口示例 |
+| `joyplay-ios/PartialGameViewController.swift` | 半屏与大半屏场景、延迟加载和关闭后重开示例 |
+| `joyplay-ios/Localizable.xcstrings` | Demo 页面中英文文案 |
+| `joyplay-ios/Assets.xcassets` | Demo 按钮颜色和场景背景图 |
+
+### Demo 数据流
+
+`DemoGameDataSource.mockBackendResponseJSON` 是一份顶层数组形式的模拟响应，不代表正式后端协议。它直接展示三条完整 URL、展示模式和比例，再由 `JSONDecoder` 解码成 `[DemoGameData]`。App 启动后，首页 `GameModeSelectionViewController` 读取解码结果；客户端不通过 AppKey、Token 或模式代码动态拼接 URL。每条数据包含：
+
+- 后端完整游戏 URL。
+- 展示模式 `displayMode`。
+- 后端原始 `widthHeightRatio`；全屏为 `nil`，半屏和大半屏为有效的宽 ÷ 高比例。
+
+模式选择页只按模式取出对应数据并传给后续控制器。全屏、半屏和大半屏页面不再接收 AppKey、Token，也不再自行拼接 URL。业务工程可把后端 JSON 字典解码成等价的强类型数据，再将三个字段直接传给 `GameWebView`。
+
+### Demo 页面行为
+
+- `FullScreenGameViewController` 隐藏导航栏，收到 `.close` 后执行 Pop。
+- `PartialGameViewController` 在当前场景嵌入游戏，收到 `.close` 后只移除游戏视图。
+- 两个页面都使用 `DemoRechargePromptPresenter` 展示演示弹窗；点击“通知游戏”后调用 `notifyGameBalanceDidChange()`。
 
 ## 本工程验证命令
 
