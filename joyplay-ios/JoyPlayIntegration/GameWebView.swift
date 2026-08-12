@@ -93,9 +93,9 @@ final class GameWebView: UIView {
             GameBridgeScript.balanceRefresh,
             completionHandler: { _, error in
                 if error != nil {
-                    print("原生通知JS--失败")
+                    print("Failed to notify the game of the balance change")
                 } else {
-                    print("原生通知JS--成功")
+                    print("Notified the game of the balance change")
                 }
             }
         )
@@ -139,7 +139,7 @@ final class GameWebView: UIView {
                 paddingBottom: window.safeAreaInsets.bottom,
                 to: gameURL
             ) else {
-                print("游戏链接追加全屏参数失败")
+                print("Failed to append full-screen parameters to the game URL")
                 return
             }
             loadURL = url
@@ -147,7 +147,7 @@ final class GameWebView: UIView {
             loadURL = gameURL
         }
         hasLoadedGame = true
-        print("开始加载游戏")
+        print("Loading game")
         webView.load(URLRequest(url: loadURL))
     }
 
@@ -191,14 +191,14 @@ extension GameWebView: WKScriptMessageHandler {
 
         switch event {
         case .insufficientBalance:
-            print("游戏回调：用户下注时余额不足")
+            print("Game callback: insufficient balance")
         case .recharge:
-            print("游戏回调：用户主动点击增加金币")
+            print("Game callback: recharge requested")
         case .close:
-            print("游戏回调：用户主动关闭游戏")
+            print("Game callback: close requested")
             stop()
         case .openGameSuccess:
-            print("游戏回调：游戏加载成功")
+            print("Game callback: game opened successfully")
         }
 
         onEvent(event)

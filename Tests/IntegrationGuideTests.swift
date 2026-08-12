@@ -5,15 +5,26 @@ private func fail(_ message: String) -> Never {
     exit(1)
 }
 
-guard let readme = try? String(contentsOfFile: "README.md", encoding: .utf8) else {
-    fail("README.md should exist")
-}
-
 private func source(at path: String) -> String {
     guard let value = try? String(contentsOfFile: path, encoding: .utf8) else {
         fail("\(path) should exist")
     }
     return value
+}
+
+let readme = source(at: "README.md")
+let chineseReadme = source(at: "README.zh-CN.md")
+
+guard
+    readme.contains("[简体中文](README.zh-CN.md)"),
+    chineseReadme.contains("[English](README.md)"),
+    readme.contains("# JoyPlay iOS H5 Game Integration Demo"),
+    chineseReadme.contains("# JoyPlay iOS H5 游戏接入 Demo"),
+    readme.contains("follows the iOS system language"),
+    readme.contains("English, the default fallback language, and Simplified Chinese"),
+    chineseReadme.contains("跟随 iOS 系统语言，支持英文（默认回退语言）和简体中文")
+else {
+    fail("README files should provide linked translations and state the Demo language support")
 }
 
 let requiredContent = [
@@ -38,14 +49,14 @@ let requiredContent = [
     "GameWebView(",
     "gameURL:",
     "onEvent:",
-    "后端下发",
+    "provided by the backend",
     "notifyGameBalanceDidChange()",
     "recharge",
     "clickRecharge",
     "newTppClose",
     "OpenGameSucc",
     "stop()",
-    "Demo AppKey 和 Token 允许公开"
+    "The Demo AppKey and Token may be public"
 ]
 
 for content in requiredContent where !readme.contains(content) {
@@ -53,17 +64,17 @@ for content in requiredContent where !readme.contains(content) {
 }
 
 guard
-    readme.contains("`INTEGRATION_REQUEST.yaml` 是可选"),
-    readme.contains("AI 先自动扫描目标工程"),
-    readme.contains("无法唯一确定"),
-    !readme.contains("先将 `INTEGRATION_REQUEST.yaml` 中所有 `<请填写>` 替换")
+    readme.contains("`INTEGRATION_REQUEST.yaml` is optional"),
+    readme.contains("AI should first scan the target project"),
+    readme.contains("cannot be uniquely determined"),
+    !readme.contains("replace every `<required>` value")
 else {
     fail("README should make automatic discovery the default and only ask about ambiguous business decisions")
 }
 
 guard
-    let minimumIntegrationRange = readme.range(of: "## 业务工程最小接入"),
-    let demoReferenceRange = readme.range(of: "## Demo 实现参考"),
+    let minimumIntegrationRange = readme.range(of: "## Minimal Integration into a Business App"),
+    let demoReferenceRange = readme.range(of: "## Demo Implementation Reference"),
     minimumIntegrationRange.lowerBound < demoReferenceRange.lowerBound
 else {
     fail("README should present business minimum integration before Demo implementation details")
@@ -84,9 +95,9 @@ for demoOnlySymbol in [
 
 let demoReferenceSection = String(readme[demoReferenceRange.lowerBound...])
 guard
-    readme.contains("业务工程只复制 `joyplay-ios/JoyPlayIntegration/` 目录"),
-    readme.contains("不要复制 Demo 页面控制器、导航结构、充值弹窗或资源"),
-    demoReferenceSection.contains("以下内容只用于让本仓库 Demo 可以直接运行，不属于业务接入代码"),
+    readme.contains("Copy only the `joyplay-ios/JoyPlayIntegration/` directory into a business app"),
+    readme.contains("Do not copy Demo view controllers, navigation, recharge prompts, or assets"),
+    demoReferenceSection.contains("The following files only make this repository's Demo runnable and are not business integration code"),
     demoReferenceSection.contains("`joyplay-ios/FullScreenGameViewController.swift`"),
     demoReferenceSection.contains("`joyplay-ios/DemoRechargePromptPresenter.swift`")
 else {
@@ -96,11 +107,11 @@ else {
 guard
     readme.contains("gameURL: backendGameURL"),
     readme.contains("DemoGameDataSource.mockBackendResponseJSON"),
-    readme.contains("再由 `JSONDecoder` 解码成 `[DemoGameData]`"),
-    readme.contains("后端 URL 不能预先包含 `safeTop` 或 `paddingBottom`"),
-    readme.contains("全屏 `GameWebView` 首次布局时追加 `safeTop=1`"),
+    readme.contains("decoded by `JSONDecoder` into `[DemoGameData]`"),
+    readme.contains("The backend URL must not already contain `safeTop` or `paddingBottom`"),
+    readme.contains("On its first full-screen layout, `GameWebView` appends `safeTop=1`"),
     readme.contains("gameWebView.attach(to: view)"),
-    readme.contains("不要复制 Demo 页面控制器"),
+    readme.contains("Do not copy the Demo view controllers"),
     readme.contains("private func removeEmbeddedGame()"),
     !readme.contains("view.addSubview(gameWebView)"),
     !readme.contains("gameWebView.topAnchor.constraint"),
@@ -114,6 +125,16 @@ else {
 
 if readme.contains("同时复制 `FullScreenGameViewController.swift`") {
     fail("the shortest integration path should use GameWebView directly instead of copying a Demo controller")
+}
+
+
+for requiredChineseContent in [
+    "## 业务工程最小接入",
+    "## Demo 实现参考",
+    "后端下发",
+    "Demo AppKey 和 Token 允许公开"
+] where !chineseReadme.contains(requiredChineseContent) {
+    fail("README.zh-CN.md should retain the complete Chinese guide: \(requiredChineseContent)")
 }
 
 let gameWebView = source(at: "joyplay-ios/JoyPlayIntegration/GameWebView.swift")

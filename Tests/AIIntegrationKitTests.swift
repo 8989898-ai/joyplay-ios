@@ -115,9 +115,9 @@ else {
 let agentInstructions = source(at: "AGENTS.md")
 let requiredAgentRules = [
     "INTEGRATION_REQUEST.yaml",
-    "可选",
-    "自动扫描",
-    "无法唯一确定",
+    "optional",
+    "automatically scan",
+    "cannot be uniquely determined",
     "JoyPlayIntegration",
     "attach(to:)",
     "DemoGameConfiguration.swift",
@@ -125,21 +125,32 @@ let requiredAgentRules = [
     "GameModeSelectionViewController.swift",
     "PartialGameViewController.swift",
     "DemoRechargePromptPresenter",
-    "不要复制",
+    "Do not copy",
     "docs/plans",
-    "历史",
+    "historical",
     "newTppClose",
     "widthHeightRatio",
     "notifyGameBalanceDidChange()",
-    "核心源码不展示充值 UI",
-    "源码内模拟 JSON 展示三条完整 URL",
-    "后端 URL 不得包含 `safeTop` 或 `paddingBottom`",
-    "追加 `safeTop=1`",
+    "core source does not present recharge UI",
+    "in-source mock JSON containing three complete URLs",
+    "backend URL must not contain `safeTop` or `paddingBottom`",
+    "appends `safeTop=1`",
     "xcodebuild",
-    "真实 H5"
+    "real H5"
 ]
 for rule in requiredAgentRules where !agentInstructions.contains(rule) {
     fail("AGENTS.md should document \(rule)")
+}
+
+
+let chineseAgentInstructions = source(at: "AGENTS.zh-CN.md")
+guard
+    chineseAgentInstructions.contains("[English](AGENTS.md)"),
+    chineseAgentInstructions.contains("JoyPlay iOS AI 接入规则"),
+    agentInstructions.contains("[简体中文](AGENTS.zh-CN.md)"),
+    agentInstructions.contains("AGENTS.md is authoritative")
+else {
+    fail("AGENTS.md should be authoritative English instructions with a linked Chinese translation")
 }
 
 if agentInstructions.contains("- `ViewController.swift`") {
@@ -172,12 +183,26 @@ for field in requiredRequestFields where !requestTemplate.contains(field) {
 }
 
 guard
-    requestTemplate.contains("可选"),
-    requestTemplate.contains("AI 自动扫描"),
+    requestTemplate.contains("optional"),
+    requestTemplate.contains("AI automatically scans"),
     requestTemplate.contains("null"),
     !requestTemplate.contains("<请填写>")
 else {
     fail("INTEGRATION_REQUEST.yaml should be an optional AI-generated override and record without required placeholders")
+}
+
+
+for chineseComment in ["本文件", "自动扫描", "无法唯一确定"] where requestTemplate.contains(chineseComment) {
+    fail("INTEGRATION_REQUEST.yaml comments should be readable by international integrators")
+}
+
+for chineseLog in [
+    "原生通知JS",
+    "游戏链接追加全屏参数失败",
+    "开始加载游戏",
+    "游戏回调"
+] where coreSource.contains(chineseLog) {
+    fail("the distributable core should use English diagnostic logs: \(chineseLog)")
 }
 
 if requestTemplate.contains("automatically_shows_demo_prompt") {

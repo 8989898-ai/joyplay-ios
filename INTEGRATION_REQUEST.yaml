@@ -1,6 +1,6 @@
-# 本文件是可选的业务覆盖和接入记录，不是接入前置申请表。
-# null 表示未指定：AI 自动扫描目标工程；只有无法唯一确定的业务决策才向用户确认。
-# 接入完成后，AI 可将自动发现或用户确认的结果回填，便于复核和后续维护。
+# This file contains optional business overrides and records the integration; it is not a prerequisite form.
+# null means unspecified: AI automatically scans the target project and asks only about business decisions it cannot uniquely determine.
+# After integration, AI may record automatically discovered or user-confirmed choices here for review and later maintenance.
 project_path: null
 project_kind: null
 scheme: null

@@ -1,77 +1,81 @@
-# JoyPlay iOS H5 游戏接入 Demo
+English | [简体中文](README.zh-CN.md)
 
-这个工程展示如何在 Swift + UIKit 应用中接入 JoyPlay H5 游戏，包括全屏、半屏、大半屏三种展示模式、JS 回调接收和充值后余额刷新。
+# JoyPlay iOS H5 Game Integration Demo
 
-## 环境要求
+This project demonstrates how to integrate JoyPlay H5 games into a Swift and UIKit app. It covers full-screen, half-screen, and large-half-screen presentation, JavaScript callbacks, and balance refresh after recharge.
 
-- Xcode 16 或更高版本
+The Demo UI follows the iOS system language and supports English, the default fallback language, and Simplified Chinese. The distributable `JoyPlayIntegration` core does not present business UI; integrating apps own and localize their recharge and error UI.
+
+## Requirements
+
+- Xcode 16 or later
 - Swift 5
 - UIKit
-- iOS 15.6 或更高版本
-- 系统框架：Foundation、UIKit、WebKit
-- 不依赖 CocoaPods 或其他第三方库
+- iOS 15.6 or later
+- System frameworks: Foundation, UIKit, and WebKit
+- No CocoaPods or other third-party dependencies
 
-## 先运行 Demo
+## Run the Demo First
 
-1. 使用 Xcode 打开 `joyplay-ios.xcodeproj`。
-2. 选择 `joyplay-ios` Scheme 和任意 iPhone 模拟器或真机。
-3. 运行工程：底部三个普通模式按钮默认选中全屏；中央圆形按钮打开全屏游戏，半屏和大半屏按钮先进入对应场景页。
+1. Open `joyplay-ios.xcodeproj` in Xcode.
+2. Select the `joyplay-ios` Scheme and any iPhone simulator or device.
+3. Run the project. The three standard mode buttons at the bottom select full screen by default. The center circular button opens the full-screen game; the half-screen and large-half-screen buttons first open their corresponding scene pages.
 
-Demo AppKey 和 Token 允许公开，当前 Demo 用一份源码内的模拟 JSON 表示首页一次取得的三条游戏数据，再通过 `JSONDecoder` 解码。迁移到业务工程时，宿主直接使用后端下发的完整游戏 URL、模式和宽高比，不在客户端拼接 AppKey、Token 或游戏参数。
+The Demo AppKey and Token may be public. The current Demo represents the three game records returned together by the home-page request as in-source mock JSON and decodes them with `JSONDecoder`. When integrating into a business app, the host uses the complete game URL, mode, and aspect ratio provided by the backend. The client does not construct AppKey, Token, or game parameters.
 
-## 业务工程最小接入
+## Minimal Integration into a Business App
 
-> 业务工程只复制 `joyplay-ios/JoyPlayIntegration/` 目录。不要复制 Demo 页面控制器、导航结构、充值弹窗或资源。
+> Copy only the `joyplay-ios/JoyPlayIntegration/` directory into a business app. Do not copy Demo view controllers, navigation, recharge prompts, or assets.
 
-### 需要复制的核心文件
+### Core Files to Copy
 
-| 文件 | 作用 |
+| File | Purpose |
 | --- | --- |
-| `joyplay-ios/JoyPlayIntegration/GameConfiguration.swift` | 游戏模式、URL 与比例校验、全屏运行时参数、事件名称、充值刷新 JS |
-| `joyplay-ios/JoyPlayIntegration/GameWebView.swift` | 宿主唯一入口，负责 WKWebView、后端 URL 加载、布局、JS 回调注册和释放 |
+| `joyplay-ios/JoyPlayIntegration/GameConfiguration.swift` | Game mode, URL and ratio validation, full-screen runtime parameters, event names, and balance-refresh JavaScript |
+| `joyplay-ios/JoyPlayIntegration/GameWebView.swift` | The single host entry point, responsible for WKWebView, backend URL loading, layout, JavaScript callback registration, and cleanup |
 
-复制整个目录可以避免漏掉依赖文件。复制后在 Xcode 的 File Inspector 中确认两个 Swift 文件都已加入业务 App Target。
+Copying the entire directory avoids missing dependencies. In Xcode's File Inspector, confirm that both Swift files belong to the business App Target.
 
-### 使用 AI 直接接入
+### Direct Integration with AI
 
-本工程同时提供：
+This project also provides:
 
-- `AGENTS.md`：约束 AI 只复制核心源码、遵守游戏契约并执行构建验证。
-- `INTEGRATION_REQUEST.yaml`：可选的业务覆盖和接入记录，不是接入前必须填写的申请表。
+- `AGENTS.md`: instructs AI to copy only the core source, preserve the game contracts, and run a build verification.
+- `INTEGRATION_REQUEST.yaml`: an optional set of business overrides and an integration record, not a form that must be completed before integration.
 
-AI 先自动扫描目标工程，定位工程容器、Scheme、App Target、候选宿主控制器、后端游戏 URL、宽高比和充值入口。能够唯一确定的内容直接使用；只有宿主控制器、关闭行为、充值入口等业务决策无法唯一确定时，才向接入方确认对应问题。
+AI should first scan the target project to locate the project container, Scheme, App Target, candidate host controller, backend game URL, aspect ratio, and recharge entry point. It should use information that can be uniquely determined and ask only about business decisions such as the host controller, close behavior, or recharge entry point when they cannot be uniquely determined.
 
-`INTEGRATION_REQUEST.yaml` 是可选配置：`null` 表示交给 AI 自动发现，非空值用于覆盖自动发现结果。接入方可以不修改它；AI 扫描或确认后可回填最终选择，作为接入记录。
+`INTEGRATION_REQUEST.yaml` is optional. A `null` value delegates discovery to AI; a non-null value overrides the discovery result. Integrators do not need to edit the file. After scanning or clarification, AI may record the final choices in it for review and later maintenance.
 
-让 AI 执行：
+Ask AI to run:
 
-> 阅读 `AGENTS.md` 和 `README.md`，将 `joyplay-ios/JoyPlayIntegration/` 接入当前 UIKit 工程。请自动定位接入口；读取 `INTEGRATION_REQUEST.yaml` 中已有的非空覆盖，遇到无法唯一确定的业务行为时再询问我。不要复制 Demo 页面控制器、背景资源和导航结构；完成后执行目标 Scheme 的无签名模拟器构建，并单独报告尚未完成的真实 H5 验证。
+> Read `AGENTS.md` and `README.md`, then integrate `joyplay-ios/JoyPlayIntegration/` into the current UIKit project. Automatically locate the integration points and honor existing non-null overrides in `INTEGRATION_REQUEST.yaml`. Ask me only when a business behavior cannot be uniquely determined. Do not copy Demo view controllers, background assets, or navigation. When finished, run an unsigned simulator build for the target Scheme and report real-H5 verification separately.
 
-### 游戏 URL 参数
+### Game URL Parameters
 
-业务接入时由后端下发可直接打开的完整 HTTPS 游戏 URL，宿主转换成 `URL` 后传给 `GameWebView`。后端负责以下参数：
+For business integration, the backend provides a complete HTTPS game URL that can be opened directly. The host converts it to `URL` and passes it to `GameWebView`. The backend owns these parameters:
 
-| 参数 | 当前规则 |
+| Parameter | Current rule |
 | --- | --- |
-| `appKey` | 后端加入完整 URL |
-| `token` | 后端加入完整 URL |
-| `gameId` | 固定为 `gameId=1` |
-| `mini` | 全屏 `mini=0`、半屏 `mini=1`、大半屏 `mini=2` |
-| `safeTop` | 后端不传；全屏 `GameWebView` 首次布局时追加 `safeTop=1` |
-| `paddingBottom` | 后端不传；全屏 `GameWebView` 首次布局时追加当前窗口底部安全距离，单位为 UIKit 点 |
-| `isNativeDemo` | 仅 Demo 的三条固定 URL 包含 `isNativeDemo=1`；业务后端默认不传 |
+| `appKey` | Included in the complete URL by the backend |
+| `token` | Included in the complete URL by the backend |
+| `gameId` | Fixed as `gameId=1` |
+| `mini` | Full screen `mini=0`, half screen `mini=1`, large half screen `mini=2` |
+| `safeTop` | Omitted by the backend; on its first full-screen layout, `GameWebView` appends `safeTop=1` |
+| `paddingBottom` | Omitted by the backend; on its first full-screen layout, `GameWebView` appends the current window bottom safe-area inset in UIKit points |
+| `isNativeDemo` | Only the Demo's three fixed URLs contain `isNativeDemo=1`; the business backend omits it by default |
 
-后端 URL 不能预先包含 `safeTop` 或 `paddingBottom`。如果 URL 使用签名，服务端验签规则必须允许客户端追加这两个参数，或将它们排除在签名字段之外。全屏首次加载时追加 `safeTop=1` 和当前底部安全距离；半屏和大半屏直接加载后端 URL，不修改查询参数。
+The backend URL must not already contain `safeTop` or `paddingBottom`. If the URL is signed, server-side signature validation must allow the client to append these two parameters or exclude them from the signed fields. On its first full-screen layout, `GameWebView` appends `safeTop=1` and the current bottom safe-area inset. Half screen and large half screen load the backend URL unchanged.
 
-### 添加到业务控制器
+### Add It to a Business Controller
 
-`GameWebView` 初始化后调用 `attach(to:)` 即可加入业务容器。该方法会根据展示模式完成外层布局：全屏铺满容器四边，半屏和大半屏贴容器左右及底部。接入方不需要调用 `addSubview` 或自行设置游戏视图约束。
+After initializing `GameWebView`, call `attach(to:)` to add it to the business container. The method owns the outer layout for each mode: full screen fills all four edges, while half screen and large half screen pin to the leading, trailing, and bottom edges. The host does not call `addSubview` or create constraints for the game view.
 
-下面代码应加入接入方已有的业务控制器，不要复制 Demo 页面控制器。
+Add the following code to the integrating app's existing business controller. Do not copy the Demo view controllers.
 
-#### 方式一：直接接入全屏业务页面
+#### Option 1: Full-Screen Business Page
 
-在业务自己的全屏控制器中直接创建 `GameWebView`，全屏模式不传比例：
+Create `GameWebView` directly in the business app's full-screen controller. Do not pass a ratio for full screen:
 
 ```swift
 private var gameWebView: GameWebView?
@@ -92,11 +96,11 @@ private func openFullScreenGame(backendGameURL: URL) {
 }
 ```
 
-宿主收到 `.close` 后，根据自己的导航结构 Pop、Dismiss 或移除游戏视图；核心会在回调前停止游戏。
+After receiving `.close`, the host pops, dismisses, or removes the game view according to its own navigation. The core stops the game before sending the callback.
 
-#### 方式二：直接嵌入业务页面
+#### Option 2: Embed It in an Existing Business Page
 
-直播间或语聊房只复制两个核心文件，并把以下最小接入代码放进已有的直播间或语聊房控制器。业务后端返回 `widthHeightRatio`（宽 ÷ 高）后，宿主把完整 URL、模式和原始比例直接传给 `GameWebView`：
+A live room or voice-chat room copies only the two core files and places this minimal code in its existing controller. After the business backend returns `widthHeightRatio` as width divided by height, the host passes the complete URL, mode, and original ratio directly to `GameWebView`:
 
 ```swift
 private var gameWebView: GameWebView?
@@ -139,48 +143,48 @@ private func removeEmbeddedGame() {
 }
 ```
 
-业务充值成功后调用 `gameWebView?.notifyGameBalanceDidChange()`。宿主主动退出直播间或语聊房时也调用 `removeEmbeddedGame()`；收到 `.close` 时核心已经先执行 `stop()`，再次调用是安全的。
+After a successful business recharge, call `gameWebView?.notifyGameBalanceDidChange()`. Also call `removeEmbeddedGame()` when the host actively exits the live or voice-chat room. If `.close` triggered the removal, the core has already called `stop()`; calling it again is safe.
 
-例如后端返回 `widthHeightRatio=1.0` 时，内部 `WKWebView` 为 `1:1`；返回约 `0.6667` 时，`WKWebView` 高度约为宽度的 `1.5` 倍。半屏和大半屏的外层 `GameWebView` 底部贴屏幕底部，高度为 `WKWebView` 高度加底部安全距离；`WKWebView` 顶部与外层顶部对齐，底部安全区域显示外层黑色背景。
+For example, backend `widthHeightRatio=1.0` produces a `1:1` internal `WKWebView`. A value near `0.6667` makes its height approximately 1.5 times its width. The outer half-screen and large-half-screen `GameWebView` pins to the bottom of the screen and has the `WKWebView` height plus the bottom safe-area inset. The `WKWebView` aligns with the outer view's top, and the safe-area region uses the outer view's black background.
 
-`GameWebView` 是可失败初始化：它会在内部拒绝非 HTTPS、缺少主机名、预先包含 `safeTop` 或 `paddingBottom` 的 URL；半屏和大半屏还会拒绝缺少、小于等于零、无限或非数字的比例，全屏则不接收比例。初始化返回 `nil` 时如何提示或重试由业务宿主决定，核心不写死兜底 URL 或比例。
+`GameWebView` has a failable initializer. It rejects a non-HTTPS URL, a URL without a host, or a URL already containing `safeTop` or `paddingBottom`. Half-screen and large-half-screen modes also reject a missing, non-positive, infinite, or nonnumeric ratio. Full screen rejects a supplied ratio. The business host decides how to report or retry an initialization failure; the core does not hard-code a fallback URL or ratio.
 
-直接嵌入全屏时使用 `.full` 且不传 `widthHeightRatio`，让 `GameWebView` 约束到页面四条边。比例只控制嵌入模式的原生容器高度；`mini` 已包含在后端 URL 中。
+For direct full-screen embedding, use `.full` without `widthHeightRatio`, allowing `GameWebView` to constrain itself to all four page edges. The ratio controls only the native container height in embedded modes; `mini` is already present in the backend URL.
 
-### 统一事件回调
+### Unified Event Callback
 
-`onEvent` 会把所有已注册的 JS 回调传给宿主：
+`onEvent` forwards every registered JavaScript callback to the host:
 
-| H5 消息名称 | `GameEvent` | 含义 |
+| H5 message name | `GameEvent` | Meaning |
 | --- | --- | --- |
-| `recharge` | `.insufficientBalance` | 用户下注时余额不足 |
-| `clickRecharge` | `.recharge` | 用户主动点击充值 |
-| `newTppClose` | `.close` | 用户关闭游戏 |
-| `OpenGameSucc` | `.openGameSuccess` | 游戏加载成功 |
+| `recharge` | `.insufficientBalance` | The player's balance is insufficient when placing a bet |
+| `clickRecharge` | `.recharge` | The player explicitly taps recharge |
+| `newTppClose` | `.close` | The player closes the game |
+| `OpenGameSucc` | `.openGameSuccess` | The game loads successfully |
 
-前面的最小接入示例已经处理全部四类事件。`newTppClose` 到达时，`GameWebView` 会先停止加载并移除 JS handler，再发送 `.close` 事件。宿主只需要决定是移除视图、Pop 页面还是执行自己的场景关闭逻辑。
+The minimal integration example above handles all four event types. When `newTppClose` arrives, `GameWebView` stops loading and removes its JavaScript handlers before sending `.close`. The host only decides whether to remove the view, pop the page, or perform its own scene-specific close behavior.
 
-### 充值处理
+### Recharge Handling
 
-`GameWebView` 只上报 `.insufficientBalance` 和 `.recharge`，核心源码不展示充值 UI。宿主应在这两个事件中打开自己的充值页面。
+`GameWebView` only reports `.insufficientBalance` and `.recharge`; the core source does not present recharge UI. The host opens its own recharge page for both events.
 
-业务 App 充值成功后，通过以下方法通知游戏刷新余额：
+After a successful recharge in the business app, notify the game to refresh the balance:
 
 ```swift
 gameWebView?.notifyGameBalanceDidChange()
 ```
 
-该方法会执行：
+The method evaluates:
 
 ```javascript
 HttpTool.NativeToJs('recharge')
 ```
 
-充值页面、取消行为和失败提示都由宿主决定。核心不包含充值文案，因此接入其他业务工程时不需要复制 Demo 的充值本地化资源。
+The recharge page, cancellation behavior, and failure message belong to the host. The core contains no recharge copy, so another business app does not copy the Demo's localization resources.
 
-### 主动关闭与释放
+### Active Close and Cleanup
 
-如果是宿主主动退出页面，而不是收到 `newTppClose`，请先停止 WebView，再移除它：
+When the host actively exits a page instead of reacting to `newTppClose`, stop the WebView before removing it:
 
 ```swift
 gameWebView?.stop()
@@ -188,54 +192,54 @@ gameWebView?.removeFromSuperview()
 gameWebView = nil
 ```
 
-`stop()` 会停止页面加载并注销全部 JS 消息 handler。全屏页面可在 Pop 前调用；嵌入式页面可在场景退出或重新创建游戏前调用。
+`stop()` stops page loading and unregisters all JavaScript message handlers. A full-screen page can call it before popping; an embedded page can call it when leaving the scene or before creating another game.
 
-### 接入检查清单
+### Integration Checklist
 
-- 核心 Swift 文件已加入业务 App Target。
-- 后端下发的游戏 URL 直接传给 `GameWebView`；初始化失败时已按业务要求提示或重试。
-- 半屏和大半屏将后端 `widthHeightRatio` 直接传给 `GameWebView`，全屏不传比例。
-- 后端为全屏、半屏和大半屏 URL 分别提供正确的 `mini=0/1/2`。
-- 全屏追加 `safeTop=1` 和当前设备的 `paddingBottom`，半屏和大半屏不修改 URL。
-- 四个 `GameEvent` 均已按业务需要处理。
-- 宿主在充值事件中展示自己的充值 UI，并在充值成功后通知游戏。
-- 主动退出场景时调用了 `stop()`。
-- 使用真实 H5 环境验证游戏渲染、关闭和充值回调。
+- Both core Swift files belong to the business App Target.
+- The complete game URL provided by the backend is passed directly to `GameWebView`; the host handles initialization failure according to business requirements.
+- Half screen and large half screen pass the backend's original `widthHeightRatio` directly to `GameWebView`; full screen passes no ratio.
+- The backend supplies the correct `mini=0/1/2` for full, half, and large half screen.
+- Full screen appends `safeTop=1` and the current device `paddingBottom`; half screen and large half screen do not modify the URL.
+- All four `GameEvent` cases are handled according to business requirements.
+- The host presents its own recharge UI and notifies the game after a successful recharge.
+- Active scene exits call `stop()`.
+- A real H5 environment verifies rendering, close callbacks, and recharge callbacks.
 
-## Demo 实现参考
+## Demo Implementation Reference
 
-以下内容只用于让本仓库 Demo 可以直接运行，不属于业务接入代码。接入方不需要复制这些文件，也不应照搬其中的导航和充值策略。
+The following files only make this repository's Demo runnable and are not business integration code. Integrators do not copy them or adopt the Demo's navigation and recharge policy.
 
-| 文件 | Demo 中的作用 |
+| File | Purpose in the Demo |
 | --- | --- |
-| `joyplay-ios/DemoGameConfiguration.swift` | 模拟 JSON、解码后的三条游戏数据、模式文案、图标和背景配置 |
-| `joyplay-ios/DemoRechargePromptPresenter.swift` | 演示充值提示弹窗 |
-| `joyplay-ios/DemoGameLaunchButton.swift` | 共用的圆形游戏启动按钮和呼吸动画 |
-| `joyplay-ios/FullScreenGameViewController.swift` | 全屏游戏的导航 Push 示例 |
-| `joyplay-ios/GameModeSelectionViewController.swift` | 三种普通模式按钮和全屏启动入口示例 |
-| `joyplay-ios/PartialGameViewController.swift` | 半屏与大半屏场景、延迟加载和关闭后重开示例 |
-| `joyplay-ios/Localizable.xcstrings` | Demo 页面中英文文案 |
-| `joyplay-ios/Assets.xcassets` | Demo 按钮颜色和场景背景图 |
+| `joyplay-ios/DemoGameConfiguration.swift` | Mock JSON, the three decoded game records, mode copy, icons, and background configuration |
+| `joyplay-ios/DemoRechargePromptPresenter.swift` | Demonstration recharge prompt |
+| `joyplay-ios/DemoGameLaunchButton.swift` | Shared circular game launch button and breathing animation |
+| `joyplay-ios/FullScreenGameViewController.swift` | Full-screen navigation-push example |
+| `joyplay-ios/GameModeSelectionViewController.swift` | Three standard mode buttons and the full-screen launch entry |
+| `joyplay-ios/PartialGameViewController.swift` | Half-screen and large-half-screen scenes, delayed loading, and reopening after close |
+| `joyplay-ios/Localizable.xcstrings` | English and Simplified Chinese Demo UI copy |
+| `joyplay-ios/Assets.xcassets` | Demo button colors and scene backgrounds |
 
-### Demo 数据流
+### Demo Data Flow
 
-`DemoGameDataSource.mockBackendResponseJSON` 是一份顶层数组形式的模拟响应，不代表正式后端协议。它直接展示三条完整 URL、展示模式和比例，再由 `JSONDecoder` 解码成 `[DemoGameData]`。App 启动后，首页 `GameModeSelectionViewController` 读取解码结果；客户端不通过 AppKey、Token 或模式代码动态拼接 URL。每条数据包含：
+`DemoGameDataSource.mockBackendResponseJSON` is an in-source mock JSON top-level array, not a formal backend protocol. It shows three complete URLs, presentation modes, and ratios, decoded by `JSONDecoder` into `[DemoGameData]`. At launch, `GameModeSelectionViewController` reads the decoded records. The client does not dynamically construct URLs from AppKey, Token, or mode codes. Each record contains:
 
-- 后端完整游戏 URL。
-- 展示模式 `displayMode`。
-- 后端原始 `widthHeightRatio`；全屏为 `nil`，半屏和大半屏为有效的宽 ÷ 高比例。
+- A complete game URL provided by the backend.
+- A `displayMode`.
+- The original backend `widthHeightRatio`; full screen uses `nil`, while half screen and large half screen use valid width-divided-by-height ratios.
 
-模式选择页只按模式取出对应数据并传给后续控制器。全屏、半屏和大半屏页面不再接收 AppKey、Token，也不再自行拼接 URL。业务工程可把后端 JSON 字典解码成等价的强类型数据，再将三个字段直接传给 `GameWebView`。
+The mode-selection page selects the matching record and passes it to the next controller. Full-screen, half-screen, and large-half-screen pages no longer receive AppKey or Token and do not construct URLs. A business app may decode a backend JSON dictionary into equivalent strongly typed data and pass these three fields directly to `GameWebView`.
 
-### Demo 页面行为
+### Demo Page Behavior
 
-- `FullScreenGameViewController` 隐藏导航栏，收到 `.close` 后执行 Pop。
-- `PartialGameViewController` 在当前场景嵌入游戏，收到 `.close` 后只移除游戏视图。
-- 两个页面都使用 `DemoRechargePromptPresenter` 展示演示弹窗；点击“通知游戏”后调用 `notifyGameBalanceDidChange()`。
+- `FullScreenGameViewController` hides the navigation bar and pops after receiving `.close`.
+- `PartialGameViewController` embeds the game in the current scene and removes only the game view after receiving `.close`.
+- Both pages use `DemoRechargePromptPresenter` to present the demonstration prompt. Tapping the notify action calls `notifyGameBalanceDidChange()`.
 
-## 本工程验证命令
+## Verification Commands
 
-配置契约测试：
+Configuration contract tests:
 
 ```sh
 swiftc -module-cache-path /tmp/joyplay-module-cache \
@@ -243,7 +247,7 @@ swiftc -module-cache-path /tmp/joyplay-module-cache \
   -o /tmp/joyplay-tests && /tmp/joyplay-tests
 ```
 
-Demo 展示策略测试：
+Demo presentation policy tests:
 
 ```sh
 swiftc -module-cache-path /tmp/joyplay-demo-module-cache \
@@ -253,7 +257,7 @@ swiftc -module-cache-path /tmp/joyplay-demo-module-cache \
   -o /tmp/joyplay-demo-tests && /tmp/joyplay-demo-tests
 ```
 
-无签名模拟器构建：
+Unsigned simulator build:
 
 ```sh
 xcodebuild -project joyplay-ios.xcodeproj \
