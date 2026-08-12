@@ -53,6 +53,15 @@ for content in requiredContent where !readme.contains(content) {
 }
 
 guard
+    readme.contains("`INTEGRATION_REQUEST.yaml` 是可选"),
+    readme.contains("AI 先自动扫描目标工程"),
+    readme.contains("无法唯一确定"),
+    !readme.contains("先将 `INTEGRATION_REQUEST.yaml` 中所有 `<请填写>` 替换")
+else {
+    fail("README should make automatic discovery the default and only ask about ambiguous business decisions")
+}
+
+guard
     let minimumIntegrationRange = readme.range(of: "## 业务工程最小接入"),
     let demoReferenceRange = readme.range(of: "## Demo 实现参考"),
     minimumIntegrationRange.lowerBound < demoReferenceRange.lowerBound

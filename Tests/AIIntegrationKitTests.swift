@@ -115,6 +115,9 @@ else {
 let agentInstructions = source(at: "AGENTS.md")
 let requiredAgentRules = [
     "INTEGRATION_REQUEST.yaml",
+    "可选",
+    "自动扫描",
+    "无法唯一确定",
     "JoyPlayIntegration",
     "attach(to:)",
     "DemoGameConfiguration.swift",
@@ -166,6 +169,15 @@ let requiredRequestFields = [
 ]
 for field in requiredRequestFields where !requestTemplate.contains(field) {
     fail("INTEGRATION_REQUEST.yaml should contain \(field)")
+}
+
+guard
+    requestTemplate.contains("可选"),
+    requestTemplate.contains("AI 自动扫描"),
+    requestTemplate.contains("null"),
+    !requestTemplate.contains("<请填写>")
+else {
+    fail("INTEGRATION_REQUEST.yaml should be an optional AI-generated override and record without required placeholders")
 }
 
 if requestTemplate.contains("automatically_shows_demo_prompt") {

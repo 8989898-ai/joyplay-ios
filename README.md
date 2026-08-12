@@ -37,11 +37,15 @@ Demo AppKey 和 Token 允许公开，当前 Demo 用一份源码内的模拟 JSO
 本工程同时提供：
 
 - `AGENTS.md`：约束 AI 只复制核心源码、遵守游戏契约并执行构建验证。
-- `INTEGRATION_REQUEST.yaml`：记录目标工程、宿主控制器、后端游戏 URL 来源、关闭方式和充值行为。
+- `INTEGRATION_REQUEST.yaml`：可选的业务覆盖和接入记录，不是接入前必须填写的申请表。
 
-先将 `INTEGRATION_REQUEST.yaml` 中所有 `<请填写>` 替换为业务工程真实信息，再让 AI 执行：
+AI 先自动扫描目标工程，定位工程容器、Scheme、App Target、候选宿主控制器、后端游戏 URL、宽高比和充值入口。能够唯一确定的内容直接使用；只有宿主控制器、关闭行为、充值入口等业务决策无法唯一确定时，才向接入方确认对应问题。
 
-> 阅读 `AGENTS.md`、`README.md` 和 `INTEGRATION_REQUEST.yaml`，将 `joyplay-ios/JoyPlayIntegration/` 接入目标工程。不要复制 Demo 页面控制器、背景资源和导航结构；完成后执行目标 Scheme 的无签名模拟器构建，并单独报告尚未完成的真实 H5 验证。
+`INTEGRATION_REQUEST.yaml` 是可选配置：`null` 表示交给 AI 自动发现，非空值用于覆盖自动发现结果。接入方可以不修改它；AI 扫描或确认后可回填最终选择，作为接入记录。
+
+让 AI 执行：
+
+> 阅读 `AGENTS.md` 和 `README.md`，将 `joyplay-ios/JoyPlayIntegration/` 接入当前 UIKit 工程。请自动定位接入口；读取 `INTEGRATION_REQUEST.yaml` 中已有的非空覆盖，遇到无法唯一确定的业务行为时再询问我。不要复制 Demo 页面控制器、背景资源和导航结构；完成后执行目标 Scheme 的无签名模拟器构建，并单独报告尚未完成的真实 H5 验证。
 
 ### 游戏 URL 参数
 
