@@ -59,6 +59,8 @@ guard
     readme.contains("后端 URL 不能预先包含 `safeTop` 或 `paddingBottom`"),
     readme.contains("全屏 `GameWebView` 首次布局时追加 `safeTop=1`"),
     readme.contains("gameWebView.attach(to: view)"),
+    readme.contains("不要复制 `PartialGameViewController`"),
+    readme.contains("private func removeEmbeddedGame()"),
     !readme.contains("view.addSubview(gameWebView)"),
     !readme.contains("gameWebView.topAnchor.constraint"),
     !readme.contains("gameWebView.bottomAnchor.constraint"),

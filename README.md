@@ -79,6 +79,8 @@ Demo AppKey 和 Token 允许公开，当前 Demo 用一份源码内的模拟 JSO
 
 `GameWebView` 初始化后调用 `attach(to:)` 即可加入业务容器。该方法会根据展示模式完成外层布局：全屏铺满容器四边，半屏和大半屏贴容器左右及底部。接入方不需要调用 `addSubview` 或自行设置游戏视图约束。
 
+下面代码应加入接入方已有的业务控制器。不要复制 `PartialGameViewController`；也不要复制 `FullScreenGameViewController`。它们只是用于演示导航、场景背景、启动按钮和关闭后重开的 Demo 页面。
+
 ### 方式一：直接接入全屏业务页面
 
 在业务自己的全屏控制器中直接创建 `GameWebView`，全屏模式不传比例：
@@ -106,7 +108,7 @@ private func openFullScreenGame(backendGameURL: URL) {
 
 ### 方式二：直接嵌入业务页面
 
-直播间或语聊房只复制两个核心文件。业务后端返回 `widthHeightRatio`（宽 ÷ 高）后，宿主把完整 URL、模式和原始比例直接传给 `GameWebView`：
+直播间或语聊房只复制两个核心文件，并把以下最小接入代码放进已有的直播间或语聊房控制器。业务后端返回 `widthHeightRatio`（宽 ÷ 高）后，宿主把完整 URL、模式和原始比例直接传给 `GameWebView`：
 
 ```swift
 private var gameWebView: GameWebView?
@@ -130,7 +132,26 @@ private func openEmbeddedGame(
     gameWebView.attach(to: view)
     self.gameWebView = gameWebView
 }
+
+private func handleGameEvent(_ event: GameEvent) {
+    switch event {
+    case .insufficientBalance, .recharge:
+        openAppRechargePage()
+    case .close:
+        removeEmbeddedGame()
+    case .openGameSuccess:
+        recordGameOpened()
+    }
+}
+
+private func removeEmbeddedGame() {
+    gameWebView?.stop()
+    gameWebView?.removeFromSuperview()
+    gameWebView = nil
+}
 ```
+
+业务充值成功后调用 `gameWebView?.notifyGameBalanceDidChange()`。宿主主动退出直播间或语聊房时也调用 `removeEmbeddedGame()`；收到 `.close` 时核心已经先执行 `stop()`，再次调用是安全的。
 
 例如后端返回 `widthHeightRatio=1.0` 时，内部 `WKWebView` 为 `1:1`；返回约 `0.6667` 时，`WKWebView` 高度约为宽度的 `1.5` 倍。半屏和大半屏的外层 `GameWebView` 底部贴屏幕底部，高度为 `WKWebView` 高度加底部安全距离；`WKWebView` 顶部与外层顶部对齐，底部安全区域显示外层黑色背景。
 
@@ -149,23 +170,7 @@ private func openEmbeddedGame(
 | `newTppClose` | `.close` | 用户关闭游戏 |
 | `OpenGameSucc` | `.openGameSuccess` | 游戏加载成功 |
 
-宿主可以统一处理：
-
-```swift
-private func handleGameEvent(_ event: GameEvent) {
-    switch event {
-    case .insufficientBalance, .recharge:
-        openAppRechargePage()
-    case .close:
-        gameWebView?.removeFromSuperview()
-        gameWebView = nil
-    case .openGameSuccess:
-        recordGameOpened()
-    }
-}
-```
-
-`newTppClose` 到达时，`GameWebView` 会先停止加载并移除 JS handler，再发送 `.close` 事件。宿主只需要决定是移除视图、Pop 页面还是执行自己的场景关闭逻辑。
+前面的最小接入示例已经处理全部四类事件。`newTppClose` 到达时，`GameWebView` 会先停止加载并移除 JS handler，再发送 `.close` 事件。宿主只需要决定是移除视图、Pop 页面还是执行自己的场景关闭逻辑。
 
 ## 充值处理
 
