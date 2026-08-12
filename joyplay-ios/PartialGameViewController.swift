@@ -1,5 +1,6 @@
 import UIKit
 
+/// Demo-only embedded host that closes by removing just the game view from the current scene.
 final class PartialGameViewController: UIViewController {
     private let gameData: DemoGameData
     private var gameWebView: GameWebView?

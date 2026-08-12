@@ -1,5 +1,6 @@
 import Foundation
 
+/// Demo-only decoded data used to exercise the three supported presentation modes.
 struct DemoGameData: Decodable {
     let gameURL: URL
     let widthHeightRatio: CGFloat?
@@ -35,6 +36,10 @@ struct DemoGameData: Decodable {
 }
 
 enum DemoGameDataSource {
+    /// Demo-only mock records, not a specification of the business backend response shape.
+    ///
+    /// Each URL is already complete. Business integrations should use the URL and ratio
+    /// supplied by their own backend instead of copying these values.
     static let mockBackendResponseJSON = """
     [
       {

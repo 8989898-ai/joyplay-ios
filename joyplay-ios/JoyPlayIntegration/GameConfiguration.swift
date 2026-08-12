@@ -1,9 +1,14 @@
 import Foundation
 
+/// Events forwarded from the fixed JoyPlay H5 message names to the host app.
 enum GameEvent: String, CaseIterable {
+    /// The game could not continue because the player's balance is insufficient.
     case insufficientBalance = "recharge"
+    /// The player explicitly selected the game's recharge entry point.
     case recharge = "clickRecharge"
+    /// The player asked to close the game. The host still owns navigation or removal.
     case close = "newTppClose"
+    /// The H5 game reported that it opened successfully.
     case openGameSuccess = "OpenGameSucc"
 }
 
@@ -12,6 +17,7 @@ enum GameBridgeScript {
 }
 
 struct GameAspectRatio: Equatable {
+    /// The backend-provided width divided by height. Pass the original value unchanged.
     let widthHeightRatio: CGFloat
 
     init?(widthHeightRatio: CGFloat) {
@@ -33,6 +39,10 @@ enum GameDisplayMode: CaseIterable, Equatable {
 }
 
 enum GameURLRuntimeAdapter {
+    /// Validates the complete backend URL before the WebView owns it.
+    ///
+    /// `safeTop` and `paddingBottom` are rejected because full-screen runtime adaptation
+    /// appends them after the view reaches a window.
     static func isValidBackendGameURL(_ gameURL: URL) -> Bool {
         guard gameURL.scheme?.lowercased() == "https",
               gameURL.host?.isEmpty == false,
@@ -48,6 +58,7 @@ enum GameURLRuntimeAdapter {
         ) != true
     }
 
+    /// Appends the device-dependent parameters used only by full-screen games.
     static func appendingFullScreenParameters(
         paddingBottom: CGFloat,
         to gameURL: URL

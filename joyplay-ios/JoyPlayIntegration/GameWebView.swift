@@ -1,6 +1,7 @@
 import UIKit
 import WebKit
 
+/// The single host-facing view for loading, laying out, and observing a JoyPlay game.
 final class GameWebView: UIView {
     private let gameURL: URL
     private let displayMode: GameDisplayMode
@@ -12,6 +13,11 @@ final class GameWebView: UIView {
     private var hasLoadedGame = false
     private var isStopped = false
 
+    /// Creates a game view from a complete backend URL and the backend's original ratio.
+    ///
+    /// Full screen requires no ratio. Embedded modes require a finite, positive
+    /// width-divided-by-height ratio. Initialization also fails for non-HTTPS URLs,
+    /// missing hosts, or URLs that already contain `safeTop` or `paddingBottom`.
     init?(
         gameURL: URL,
         displayMode: GameDisplayMode,
@@ -63,6 +69,9 @@ final class GameWebView: UIView {
         loadGameIfNeeded()
     }
 
+    /// Adds the game view to a host container and installs the mode-specific outer constraints.
+    ///
+    /// The host should not call `addSubview` or create constraints for this view separately.
     func attach(to containerView: UIView) {
         containerView.addSubview(self)
 
@@ -79,6 +88,9 @@ final class GameWebView: UIView {
         NSLayoutConstraint.activate(constraints)
     }
 
+    /// Stops loading and unregisters all H5 message handlers.
+    ///
+    /// Call this before the host actively removes the game. Repeated calls are safe.
     func stop() {
         guard !isStopped else {
             return
@@ -88,6 +100,7 @@ final class GameWebView: UIView {
         webView.stopLoading()
     }
 
+    /// Notifies H5 to refresh the player's balance after a successful host-side recharge.
     func notifyGameBalanceDidChange() {
         webView.evaluateJavaScript(
             GameBridgeScript.balanceRefresh,
@@ -205,6 +218,7 @@ extension GameWebView: WKScriptMessageHandler {
     }
 }
 
+/// Breaks the retain cycle otherwise created by `WKUserContentController` retaining its handler.
 private final class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
     private weak var delegate: WKScriptMessageHandler?
 

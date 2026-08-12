@@ -1,5 +1,6 @@
 import UIKit
 
+/// Presents Demo-only recharge UI; integrating apps provide their own localized recharge flow.
 enum DemoRechargePromptPresenter {
     static func present(
         from viewController: UIViewController,

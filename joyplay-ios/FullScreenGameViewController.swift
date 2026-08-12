@@ -1,5 +1,6 @@
 import UIKit
 
+/// Demo-only full-screen host that closes by popping its navigation page.
 final class FullScreenGameViewController: UIViewController {
     private let gameData: DemoGameData
     private lazy var gameWebView: GameWebView? = GameWebView(
