@@ -19,10 +19,6 @@ else {
 }
 
 let expectedValues: [String: [String: String]] = [
-    "common.back": [
-        "en": "Back",
-        "zh-Hans": "返回"
-    ],
     "game.mode.full": [
         "en": "Full Screen",
         "zh-Hans": "全屏"
@@ -62,26 +58,6 @@ let expectedValues: [String: [String: String]] = [
     "game.title": [
         "en": "Game",
         "zh-Hans": "游戏"
-    ],
-    "home.app_key.placeholder": [
-        "en": "Enter AppKey",
-        "zh-Hans": "请输入 AppKey"
-    ],
-    "home.enter_button": [
-        "en": "Enter",
-        "zh-Hans": "进入"
-    ],
-    "home.section.integration_info": [
-        "en": "Integration Information",
-        "zh-Hans": "接入信息"
-    ],
-    "home.title": [
-        "en": "H5 Game Integration Demo",
-        "zh-Hans": "H5 游戏接入 Demo"
-    ],
-    "home.token.placeholder": [
-        "en": "Enter Game Token",
-        "zh-Hans": "请输入游戏 Token"
     ]
 ]
 
